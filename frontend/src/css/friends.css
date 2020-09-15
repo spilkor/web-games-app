@@ -1,0 +1,169 @@
+
+
+.friends-logo{
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    background: lightgray;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .3s;
+    width: 50px;
+    height: 40px;
+}
+
+.friends-logo:hover{
+    transform: scale(1.1);
+}
+
+.add-friend-logo{
+    position: absolute;
+    bottom: 30px;
+    right: 90px;
+    background: lightgray;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .3s;
+    width: 40px;
+    height: 40px;
+}
+
+.add-friend-logo:hover{
+    transform: scale(1.1);
+}
+
+.remove-friend-logo {
+    position: absolute;
+    bottom: 30px;
+    right: 140px;
+    background: lightgray;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .3s;
+    width: 40px;
+    height: 40px;
+}
+
+.remove-friend-logo.active path{
+    fill: rgb(222, 118, 118);
+}
+
+
+
+.remove-friend-logo:hover{
+    transform: scale(1.1);
+}
+
+.friends .modal{
+    /*background: none!important;*/
+}
+
+.friend-list{
+    position: absolute;
+    bottom: 90px;
+    right: 30px;
+    background: lightgray;
+    border-radius: 10px 0 0 10px;
+    padding: 5px;
+    width: 250px;
+    max-height: 525px;
+    overflow: scroll;
+    overflow-x: hidden;
+
+    scrollbar-color: black transparent;
+    overflow-y: auto;
+
+    border: 2px solid white;
+}
+
+.friend-card{
+    border: 1px solid black;
+    padding: 10px;
+    margin: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 20px;
+    transition: all .2s ease;
+}
+
+.friend-card:hover{
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.friend-state{
+    min-width: 20px;
+    height: 20px;
+    margin-left: 4px;
+    border-radius: 50%;
+}
+
+.friend-state.online{
+    background: rgb(100, 200, 100)
+}
+
+.friend-state.offline{
+    background: gray;
+}
+
+.friend-name{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.add-new-friend-wrapper{
+    position: fixed;
+    margin: auto;
+    top: 50%;
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.add-new-friend{
+    background: gray;
+    display: flex;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.add-new-friend.filled{
+    background: lightgrey;
+}
+
+.add-new-friend .plus-sign{
+    transition: all .3s ease;
+    margin-left: 5px;
+}
+
+.add-new-friend.filled:hover .plus-sign{
+    transform: scale(1.1);
+}
+
+.add-new-friend{
+    box-shadow: 5px 5px 5px 5px rgba(0,0,0 , .3);
+}
+
+.add-new-friend-wrapper .error{
+    background: rgb(222, 118, 118);
+    width: 80%;
+    margin: auto;
+    text-align: center;
+    border-radius: 0 0 5px 5px;
+    padding: 5px;
+    transition: all .3s;
+}
+
+.add-new-friend-wrapper .error:hover{
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+.add-new-friend{
+    border: 1px solid black;
+    position: relative;
+    z-index: 2;
+}

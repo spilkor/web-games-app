@@ -1,0 +1,408 @@
+/*.App {*/
+/*text-align: center;*/
+/*}*/
+
+/*.App-logo {*/
+/*height: 40vmin;*/
+/*}*/
+
+/*.App-header {*/
+/*background-color: #282c34;*/
+/*min-height: 100vh;*/
+/*display: flex;*/
+/*flex-direction: column;*/
+/*align-items: center;*/
+/*justify-content: center;*/
+/*font-size: calc(10px + 2vmin);*/
+/*color: white;*/
+/*}*/
+
+/*.App-link {*/
+/*color: #09d3ac;*/
+/*}*/
+
+.app{
+
+    height: 100vh;
+}
+
+.user-list{
+    background: red;
+    width: 500px;
+    margin: 20px;
+}
+
+.user-list{
+    padding-bottom: 0.5px;
+}
+
+.user{
+    margin: 2px;
+    background: black;
+}
+
+.user:hover{
+    cursor: pointer;
+    background: lightpink;
+}
+
+.user-list div:first-child{
+    font-weight: bold;
+    color: white;
+    background: red;
+}
+
+/*LOGIN*/
+.login-wrapper{
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login{
+    border-radius: 10px;
+    color: white;
+    background: gray;
+    padding: 10px;
+    display: grid;
+    border: 1px solid black;
+    box-shadow: 5px 5px 5px 5px rgba(0,0,0 , .3);
+}
+
+.login-z{
+    position: relative;
+}
+
+.login.active{
+    background: lightgray;
+    cursor: pointer;
+    color: black;
+}
+
+input{
+    margin: 5px auto;
+    font-size: 30px;
+    border-radius: 6px;
+}
+
+.login div{
+    text-align: center;
+    margin: auto;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+.login-z .error{
+    background: rgb(222, 118, 118);
+    width: 80%;
+    margin: auto;
+    text-align: center;
+    border-radius: 0 0 5px 5px;
+    padding: 5px;
+    transition: all .3s;
+}
+
+.login-z .error:hover{
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+/*LOGIN*/
+
+
+
+
+
+.game-button:hover{
+    cursor: pointer;
+}
+
+
+/*!*CHAT*!*/
+.chat{
+    height: 100%;
+    width: 1000px;
+    margin: auto;
+    border: 1px solid white;
+    box-shadow: inset 0 0 10px rgb(255, 255, 255);
+}
+
+.chat .messages{
+    /*     display: revert; */
+    height: 40vh;
+    height: calc(100% - 160px);
+    overflow-y: auto;
+    /*! margin: -20px; */
+    /*! margin: 0; */
+
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*justify-content: flex-end;*/
+    padding: 20px;
+    scrollbar-color: white transparent;
+
+}
+
+.chat .message-box{
+    color: white;
+}
+
+.message-box.mine{
+    margin-right: 0;
+    margin-left: auto;
+    text-align: right;
+    border-radius: 10px 0 10px 10px;
+}
+
+.message-box{
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 500px;
+    border-radius: 0 10px 10px 10px;
+
+}
+
+.chat .message-user{
+    font-weight: bold;
+}
+
+.chat input{
+    margin-top: 20px;
+    display: block;
+    font-size: 2rem;
+}
+
+
+/*!*CHAT*!*/
+
+/*MENU*/
+.menu-container{
+    display: flex
+}
+
+.menu-element{
+    margin: 10px;
+    padding: 10px;
+    background: gray;
+    color: black;
+}
+
+.menu-element.active{
+    background: white;
+}
+/*MENU*/
+
+/*GROUP*/
+.group{
+    border: 2px solid yellow;
+}
+/*GROUP*/
+
+.users{
+    border: 2px solid green;
+}
+
+.invites{
+    border: 2px solid white;
+}
+
+.game-component{
+    border: 2px solid coral;
+}
+
+
+.amoba div{
+    display: flex;
+}
+
+.amoba .square{
+    border: 3px solid cyan;
+    height: 100px;
+    width: 100px;
+}
+
+.amoba .square{
+    padding: 10px;
+}
+
+
+.square.empty:hover{
+
+}
+
+.square.empty:hover{
+    background: rgba(255,255,255, 0.5);
+    cursor: pointer;
+}
+
+.amoba .row{
+    display: flex;
+    z-index: 100;
+}
+
+
+.game-settings{
+    border: 2px solid red;
+}
+
+
+.amoba_x{
+    fill: yellow;
+}
+
+.amoba_o{
+    fill: none;
+    stroke: yellow;
+}
+
+.amoba-header{
+    position: absolute;
+
+    top: 10px;
+    left: 10px;
+
+    display: grid!important;
+    width: unset!important;
+
+    border: none!important;
+    width: 200px;
+    z-index: 10;
+}
+
+.amoba-header .amoba-header-row{
+    white-space: nowrap;
+    font-size: 30px;
+    height: 40px;
+}
+
+.amoba-header svg{
+    margin-left: 10px;
+    margin-top: 8px;
+}
+
+.amoba-board{
+
+    display: grid!important;
+}
+
+.amoba{
+    stroke: yellow;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.amoba_o{
+    fill: none;
+    stroke: yellow;
+}
+
+
+.sign{
+    position: absolute;
+    right: 40px;
+    top: -40px;
+    background: lightgray;
+    border-radius: 4px 4px 0 0;
+    z-index: 1;
+    transition: .3s ease;
+    height: 80px;
+}
+
+.sign:hover{
+    cursor: pointer;
+    transform: scale(1.2);
+    top: -43px;
+}
+
+.login{
+    position: relative;
+    z-index: 2;
+}
+
+
+
+.input-with-default-value input:not(:valid):not(:focus) + div:after{
+    position: absolute;
+    top: 15px;
+    left: 8px;
+    color: gray;
+    font-size: 30px;
+    opacity: .5;
+    font-weight: normal;
+    pointer-events: none;
+}
+
+.input-with-default-value{
+    position: relative;
+}
+
+
+.user-name input:not(:valid):not(:focus) + div:after{
+    content: "UserName";
+}
+
+.user-name-new input:not(:valid):not(:focus) + div:after{
+    content: "UserName (3+)";
+}
+
+.password input:not(:valid):not(:focus) + div:after{
+    content: "Password";
+}
+
+.password-new input:not(:valid):not(:focus) + div:after{
+    content: "Password (3+)";
+}
+
+.password-again input:not(:valid):not(:focus) + div:after{
+    content: "Password again";
+}
+
+.hello-button{
+    background: red;
+    padding: 10px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.modal{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+.modal-background{
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 99;
+    background: rgba(0,0,0, .3);
+}
+
+.modal-content{
+    top: 0;
+    left: 0;
+    position: relative;
+    z-index: 100;
+}
+
+.modal-background .modal-background{
+    z-index: 101;
+}
+
+.modal-content .modal-content{
+    z-index: 102;
+}
+
+.content{
+    height: calc(100% - 120px);
+    width: calc(100% - 20px);
+    /*position: relative;*/
+    padding: 10px;
+}
