@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spilkor.webgamesapp.model.User;
 import com.spilkor.webgamesapp.util.dto.ChatMessageDTO;
-import com.spilkor.webgamesapp.util.enums.MessageType;
+import com.spilkor.webgamesapp.util.dto.WebSocketMessage;
+import com.spilkor.webgamesapp.util.enums.WebSocketMessageType;
 import com.spilkor.webgamesapp.util.dto.UserDTO;
 import com.spilkor.webgamesapp.util.dto.UserTokenDTO;
 import com.spilkor.webgamesapp.util.ConnectionHandler;
-import com.spilkor.webgamesapp.util.dto.WSMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -43,11 +43,11 @@ public class WebGamesApi {
 
         ConnectionHandler.addUserToken(userToken);
 
-        WSMessage wsMessage = new WSMessage();
-        wsMessage.setMessageType(MessageType.USER_TOKEN);
+        WebSocketMessage webSocketMessage = new WebSocketMessage();
+        webSocketMessage.setMessageType(WebSocketMessageType.USER_TOKEN);
         try {
-            wsMessage.setData(mapper.writeValueAsString(userToken.getToken()));
-            return mapper.writeValueAsString(wsMessage);
+            webSocketMessage.setData(mapper.writeValueAsString(userToken.getToken()));
+            return mapper.writeValueAsString(webSocketMessage);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -62,7 +62,7 @@ public class WebGamesApi {
         HttpSession session = request.getSession(true);
 
         if (oldUser!=null){
-            ConnectionHandler.removeAndCloseWebSockets(oldUser.getId());
+            ConnectionHandler.removeAndCloseConnections(oldUser.getId());
         }
 
         if (userNameAndPassword.getUserName()==null || userNameAndPassword.getPassword()==null){
@@ -88,7 +88,7 @@ public class WebGamesApi {
         HttpSession session = request.getSession(true);
 
         if (oldUser!=null){
-            ConnectionHandler.removeAndCloseWebSockets(oldUser.getId());
+            ConnectionHandler.removeAndCloseConnections(oldUser.getId());
         }
 
         if (userNameAndPassword.getUserName()==null || userNameAndPassword.getPassword()==null){
@@ -103,7 +103,9 @@ public class WebGamesApi {
             return;
         }
 
-        if (userNameAndPassword.getUserName().length()<3 || userNameAndPassword.getPassword().length()<3){
+        if (userNameAndPassword.getUserName().length() < 3 || userNameAndPassword.getPassword().length() < 3
+            || userNameAndPassword.getUserName().length() > 9 || userNameAndPassword.getPassword().length() > 9
+        ){
             response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
             return;
         }
@@ -196,17 +198,17 @@ public class WebGamesApi {
             chatMessageDTO.setMessage(text);
             chatMessageDTO.setUser(user);
 
-            WSMessage wsMessage = new WSMessage();
+            WebSocketMessage webSocketMessage = new WebSocketMessage();
             String data = null;
             try {
                 data = mapper.writeValueAsString(chatMessageDTO);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            wsMessage.setData(data);
-            wsMessage.setMessageType(MessageType.CHAT_MESSAGE);
+            webSocketMessage.setData(data);
+            webSocketMessage.setMessageType(WebSocketMessageType.CHAT_MESSAGE);
 
-            WebGamesWebSocketServer.broadcastMessage(wsMessage);
+            WebSocketMessageSender.broadcastMessage(webSocketMessage);
         }
     }
 
@@ -218,7 +220,7 @@ public class WebGamesApi {
         request.getSession(true);
 
         if (user!=null && user.getId()!=null){
-            ConnectionHandler.removeAndCloseWebSockets(user.getId());
+            ConnectionHandler.removeAndCloseConnections(user.getId());
         }
     }
 

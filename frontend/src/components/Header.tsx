@@ -1,5 +1,5 @@
 import React, {useContext, useEffect} from 'react';
-import {api} from "../util/API";
+import API from "../util/API";
 
 import {AppContext, ContentMode} from "../App";
 import '../css/header.css';
@@ -68,7 +68,7 @@ export function Header () {
         );
 
         async function logout() {
-            await api.logout();
+            await API.logout();
             reconnect!();
         }
 

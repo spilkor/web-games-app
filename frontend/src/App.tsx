@@ -5,17 +5,16 @@ import './css/app.css';
 import {ChatMessage, User, WSMessage} from "./util/types";
 import {Login} from "./components/Login";
 import {MessageType} from "./util/enums";
-import {api} from "./util/API";
+import API from "./util/API";
 
 import {Header} from "./components/Header";
 import {Chat} from "./components/Chat";
 import {Friends} from "./components/Friends";
 import {Home} from "./components/Home";
+import {IP, log, PORT} from "./index";
+
 
 export const AppContext = React.createContext<Partial<ContextProps>>({});
-
-export const LOG_ON = true;
-
 
 export type ContextProps = {
     user: User | null,
@@ -33,41 +32,28 @@ export function App () {
     const [user, setUser] = useState<User | null | undefined>(undefined);
     const [friends, setFriends] = useState<User[]>([]);
     const [webSocket, setWebsocket] = useState<WebSocket | null>(null);
-
     const [contentMode, setContentMode] = useState<ContentMode>(ContentMode.HOME);
-
     const [chatMessages, _setChatMessages] = useState<ChatMessage[]>([]);
     const chatMessagesRef = React.useRef(chatMessages);
     const setChatMessages = (chatMessages: ChatMessage[]) => {
         chatMessagesRef.current = chatMessages;
         _setChatMessages(chatMessages);
     };
-
     const [isOpen, setIsOpen] = useState<boolean>(true);
 
     useEffect(() => {
-        LOG_ON && console.log("HERE WE GO!");
-    }, []);
+        if (user === null){
+            return;
+        }
 
-    useEffect(() => {
-        LOG_ON && console.log("useEffect START");
         if(user === undefined){
             setInitialState();
             fetchUser();
-        } else {
-            createNewWebSocket(user);
-        }
-        LOG_ON && console.log("useEffect END");
-    }, [user]);
-
-
-    const disableInModal = (f: () => any) => () => {
-        if (isOpen){
             return;
-        } else {
-            f();
         }
-    };
+
+        reConnect();
+    }, [user]);
 
     if(user === undefined){
         return null;
@@ -77,14 +63,12 @@ export function App () {
         <AppContext.Provider
             value={{
                 user,
-                reconnect,
                 chatMessages,
+                reconnect: ()=>{setUser(undefined)},
                 friends,
                 setContentMode
             }}>
-
             <div className="app">
-
                 <Switch>
 
                     { !user &&
@@ -94,24 +78,20 @@ export function App () {
                     }
 
                     <Route exact={true} path={"/"} >
-
                         <Header />
                         <Friends/>
-
                         <div className={"content"}>
                             <Content />
                         </div>
-
                     </Route>
 
                     <Redirect to="" />
-
                 </Switch>
             </div>
         </AppContext.Provider>
     );
 
-    function Content () {
+    function Content() {
         switch (contentMode) {
             case ContentMode.HOME:
                 return(<Home/>);
@@ -123,18 +103,13 @@ export function App () {
     }
 
     async function fetchUser(){
-        LOG_ON && console.log("fetchUser START");
-        let user = await api.getUser();
+        let user = await API.getUser() as User;
+        log("fetchUser: " + (user && user.name));
         setUser(user);
-        LOG_ON && console.log("fetchUser END");
-    }
-
-    function reconnect() {
-        setUser(undefined);
     }
 
     function sendMessage(data: any, messageType: MessageType){
-        LOG_ON && console.log("sendMessage: ",messageType, data);
+        log("sendMessage: " + messageType + data);
         let messageDto = JSON.stringify({
             data: JSON.stringify(data),
             messageType: messageType
@@ -143,7 +118,7 @@ export function App () {
     }
 
     function setInitialState() {
-        LOG_ON && console.log("setInitialState START");
+        log("setInitialState");
 
         setUser(undefined);
         webSocket && webSocket.close();
@@ -151,80 +126,69 @@ export function App () {
 
         setChatMessages([]);
         setFriends([]);
-
-        LOG_ON && console.log("setInitialState END");
     }
 
-    async function createNewWebSocket(user: User | null){
-        LOG_ON && console.log("createNewWebSocket START");
+    async function reConnect(){
+        log("reConnect");
 
         webSocket && webSocket.close();
 
         if(!user){
             setWebsocket(null);
-            LOG_ON && console.log("createNewWebSocket END");
             return;
-        } else {
-            let token = await api.getUserToken();
-            let webSocket = new WebSocket("ws://localhost:9000") as WebSocket;
-
-            {
-                //////////////////////////////
-                webSocket.onmessage = (json) => {
-                    let message = JSON.parse(json.data) as WSMessage;
-                    LOG_ON && console.log("onmessage: ", message);
-                    switch (message.messageType) {
-                        case MessageType.CHAT_MESSAGE.valueOf():
-                            setChatMessages(chatMessagesRef.current.concat(JSON.parse(message.data) as ChatMessage));
-                            break;
-                        case MessageType.FRIEND_LIST.valueOf():
-                            setFriends(JSON.parse(message.data) as User[]);
-                            break;
-                    }
-                };
-
-                //////////////////////////////
-
-                webSocket.onerror = (response) => {
-                    LOG_ON && console.log("onError START");
-                    setUser(undefined);
-                    LOG_ON && console.log("onError END");
-                };
-
-                //////////////////////////////
-
-                webSocket.onclose = (response) => {
-                    LOG_ON && console.log("onclose START");
-                    setUser(undefined);
-                    LOG_ON && console.log("onclose END");
-                };
-
-                //////////////////////////////
-
-                webSocket.onopen = async (response) => {
-                    LOG_ON && console.log("onOpen START");
-
-                    let messageDto = JSON.stringify({
-                        data: JSON.stringify({
-                            userId: user.id,
-                            token
-                        }),
-                        messageType: MessageType.USER_TOKEN
-                    } as WSMessage);
-                    webSocket.send(messageDto);
-                    LOG_ON && console.log("onOpen END");
-                };
-
-                //////////////////////////////
-            }
-
-            setWebsocket(webSocket);
         }
 
-        LOG_ON && console.log("createNewWebSocket END");
+        let token = await API.getUserToken();
+
+        let newWebSocket = new WebSocket('ws://' + IP + PORT + '/websocket') as WebSocket;
+
+        newWebSocket.onmessage = (json) => {
+            try{
+                let message = JSON.parse(json.data) as WSMessage;
+                log("onMessage: " + message.messageType + message.data);
+
+                switch (message.messageType) {
+                    case MessageType.CHAT_MESSAGE.valueOf():
+                        setChatMessages(chatMessagesRef.current.concat(JSON.parse(message.data) as ChatMessage));
+                        break;
+                    case MessageType.FRIEND_LIST.valueOf():
+                        setFriends(JSON.parse(message.data) as User[]);
+                        break;
+                }
+            } catch (e) {
+                log("ERROR in onMessage");
+            }
+
+        };
+
+        newWebSocket.onerror = (response) => {
+            log("onError");
+            setUser(undefined);
+        };
+
+        newWebSocket.onclose = (response) => {
+            log("onClose");
+            setUser(undefined);
+        };
+
+        newWebSocket.onopen = async (response) => {
+            log("onOpen");
+            newWebSocket.send(
+                JSON.stringify({
+                    data: JSON.stringify({
+                        userId: user.id,
+                        token
+                }),
+                messageType: MessageType.USER_TOKEN
+            } as WSMessage));
+        };
+
+        setWebsocket(newWebSocket);
     }
 
 
 }
+
+
 
 export default App;

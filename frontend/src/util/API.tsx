@@ -1,42 +1,45 @@
-import { User } from "./types";
-import {LOG_ON} from "../App";
+import {User} from "./types";
+import {log} from "../index";
 
 function returnResponse (response: any){
     return response;
 }
 
-class API{
+async function translateJSON (response: any){
+    return response.json();
+}
 
-    public async getUserToken(): Promise<string>{
-        LOG_ON && console.log("getUserToken");
+export default class API {
+
+    public static async getUserToken(): Promise<string>{
+        log("getUserToken");
         let message = await fetch("/userToken", {
             method: 'GET',
             credentials: 'include'
-        })
-            .then( res => res.json())
-            .then( res => { return res });
-        let token = JSON.parse(message.data) as string;
-        return token;
+        }).then(translateJSON)
+            .then(returnResponse);
+        return JSON.parse(message.data) as string;
     }
 
-    public async getUser(): Promise<User>{
+    public static async getUser(): Promise<User>{
         let res = await fetch('/user', {
             method: 'GET',
             credentials: 'include'
-        }).then( res => res.json()).then( res =>{return res}).catch((error=>{return null}));
-        LOG_ON && console.log("api.getUser" + res);
+        }).then( translateJSON)
+            .then(returnResponse)
+            .catch((error=>{return null}));
         return res as User;
     }
 
-    public async logout() {
-        let res = await fetch('/logout', {
+    public static async logout() {
+        await fetch('/logout', {
             method: 'GET',
             credentials: 'include'
         });
     }
 
-    public async login(userName: string, password: string): Promise<Error | undefined>{
-        const res = await fetch('/login', {
+    public static async login(userName: string, password: string): Promise<Error | undefined>{
+        return await fetch('/login', {
             mode: 'cors',
             credentials: 'include',
             method: 'POST',
@@ -49,22 +52,20 @@ class API{
                     password: password
                 }
             )
-        }).then((response)=> {
-            if(response.ok){
+        }).then((response) => {
+            if (response.ok) {
                 return;
             } else {
-                if(response.status == 404){
+                if (response.status == 404) {
                     return Error("Invalid UserName / Password");
                 } else {
                     return Error("Unknown Error");
                 }
             }
         }).then(returnResponse);
-
-        return res;
     }
 
-    public async removeFriend(id: string) {
+    public static async removeFriend(id: string) {
         await fetch('/remove-friend', {
             mode: 'cors',
             credentials: 'include',
@@ -77,9 +78,8 @@ class API{
         });
     }
 
-    public async requestFriend(userName: string) :Promise<Error | undefined> {
-
-        const res = await fetch('/friend-request', {
+    public static async requestFriend(userName: string): Promise<Error | undefined> {
+        return await fetch('/friend-request', {
             mode: 'cors',
             credentials: 'include',
             method: 'POST',
@@ -88,30 +88,27 @@ class API{
                 'Accept': 'application/json'
             },
             body: userName
-        }).then(function(response) {
-            if(response.ok){
+        }).then(function (response) {
+            if (response.ok) {
                 return;
             } else {
-                if(response.status == 409){
+                if (response.status == 409) {
                     return Error("You cannot add yourself as friend");
-                } else if(response.status == 404){
+                } else if (response.status == 404) {
                     return Error("There is no user with this name");
-                } else if(response.status == 302){
+                } else if (response.status == 302) {
                     return Error("You are already friends");
-                } else if(response.status == 403){
+                } else if (response.status == 403) {
                     return Error("You already sent a request to this user");
                 } else {
                     return Error("Unknown Error");
                 }
             }
         }).then(returnResponse);
-
-        return res;
     }
 
-    public async createNewAccount(userName: string, password: string) :Promise<Error | undefined> {
-
-        const res = await fetch('/create-account', {
+    public static async createNewAccount(userName: string, password: string) :Promise<Error | undefined> {
+        return await fetch('/create-account', {
             mode: 'cors',
             credentials: 'include',
             method: 'POST',
@@ -124,28 +121,25 @@ class API{
                     password: password
                 }
             )
-        }).then(function(response) {
-            if(response.ok){
+        }).then(function (response) {
+            if (response.ok) {
                 return;
             } else {
-                if(response.status == 409){
+                if (response.status == 409) {
                     return Error("UserName already taken");
-                } else if(response.status == 406){
-                    return Error("UserName and Password must be at least 3 letters");
+                } else if (response.status == 406) {
+                    return Error("UserName and Password must be between 3 and 10 letters");
                 } else {
                     return Error("Unknown Error");
                 }
             }
         }).then(returnResponse);
-
-        return res;
     }
 
 
-    public async sendChatMessage(text: string) {
-        console.log("api.sendChatMessage:",text);
-
-        const res = await fetch('/chat-message', {
+    public static async sendChatMessage(text: string) {
+        log("api.sendChatMessage: " + text);
+        return await fetch('/chat-message', {
             mode: 'cors',
             credentials: 'include',
             method: 'POST',
@@ -154,14 +148,13 @@ class API{
                 'Accept': 'application/json'
             },
             body: text
-        }).then( res =>{return res.ok });
-
-        return res;
+        }).then(res => {
+            return res.ok
+        });
     }
 
 }
 
-export const api = new API();
 
 
 

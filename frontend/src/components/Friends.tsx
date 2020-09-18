@@ -7,7 +7,7 @@ import {ReactComponent as MinusLogo40} from '../svg/minus40.svg';
 import {ReactComponent as PlusLogo70} from '../svg/plus70.svg';
 import {User, UserState} from "../util/types";
 import {AppContext} from "../App";
-import {api} from "../util/API";
+import API from "../util/API";
 
 export function Friends () {
 
@@ -63,7 +63,7 @@ export function Friends () {
     }
 
     async function removeFriend(friend: User) {
-        await api.removeFriend(friend.id);
+        await API.removeFriend(friend.id);
     }
 
     function FriendCard({friend}: FriendCardProps) {
@@ -93,7 +93,7 @@ export function Friends () {
         };
 
         async function addNewFriend(userName: string) {
-            let error = await api.requestFriend(userName);
+            let error = await API.requestFriend(userName);
             if(!error){
                 setUserName("");
                 setAddNewFriendOpen(false);

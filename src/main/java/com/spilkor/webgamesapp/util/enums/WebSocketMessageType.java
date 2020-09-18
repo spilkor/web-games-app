@@ -1,6 +1,6 @@
 package com.spilkor.webgamesapp.util.enums;
 
-public enum MessageType {
+public enum WebSocketMessageType {
     STATE,
     USER_TOKEN,
     CHAT_MESSAGE,

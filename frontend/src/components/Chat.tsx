@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {AppContext} from "../App";
 import {Key} from "ts-keycode-enum";
-import {api} from "../util/API";
+import API from "../util/API";
 
 
 export function Chat () {
@@ -18,7 +18,7 @@ export function Chat () {
     const listener = (event: KeyboardEvent) => {
         console.log("text:", textRef.current);
         if (event.keyCode === Key.Enter && textRef.current != "") {
-            api.sendChatMessage(textRef.current);
+            API.sendChatMessage(textRef.current);
             setText("");
         }
     };
@@ -36,7 +36,7 @@ export function Chat () {
     const scrollToBottom = () => {
         // @ts-ignore
         messagesEndRef.current.scrollIntoView()
-    }
+    };
 
     useEffect(scrollToBottom, [chatMessages]);
 
@@ -59,8 +59,6 @@ export function Chat () {
             <div className={"user-input"}>
                 <input value={text} onChange={(event) => setText(event.target.value)}/>
             </div>
-        }
-
         </div>
     );
 

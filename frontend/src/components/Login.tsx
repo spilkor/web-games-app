@@ -1,10 +1,10 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {api} from "../util/API";
 import {Key} from 'ts-keycode-enum';
 
 import {AppContext} from "../App";
 import {ReactComponent as PlusSign} from '../svg/plus.svg';
 import {ReactComponent as BackSign} from '../svg/back.svg';
+import API from "../util/API";
 
 enum Mode {
     LOGIN, REGISTRATION
@@ -105,14 +105,12 @@ export function Login () {
                     }
                 </div>
 
-                {isFilled() ||
                 <div className={"sign"} onClick={()=> changeMode()}>
                     {mode === Mode.LOGIN ?
                         <PlusSign/> :
                         <BackSign/>
                     }
                 </div>
-                }
 
                 {error &&
                 <div className={"error"} onClick={()=> setError("")}>
@@ -140,15 +138,15 @@ export function Login () {
 
     async function submit() {
         if (modeRef.current === Mode.LOGIN){
-            let error = await api.login(userNameRef.current, passwordRef.current);
-            if(!error){
-                reconnect!();
-            } else {
+            let error = await API.login(userNameRef.current, passwordRef.current);
+            if(error){
                 setError(error.message);
+            } else {
+                reconnect!();
             }
         } else {
             if (passwordNewRef.current === passwordAgainRef.current){
-                const error = await api.createNewAccount!(userNameNewRef.current, passwordNewRef.current);
+                const error = await API.createNewAccount!(userNameNewRef.current, passwordNewRef.current);
                 if(error){
                     setError(error.message);
                 } else {

@@ -6,13 +6,12 @@ import com.spilkor.webgamesapp.util.enums.UserState;
 import java.util.Objects;
 
 public class UserDTO {
+
     Long id;
     String name;
     UserState userState;
 
-
     public UserDTO() {
-
     }
 
     public UserDTO(User user) {
