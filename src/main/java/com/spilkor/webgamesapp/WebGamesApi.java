@@ -12,10 +12,7 @@ import com.spilkor.webgamesapp.util.ConnectionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@RequestMapping(value = "/api")
 public class WebGamesApi {
 
     @Autowired
@@ -35,7 +33,7 @@ public class WebGamesApi {
 
     @GetMapping("/userToken")
     public String getUserToken(HttpServletRequest request) {
-        UserDTO user = getUserDTOFromRequest( request);
+        UserDTO user = getUserDTOFromRequest(request);
 
         UserTokenDTO userToken = new UserTokenDTO();
         userToken.setToken(UUID.randomUUID().toString());
@@ -219,9 +217,7 @@ public class WebGamesApi {
         request.getSession().invalidate();
         request.getSession(true);
 
-        if (user!=null && user.getId()!=null){
-            ConnectionHandler.removeAndCloseConnections(user.getId());
-        }
+        ConnectionHandler.removeAndCloseConnections(user.getId());
     }
 
     @GetMapping("/user")

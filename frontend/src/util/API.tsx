@@ -13,7 +13,7 @@ export default class API {
 
     public static async getUserToken(): Promise<string>{
         log("getUserToken");
-        let message = await fetch("/userToken", {
+        let message = await fetch("/api/userToken", {
             method: 'GET',
             credentials: 'include'
         }).then(translateJSON)
@@ -22,24 +22,24 @@ export default class API {
     }
 
     public static async getUser(): Promise<User>{
-        let res = await fetch('/user', {
+        let res = await fetch('/api/user', {
             method: 'GET',
             credentials: 'include'
-        }).then( translateJSON)
+        }).then(translateJSON)
             .then(returnResponse)
             .catch((error=>{return null}));
         return res as User;
     }
 
     public static async logout() {
-        await fetch('/logout', {
+        await fetch('/api/logout', {
             method: 'GET',
             credentials: 'include'
         });
     }
 
     public static async login(userName: string, password: string): Promise<Error | undefined>{
-        return await fetch('/login', {
+        return await fetch('/api/login', {
             mode: 'cors',
             credentials: 'include',
             method: 'POST',
@@ -66,7 +66,7 @@ export default class API {
     }
 
     public static async removeFriend(id: string) {
-        await fetch('/remove-friend', {
+        await fetch('/api/remove-friend', {
             mode: 'cors',
             credentials: 'include',
             method: 'POST',
@@ -79,7 +79,7 @@ export default class API {
     }
 
     public static async requestFriend(userName: string): Promise<Error | undefined> {
-        return await fetch('/friend-request', {
+        return await fetch('/api/friend-request', {
             mode: 'cors',
             credentials: 'include',
             method: 'POST',
@@ -108,7 +108,7 @@ export default class API {
     }
 
     public static async createNewAccount(userName: string, password: string) :Promise<Error | undefined> {
-        return await fetch('/create-account', {
+        return await fetch('/api/create-account', {
             mode: 'cors',
             credentials: 'include',
             method: 'POST',
@@ -139,7 +139,7 @@ export default class API {
 
     public static async sendChatMessage(text: string) {
         log("api.sendChatMessage: " + text);
-        return await fetch('/chat-message', {
+        return await fetch('/api/chat-message', {
             mode: 'cors',
             credentials: 'include',
             method: 'POST',
