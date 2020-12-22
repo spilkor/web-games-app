@@ -32,13 +32,20 @@ export type Invite = {
 
 export function InvitesLogo(){
 
-    const { invitesOpen, setInvitesOpen, invites} = useContext(AppContext);
+    const { user, invitesOpen, setInvitesOpen, invites} = useContext(AppContext);
 
-    return(
-        <div className={"invites-logo " + (invites && invites.length===0 ? "" : " yellow")} onClick={()=> {invites && invites.length!==0 && setInvitesOpen!(!invitesOpen)}}>
-            <Logo/>
-        </div>
-    );
+    const hasInvite = invites && invites.filter(i=>i.owner.id !== user!.id).length != 0;
+
+    if (hasInvite || invitesOpen){
+        return(
+            <div className={"invites-logo " + (hasInvite && " yellow")} onClick={()=> {hasInvite || invitesOpen && setInvitesOpen!(!invitesOpen)}}>
+                <Logo/>
+            </div>
+        );
+    } else {
+        return null;
+    }
+
 }
 
 
@@ -54,7 +61,7 @@ export function Invites () {
             <div className={"invites"}>
                 <div className={"invite-list"}>
 
-                    {invites && invites.map((invite, key) =>
+                    {invites && invites.filter((i) => i.owner.id !== user!.id).map((invite, key) =>
                         <InviteCard key = {key} invite={invite} />
                     )}
 
@@ -79,10 +86,14 @@ export function Invites () {
         function Accept() {
 
             return (
-                <div className={"accept-invite-logo"}>
+                <div className={"accept-invite-logo"} onClick={()=> accept()}>
                     <AcceptInviteLogo/>
                 </div>
             );
+        }
+
+        function accept() {
+            API.accept(invite.owner.id);
         }
 
         function Decline() {

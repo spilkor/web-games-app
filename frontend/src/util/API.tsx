@@ -207,6 +207,22 @@ export default class API {
             credentials: 'include'
         });
     }
+
+    public static async accept(ownerId: string) {
+        await fetch('/api/accept-invite/' + ownerId, {
+            method: 'GET',
+            credentials: 'include'
+        });
+    }
+
+    public static async startGame() {
+        console.log("start-game");
+        await fetch('/api/start-game', {
+            method: 'GET',
+            credentials: 'include'
+        });
+    }
+
 }
 
 

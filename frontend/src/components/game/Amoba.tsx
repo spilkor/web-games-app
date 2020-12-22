@@ -3,6 +3,7 @@ import {AppContext, GameData} from "../../App";
 import {GameButton} from "../Game";
 import {placeholder} from "@babel/types";
 import API from "../../util/API";
+import {User} from "../../util/types";
 
 
 type AmobaProps = {
@@ -19,70 +20,18 @@ type AmobaLobbyProps = {
     ownerAs: OwnerAs
 }
 
-export function Amoba ({}: AmobaProps) {
+type AmobaGameDTO = {
+    nextPlayer: User,
+    table: Boolean[][]
+}
 
-    //
-    // if (lobbyData === undefined){
-    //
-    // }
-    //
-    // if (gameData){
-    //     return AmobaGame();
-    // } else if(lobbyData){
-    //     return AmobaLobby();
-    // } else {
-    //     return null;
-    // }
-    //
-    // function AmobaLobby () {
-    //
-    //     const { user } = useContext(AppContext);
-    //
-    //     return (
-    //         <div>
-    //             {lobbyData!.users.map((user, key)=>
-    //                 <GameButton enabled={true} key={key} text={user.name} onClick={()=> {}}/>
-    //             )}
-    //             {
-    //                 user!.id == lobbyData!.user.id && AmobaSettings()
-    //             }
-    //         </div>
-    //     );
-    //
-    // }
-    //
-    // function AmobaSettings () {
-    //
-    //     enum MeAs {
-    //         X = "Me as: X",
-    //         O = "Me as: O",
-    //         R = "Me as: Random"
-    //     }
-    //
-    //     const [meAs, setMeAs] = useState<MeAs>(MeAs.R);
-    //
-    //     return (
-    //         <>
-    //             <select className={"game-button"} onChange={(e:ChangeEvent<HTMLSelectElement>)=> {setMeAs(e.target.value as MeAs)}} value={meAs}>
-    //                 <option value = {MeAs.X}>{MeAs.X}</option>
-    //                 <option value = {MeAs.O}>{MeAs.O}</option>
-    //                 <option value = {MeAs.R}>{MeAs.R}</option>
-    //             </select>
-    //             {/*<StartGameButton enabled={startable()} lobbyData={{gameType: GameType.AMOBA} as LobbyData}/>*/}
-    //             {/*<StartGameButton enabled={startable()} lobbyData={{gameType: GameType.AMOBA, ...lobbyData} as LobbyData}/>*/}
-    //         </>
-    //     );
-    //
-    //     function startable() :boolean{
-    //         return lobbyData!.users.length == 2;
-    //     }
-    //
-    // }
+export function Amoba (amobaGameDTO: AmobaGameDTO) {
 
-
+    // const amobaGameData = JSON.parse(gameData.gameJSON) as AmobaGameDTO;
+    // console.log("amobaGameData: ", amobaGameData);
 
     return (
-        <div>AMOBA_GAME</div>
+        <div>AMOBA_GAME{amobaGameDTO.table.toString()}</div>
     );
 
 
@@ -103,16 +52,9 @@ export function AmobaLobby (gameData: GameData) {
     const amobaLobbyData = JSON.parse(gameData.lobbyJSON) as AmobaLobbyProps;
     console.log("amobaLobbyData: ", amobaLobbyData);
 
+
     if (amobaLobbyData == null){
         return null;
-    }
-
-    function setOwnerAs(ownerAs: OwnerAs) {
-        const amobaLobbyData = {
-            ownerAs: ownerAs
-        } as AmobaLobbyProps;
-
-        API.sendLobbyData(amobaLobbyData);
     }
 
     return (
@@ -159,12 +101,19 @@ export function AmobaLobby (gameData: GameData) {
             </div>
 
             {
-                gameData.owner.id === user!.id && <GameButton text={"START"} onClick={()=> {}} enabled={!!gameData.startable}/>
+                gameData.owner.id === user!.id && <GameButton text={"START"} onClick={()=> {API.startGame()}} enabled={true}/>
             }
 
         </div>
     );
 
+    function setOwnerAs(ownerAs: OwnerAs) {
+        const amobaLobbyData = {
+            ownerAs: ownerAs
+        } as AmobaLobbyProps;
+
+        API.sendLobbyData(amobaLobbyData);
+    }
 
 }
 

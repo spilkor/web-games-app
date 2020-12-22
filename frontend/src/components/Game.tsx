@@ -22,20 +22,21 @@ export function Game () {
                     return(
                         <AmobaLobby {...gameData}/>
                     );
-                case GameType.CHESS:
+                // case GameType.CHESS:
                     // return(
                     //     <ChessLobby/>
                     // );
             }
+
         case GameState.IN_GAME:
             switch (gameData.gameType) {
                 case GameType.AMOBA:
                     return(
-                        <Amoba/>
+                        <Amoba {...JSON.parse(gameData.gameJSON)}/>
                     );
                 // case GameType.CHESS:
                 //     return(
-                //         <Chess/>
+                //         <Chess {...JSON.parse(gameData.gameJSON)}/>
                 //     );
             }
     }

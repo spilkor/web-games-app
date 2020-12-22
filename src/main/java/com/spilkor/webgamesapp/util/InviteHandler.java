@@ -53,4 +53,42 @@ public abstract class InviteHandler {
 
         WebSocketMessageSender.sendMessage(userDTO.getId(), webSocketMessage);
     }
+
+    public static void acceptInvite(Group newGroup, Group oldGroup, Invite invite) {
+        invites.remove(invite);
+
+        if (groupMap.containsKey(newGroup)) {
+            List<Invite> invites = new ArrayList<>(groupMap.get(newGroup));
+            invites.remove(invite);
+            if (!invites.isEmpty()){
+                groupMap.put(newGroup, invites);
+            }
+
+            if (oldGroup == null){
+                newGroup.getPlayers().add(invite.getFriend());
+                GroupHandler.updateGroup(newGroup);
+            } else {
+                if (oldGroup.getOwner().equals(invite.getFriend())){
+                    newGroup.getPlayers().addAll(oldGroup.getPlayers());
+                    GroupHandler.destroyGroup(oldGroup);
+                    GroupHandler.updateGroup(newGroup);
+                } else {
+                    oldGroup.getPlayers().remove(invite.getFriend());
+                    GroupHandler.updateGroup(oldGroup);
+
+                    newGroup.getPlayers().add(invite.getFriend());
+                    GroupHandler.updateGroup(newGroup);
+                }
+            }
+        }
+
+        updateInviteList(invite.getOwner());
+        updateInviteList(invite.getFriend());
+    }
+
+    public static void removeGroup(Group group){
+        invites.removeAll(group.getInvites());
+        groupMap.remove(group);
+    }
+
 }

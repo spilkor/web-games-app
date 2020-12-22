@@ -252,8 +252,8 @@ export function App () {
                         setChatMessages(chatMessagesRef.current.concat(JSON.parse(message.data) as ChatMessage));
                         break;
                     case MessageType.FRIEND_LIST.valueOf():
-                        setFriends(JSON.parse(message.data) as User[]);
-                        // setFriends([{id: "3", name: "3", userState: UserState.ONLINE} as User,{id: "1", name: "4", userState: UserState.ONLINE} as User,{id: "5", name: "5", userState: UserState.ONLINE} as User] as User[]);
+                        let friends = JSON.parse(message.data) as User[];
+                        setFriends(friends);
                         break;
                     case MessageType.GAME_DATA.valueOf():
                         setGameData(JSON.parse(message.data) as GameData);

@@ -32,7 +32,7 @@ public class Group {
 
         switch (gameType){
             case AMOBA:
-                game = Amoba.newInstance(owner);
+                game = Amoba.newInstance(Group.this);
 //            case CHESS:
 //                game = Chess.newInstance(owner);
         }
@@ -41,7 +41,7 @@ public class Group {
     public GameDataDTO getGameDataDTO(UserDTO user) {
         GameDataDTO gameDataDTO = new GameDataDTO();
 
-        gameDataDTO.setStatable(game == null ? null : GameState.IN_LOBBY.equals(gameState) && game.getStartable(user));
+        gameDataDTO.setStatable(game == null ? null : GameState.IN_LOBBY.equals(gameState) && game.isStartable());
         owner.setUserState(ConnectionHandler.getConnectionsByUserId(owner.getId()).isEmpty() ? UserState.offline : UserState.online);
         gameDataDTO.setOwner(owner);
         players.forEach(player-> player.setUserState(ConnectionHandler.getConnectionsByUserId(player.getId()).isEmpty() ? UserState.offline : UserState.online));
@@ -49,8 +49,14 @@ public class Group {
         gameDataDTO.setGameType(gameType);
         gameDataDTO.setGameState(gameState);
 
-        gameDataDTO.setLobbyJSON(game == null ? null : game.getLobbyJSON(user));
-        gameDataDTO.setGameJSON(game == null ? null : game.getGameJSON(user));
+        switch (gameState){
+            case IN_LOBBY:
+                gameDataDTO.setLobbyJSON(game == null ? null : game.getLobbyJSON(user));
+                break;
+            case IN_GAME:
+                gameDataDTO.setGameJSON(game == null ? null : game.getGameJSON(user));
+                break;
+        }
 
         return gameDataDTO;
     }
@@ -103,6 +109,14 @@ public class Group {
         return players;
     }
 
+    public List<Invite> getInvites() {
+        return invites;
+    }
+
+    public void setInvites(List<Invite> invites) {
+        this.invites = invites;
+    }
+
     public void joinGroup(Group groupOfUser) {
         players.addAll(groupOfUser.players);
         GroupHandler.destroyGroup(groupOfUser);
@@ -126,7 +140,31 @@ public class Group {
         InviteHandler.addInvite(this, invite);
     }
 
+    public void acceptInvite(UserDTO ownerDTO, UserDTO user) throws InviteException{
+        Invite invite = invites.stream().filter(i -> i.getOwner().equals(ownerDTO) && i.getFriend().equals(user)).findFirst().orElse(null);
+        if (invite == null){
+            throw new InviteException();
+        }
+
+        Group oldGroup = GroupHandler.getGroupOfUser(user);
+        InviteHandler.acceptInvite(this, oldGroup, invite);
+    }
+
     public static class InviteException extends Exception{
 
     }
+
+    public UserDTO getSecondPlayer(){
+        return players.stream().filter(player -> !player.equals(owner)).findFirst().orElse(null);
+    }
+
+    public boolean isStartable(){
+        return GameState.IN_LOBBY.equals(gameState) && game != null && game.isStartable();
+    }
+
+    public void startGame(){
+        gameState = GameState.IN_GAME;
+        game.startGame();
+    }
+
 }

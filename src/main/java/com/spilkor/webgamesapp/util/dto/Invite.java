@@ -1,6 +1,8 @@
 package com.spilkor.webgamesapp.util.dto;
 
 
+import java.util.Objects;
+
 public class Invite {
 
     public enum InviteState {
@@ -33,5 +35,13 @@ public class Invite {
 
     public void setInviteState(InviteState inviteState) {
         this.inviteState = inviteState;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Invite invite = (Invite) o;
+        return Objects.equals(owner, invite.owner) &&  Objects.equals(friend, invite.friend);
     }
 }

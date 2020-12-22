@@ -115,6 +115,64 @@ public class WebGamesApi {
             return;
         }
     }
+    @GetMapping(path = "/accept-invite/{ownerId}")
+    public void acceptInvite(@PathVariable Long ownerId, HttpServletResponse response, HttpServletRequest request) {
+        UserDTO user = getUserDTOFromRequest(request);
+
+        User owner = businessManager.findUserById(ownerId);
+        if (owner == null){
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        UserDTO ownerDTO = new UserDTO(owner);
+
+        Group groupOfOwner = GroupHandler.getGroupOfUser(ownerDTO);
+        if (groupOfOwner == null){
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        if (!groupOfOwner.getOwner().equals(ownerDTO)){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        if (!businessManager.friends(user.getId(), ownerId)){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        try {
+            groupOfOwner.acceptInvite(ownerDTO, user);
+        } catch (Group.InviteException e){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+    }
+
+    @GetMapping(path = "/start-game")
+    public void startGame(HttpServletResponse response, HttpServletRequest request) {
+        UserDTO user = getUserDTOFromRequest(request);
+        Group group = GroupHandler.getGroupOfUser(user);
+
+        if (group == null){
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        if (!group.getOwner().equals(user)){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        if (!group.isStartable()){
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+
+        }
+
+        group.startGame();
+        GroupHandler.updateGroup(group);
+    }
 
     @PostMapping(path = "/create-account", consumes = MediaType.APPLICATION_JSON_VALUE )
     public void createAccount(@RequestBody UserNameAndPassword userNameAndPassword, HttpServletResponse response, HttpServletRequest request) {
@@ -339,7 +397,10 @@ public class WebGamesApi {
             return;
         }
 
-        boolean success = group.getGame().updateLobby(group, lobbyDataJSON);
+        boolean success = group.getGame().updateLobby(lobbyDataJSON);
+        if (success){
+            GroupHandler.updateGroup(group);
+        }
 
         if (!success){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

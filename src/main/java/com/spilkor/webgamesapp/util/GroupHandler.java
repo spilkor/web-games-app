@@ -41,8 +41,9 @@ public class GroupHandler {
         return null;
     }
 
-    public static void destroyGroup(Group groupOfUser) {
-        groups.remove(groupOfUser);
+    public static void destroyGroup(Group group) {
+        groups.remove(group);
+        InviteHandler.removeGroup(group);
     }
 
     public static void updateGroup(Group group) {
@@ -81,7 +82,6 @@ public class GroupHandler {
 
         WebSocketMessage webSocketMessage = new WebSocketMessage();
         webSocketMessage.setMessageType(WebSocketMessageType.GAME_DATA);
-//        FIXME gameDataDTO == null?
         try {
             webSocketMessage.setData(mapper.writeValueAsString(gameDataDTO));
         } catch (JsonProcessingException e) {

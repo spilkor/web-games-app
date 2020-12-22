@@ -206,9 +206,13 @@ export function Users () {
         }
 
         function UserState() {
+
+            let friend = friends && friends.find((f)=>{return f.id === cardUser.id});
+            let userState = friend ? friend.userState : cardUser.userState;
+
             return(
                 <div className={"friend-sign"}>
-                    <div className={"friend-state " + (cardUser.userState.toString())}/>
+                    <div className={"friend-state " + (userState.toString())}/>
                 </div>
             );
 
