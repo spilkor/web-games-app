@@ -62,9 +62,7 @@
     position: absolute;
     bottom: 90px;
     right: 30px;
-    background: lightgray;
-    border-radius: 10px 0 0 10px;
-    padding: 5px;
+
     width: 250px;
     max-height: 525px;
     overflow: scroll;
@@ -73,23 +71,47 @@
     scrollbar-color: black transparent;
     overflow-y: auto;
 
-    border: 2px solid white;
+}
+
+.friends-background{
+    background: lightgray;
+    border-radius: 10px 0 0 10px;
+    padding: 5px;
+
+
+
+}
+
+.lobby-background{
+    background: lightgray;
+    border-radius: 10px 0 0 10px;
+    padding: 5px;
+    background: rgba( 253, 255, 100 , 0.8 );
+
+
+    margin-bottom: 10px;
+}
+
+.lobby-background .friend-card{
+    background: lightgray;
+
 }
 
 .friend-card{
-    border: 1px solid black;
+    border: 2px solid black;
     padding: 10px;
     margin: 10px;
     display: flex;
-    justify-content: space-between;
+    /*justify-content: space-between;*/
     align-items: center;
     height: 20px;
     transition: all .2s ease;
+    font-weight: bold;
 }
 
 .friend-card:hover{
-    margin-right: 5px;
-    cursor: pointer;
+    /*margin-right: 5px;*/
+    /*cursor: pointer;*/
 }
 
 .friend-state{
@@ -97,6 +119,10 @@
     height: 20px;
     margin-left: 4px;
     border-radius: 50%;
+}
+
+.friend-card div:nth-child(2) {
+    margin-left: auto;
 }
 
 .friend-state.online{
@@ -166,4 +192,160 @@
     border: 1px solid black;
     position: relative;
     z-index: 2;
+}
+
+.pawn{
+    height: 25px;
+    width: 24px;
+    /*margin-right: -2px;*/
+}
+
+.crown{
+    height: 40px;
+    width:   40px;
+}
+
+
+.invite{
+    transition: all .3s ease;
+    height: 40px;
+    width: 30px;
+    transform: scale(.7);
+    margin-right: 8px;
+}
+
+.invite:hover{
+    transform: scale(.75);
+}
+
+
+.invite path{
+    fill: rgba( 253, 255, 100 , 0.8 );
+    /*     color: green; */
+}
+
+.kick{
+    transition: all .3s ease;
+    height: 40px;
+    width: 30px;
+    transform: scale(.7);
+    margin-right: 8px;
+}
+
+.kick:hover{
+    transform: scale(.75);
+}
+
+
+.kick path{
+    fill: rgba( 253, 255, 100 , 0.8 );
+    /*     color: green; */
+}
+
+.name-and-crown{
+    display: flex;
+}
+
+.friend-name{
+    margin: 10px 0;
+}
+
+.invite-list{
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+
+
+
+    width: 250px;
+    max-height: 525px;
+    overflow: scroll;
+    overflow-x: hidden;
+
+    scrollbar-color: black transparent;
+    overflow-y: auto;
+
+}
+
+.invite-card{
+    border: 2px solid black;
+    padding: 10px;
+    margin: 10px;
+    display: flex;
+    /*justify-content: space-between;*/
+    align-items: center;
+    height: 20px;
+    transition: all .2s ease;
+    font-weight: bold;
+    background: rgba( 253, 255, 100 , 0.8 );
+
+}
+
+.invites-logo{
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    background: lightgray;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .3s;
+    width: 40px;
+    height: 40px;
+}
+
+.invites-logo svg{
+    margin: 2px;
+}
+
+.invites-logo:hover{
+    transform: scale(1.1);
+}
+
+.invite-list{
+    position: absolute;
+    bottom: 90px;
+    left: 30px;
+    width: 250px;
+    max-height: 525px;
+    overflow: scroll;
+    overflow-x: hidden;
+    scrollbar-color: black transparent;
+    overflow-y: auto;
+
+    background: lightgray;
+    border-radius: 0 10px 10px 0;
+    padding: 5px;
+}
+
+.accept-invite-logo{
+    width:27px;
+    height: 26px;
+    margin: 0 3px;
+    margin-left: auto;
+}
+
+.decline-invite-logo{
+    width:28px;
+    height: 28px;
+    margin: 0 3px;
+}
+
+.accept-invite-logo:hover{
+    transform: scale(1.1);
+    cursor: pointer;
+    transition: all .3s;
+}
+
+.decline-invite-logo:hover{
+    transform: scale(1.1);
+    cursor: pointer;
+    transition: all .3s;
+}
+
+.invite:hover{
+    cursor: pointer;
+}
+
+.kick:hover{
+    cursor: pointer;
 }

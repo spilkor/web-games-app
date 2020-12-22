@@ -66,12 +66,6 @@ public abstract class ConnectionHandler {
             friends.add(userDTO);
         }
 
-        try {
-            mapper.writeValueAsString(friends);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
         WebSocketMessage webSocketMessage = new WebSocketMessage();
         webSocketMessage.setMessageType(WebSocketMessageType.FRIEND_LIST);
         try {
@@ -90,11 +84,11 @@ public abstract class ConnectionHandler {
     public static void removeAndCloseConnections(Long userId) {
         List<Session> connectionsOfUser = userConnections.get(userId);
         if (connectionsOfUser != null){
-            connectionsOfUser.stream().forEach(connection -> removeAndCloseConnection(connection));
+            connectionsOfUser.forEach(ConnectionHandler::removeAndCloseConnection);
         }
     }
 
-    public static void removeAndCloseConnection(Session session) {
+    private static void removeAndCloseConnection(Session session) {
         removeConnection(session);
         try {
             session.close();

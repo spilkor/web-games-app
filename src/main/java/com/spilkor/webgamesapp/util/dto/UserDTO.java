@@ -19,6 +19,12 @@ public class UserDTO {
         this.name = user.getUserName();
     }
 
+    public UserDTO(User user, UserState userState) {
+        this.id = user.getId();
+        this.name = user.getUserName();
+        this.userState = userState;
+    }
+
     public Long getId() {
         return id;
     }

@@ -58,4 +58,8 @@ public class BusinessManager {
         return entities;
     }
 
+    public boolean friends(Long userId_1, Long userId_2) {
+        User user_1 = findEagerUserById(userId_1);
+        return user_1 != null && user_1.getFriends().stream().anyMatch(f-> f.getId().equals(userId_2));
+    }
 }

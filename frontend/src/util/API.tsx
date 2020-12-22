@@ -1,5 +1,7 @@
-import {User} from "./types";
+import { GameState, User} from "./types";
 import {log} from "../index";
+import {GameData, GameType} from "../App";
+import {Invite} from "../components/Invites";
 
 function returnResponse (response: any){
     return response;
@@ -30,6 +32,29 @@ export default class API {
             .catch((error=>{return null}));
         return res as User;
     }
+
+
+    public static async getGameData(): Promise<GameData>{
+        let res = await fetch('/api/game', {
+            method: 'GET',
+            credentials: 'include'
+        }).then(translateJSON)
+            .then(returnResponse)
+            .catch((error=>{return null}));
+        return res as GameData;
+    }
+
+    public static async getInvites(): Promise<Invite[]>{
+        let res = await fetch('/api/my-invites', {
+            method: 'GET',
+            credentials: 'include'
+        }).then(translateJSON)
+            .then(returnResponse)
+            .catch((error=>{return null}));
+        return res as Invite[];
+    }
+
+
 
     public static async logout() {
         await fetch('/api/logout', {
@@ -153,6 +178,35 @@ export default class API {
         });
     }
 
+    public static async createGroup(gameType: GameType) {
+        await fetch('/api/create-group/' + gameType, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+    }
+
+    public static async sendLobbyData(lobbyData: any) {
+        log("api.sendLobbyData: " + lobbyData);
+        return await fetch('/api/lobby', {
+            mode: 'cors',
+            credentials: 'include',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(lobbyData)
+        }).then(res => {
+            return res.ok
+        });
+    }
+
+    public static async invite(userId: string) {
+        await fetch('/api/invite/' + userId, {
+            method: 'GET',
+            credentials: 'include'
+        });
+    }
 }
 
 
