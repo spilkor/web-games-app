@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class GameDataDTO implements Serializable {
 
-    private Boolean statable;
+    private Boolean startable;
     private GameType gameType;
     private GameState gameState;
     private Set<UserDTO> players = new HashSet<>();
@@ -17,14 +17,14 @@ public class GameDataDTO implements Serializable {
 
     private String lobbyJSON;
     private String gameJSON;
+    private String endJSON;
 
-
-    public boolean getStatable() {
-        return statable;
+    public boolean getStartable() {
+        return startable;
     }
 
-    public void setStatable(Boolean statable) {
-        this.statable = statable;
+    public void setStartable(Boolean startable) {
+        this.startable = startable;
     }
 
     public GameType getGameType() {
@@ -73,5 +73,13 @@ public class GameDataDTO implements Serializable {
 
     public void setGameJSON(String gameJSON) {
         this.gameJSON = gameJSON;
+    }
+
+    public String getEndJSON() {
+        return endJSON;
+    }
+
+    public void setEndJSON(String endJSON) {
+        this.endJSON = endJSON;
     }
 }

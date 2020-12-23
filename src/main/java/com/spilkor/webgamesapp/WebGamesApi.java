@@ -235,6 +235,23 @@ public class WebGamesApi {
         ConnectionHandler.updateFriendList(toUpdate);
     }
 
+    @PostMapping(path = "/move", consumes = MediaType.APPLICATION_JSON_VALUE )
+    public void move(@RequestBody String moveJSON, HttpServletResponse response, HttpServletRequest request) {
+        UserDTO userDTO = getUserDTOFromRequest(request);
+        Group group = GroupHandler.getGroupOfUser(userDTO);
+
+        if (group == null || group.getGame() == null || !GameState.IN_GAME.equals(group.getGameState())){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        Game game = group.getGame();
+        if (game.legal(userDTO, moveJSON)){
+            game.move(userDTO, moveJSON);
+            GroupHandler.updateGroup(group);
+        }
+    }
+
     @PostMapping(path = "/friend-request", consumes = MediaType.APPLICATION_JSON_VALUE )
     public void friendRequest(@RequestBody String userName, HttpServletResponse response, HttpServletRequest request) {
         UserDTO userDTO = getUserDTOFromRequest(request);
@@ -367,7 +384,7 @@ public class WebGamesApi {
     }
 
     @GetMapping(path = "/create-group/{gameType}")
-    public void createGroup2(@PathVariable GameType gameType, HttpServletResponse response, HttpServletRequest request) {
+    public void createGroup(@PathVariable GameType gameType, HttpServletResponse response, HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
 
         Group group = GroupHandler.getGroupOfUser(user);

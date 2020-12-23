@@ -115,7 +115,7 @@ input{
 
 
 
-.game-button:hover{
+.game-button:not(.disabled):hover{
     cursor: pointer;
 }
 
@@ -250,13 +250,10 @@ input{
 
 
 .amoba_x{
-    fill: yellow;
+    stroke: #87C3E9;
 }
 
-.amoba_o{
-    fill: none;
-    stroke: yellow;
-}
+
 
 .amoba-header{
     position: absolute;
@@ -296,7 +293,7 @@ input{
 
 .amoba_o{
     fill: none;
-    stroke: yellow;
+    stroke: #87C3E9;
 }
 
 
@@ -472,4 +469,22 @@ input{
     height: calc(100% - 100px);
     overflow: hidden;
     width: 100%;
+}
+
+.start-button{
+    border: 1px solid;
+    background: rgba( 253, 255, 100 , 0.8 );
+}
+
+
+.start-button:not(.disabled):hover{
+    transform: scale(1.05);
+    /*background: rgba(0,0,0, .5);*/
+    transition: all.2s;
+}
+
+.amoba .system-message{
+    display: block;
+    margin-top: 10px;
+    color: #87C3E9;
 }

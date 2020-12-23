@@ -38,7 +38,7 @@ export function InvitesLogo(){
 
     if (hasInvite || invitesOpen){
         return(
-            <div className={"invites-logo " + (hasInvite && " yellow")} onClick={()=> {hasInvite || invitesOpen && setInvitesOpen!(!invitesOpen)}}>
+            <div className={"invites-logo " + (hasInvite && " yellow")} onClick={()=> {(hasInvite || invitesOpen) && setInvitesOpen!(!invitesOpen)}}>
                 <Logo/>
             </div>
         );
@@ -77,7 +77,7 @@ export function Invites () {
 
         return (
             <div className={"invite-card"}>
-                <span className={"friend-name"}>{invite.friend.name}</span>
+                <span className={"friend-name"}>{invite.owner.name}</span>
                 <Accept/>
                 <Decline/>
             </div>

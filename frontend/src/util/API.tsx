@@ -185,8 +185,8 @@ export default class API {
                 });
     }
 
-    public static async sendLobbyData(lobbyData: any) {
-        log("api.sendLobbyData: " + lobbyData);
+    public static async sendLobbyData(lobbyJSON: string) {
+        log("api.sendLobbyData: " + lobbyJSON);
         return await fetch('/api/lobby', {
             mode: 'cors',
             credentials: 'include',
@@ -195,7 +195,7 @@ export default class API {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(lobbyData)
+            body: lobbyJSON
         }).then(res => {
             return res.ok
         });
@@ -223,6 +223,18 @@ export default class API {
         });
     }
 
+    public static async move(moveJSON: string) {
+        await fetch('/api/move', {
+            mode: 'cors',
+            credentials: 'include',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: moveJSON
+        });
+    }
 }
 
 

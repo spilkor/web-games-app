@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
-import {Amoba, AmobaLobby} from "./game/Amoba";
-import {GameButtonProps, GameState, StatGameButtonProps} from "../util/types";
+import {Amoba} from "./game/Amoba";
+import {GameButtonProps, GameState, StartGameButtonProps} from "../util/types";
 import {AppContext, GameType} from "../App";
 import {Simulate} from "react-dom/test-utils";
 import API from "../util/API";
@@ -15,31 +15,18 @@ export function Game () {
         );
     }
 
-    switch (gameData.gameState) {
-        case GameState.IN_LOBBY:
-            switch (gameData.gameType) {
-                case GameType.AMOBA:
-                    return(
-                        <AmobaLobby {...gameData}/>
-                    );
-                // case GameType.CHESS:
-                    // return(
-                    //     <ChessLobby/>
-                    // );
-            }
 
-        case GameState.IN_GAME:
-            switch (gameData.gameType) {
-                case GameType.AMOBA:
-                    return(
-                        <Amoba {...JSON.parse(gameData.gameJSON)}/>
-                    );
-                // case GameType.CHESS:
-                //     return(
-                //         <Chess {...JSON.parse(gameData.gameJSON)}/>
-                //     );
-            }
+    switch (gameData.gameType) {
+        case GameType.AMOBA:
+            return(
+                <Amoba/>
+            );
+        // case GameType.CHESS:
+        // return(
+        //     <Chess/>
+        // );
     }
+
 
     return null;
 
@@ -72,6 +59,7 @@ export function Game () {
         }
 
         function ChoseGameType() {
+
             return (
                 <div>
                     {gameTypes!.map((gameType, key)=>
@@ -103,6 +91,14 @@ export function Game () {
 export function GameButton({text, onClick, enabled}: GameButtonProps) {
     return (
         <div className={"game-button" + (enabled ? "" : " disabled")} onClick={()=> {if(enabled) onClick()}}>
+            {text}
+        </div>
+    );
+}
+
+export function StartGameButton({text, enabled}: StartGameButtonProps) {
+    return (
+        <div className={"start-button game-button" + (enabled ? "" : " disabled")} onClick={()=> {API.startGame()}}>
             {text}
         </div>
     );

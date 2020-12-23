@@ -24,7 +24,8 @@ export type ChatMessage = {
 
 export enum GameState  {
     IN_LOBBY = "IN_LOBBY",
-    IN_GAME = "IN_GAME"
+    IN_GAME = "IN_GAME",
+    GAME_END = "GAME_END"
 }
 
 export type MenuButtonProps = {
@@ -38,7 +39,8 @@ export type GameButtonProps = {
     enabled: boolean
 }
 
-export type StatGameButtonProps = {
+export type StartGameButtonProps = {
+    text: string
     enabled: boolean
 }
 

@@ -41,7 +41,7 @@ public class Group {
     public GameDataDTO getGameDataDTO(UserDTO user) {
         GameDataDTO gameDataDTO = new GameDataDTO();
 
-        gameDataDTO.setStatable(game == null ? null : GameState.IN_LOBBY.equals(gameState) && game.isStartable());
+        gameDataDTO.setStartable(game == null ? null : owner.equals(user) && GameState.IN_LOBBY.equals(gameState) && game.isStartable());
         owner.setUserState(ConnectionHandler.getConnectionsByUserId(owner.getId()).isEmpty() ? UserState.offline : UserState.online);
         gameDataDTO.setOwner(owner);
         players.forEach(player-> player.setUserState(ConnectionHandler.getConnectionsByUserId(player.getId()).isEmpty() ? UserState.offline : UserState.online));
@@ -49,13 +49,13 @@ public class Group {
         gameDataDTO.setGameType(gameType);
         gameDataDTO.setGameState(gameState);
 
-        switch (gameState){
+        switch (gameState){ //no break!
+            case GAME_END:
+                gameDataDTO.setEndJSON(game.getEndJSON(user));
+            case IN_GAME:
+                gameDataDTO.setGameJSON(game.getGameJSON(user));
             case IN_LOBBY:
                 gameDataDTO.setLobbyJSON(game == null ? null : game.getLobbyJSON(user));
-                break;
-            case IN_GAME:
-                gameDataDTO.setGameJSON(game == null ? null : game.getGameJSON(user));
-                break;
         }
 
         return gameDataDTO;
@@ -148,6 +148,12 @@ public class Group {
 
         Group oldGroup = GroupHandler.getGroupOfUser(user);
         InviteHandler.acceptInvite(this, oldGroup, invite);
+    }
+
+    public void updatePlayers() {
+
+
+
     }
 
     public static class InviteException extends Exception{

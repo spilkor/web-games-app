@@ -40,6 +40,7 @@ export type GameData = {
 
     lobbyJSON: string
     gameJSON: string
+    endJSON: string
 }
 
 export type ContextProps = {
