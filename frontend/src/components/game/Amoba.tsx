@@ -1,12 +1,8 @@
 import React, {ChangeEvent, useContext} from 'react';
-import {AppContext, GameData, GameType} from "../../App";
-import {GameButton, StartGameButton} from "../Game";
+import {AppContext} from "../../App";
+import {QuitButton, StartGameButton, SystemMessage} from "../Game";
 import API from "../../util/API";
 import {GameState, User} from "../../util/types";
-
-type AmobaProps = {
-
-}
 
 enum OwnerAs {
     Random = "Random",
@@ -14,96 +10,91 @@ enum OwnerAs {
     O = "O"
 }
 
-type AmobaLobbyProps = {
-    ownerAs: OwnerAs
-}
-
-type AmobaLobbyDTO = {
-    ownerAs: OwnerAs
-}
-
-type AmobaEndDTO = {
-    winner: User
-}
-
-type AmobaGameDTO = {
-    nextPlayer: User | null,
-    table: Boolean[]
-}
-
-
-type AmobaMoveDTO = {
-    index: number
-}
-
 export function Amoba () {
 
+    type AmobaLobbyDTO = {
+        ownerAs: OwnerAs
+    }
 
-    const { user, gameData, setUsersOpen} = useContext(AppContext);
+    type AmobaGameDTO = {
+        nextPlayer: User | null,
+        table: Boolean[]
+    }
 
-    const amobaGameData = JSON.parse(gameData!.gameJSON) as AmobaGameDTO;
-    const amobaLobbyData = JSON.parse(gameData!.lobbyJSON) as AmobaLobbyDTO;
-    const amobaEndData = JSON.parse(gameData!.endJSON) as AmobaEndDTO;
+    type AmobaEndDTO = {
+        winner: User | null
+    }
 
-    const myMove = amobaGameData && amobaGameData.nextPlayer && amobaGameData.nextPlayer.id === user!.id;
+    type AmobaMoveDTO = {
+        index: number
+    }
 
-    switch (gameData!.gameState) {
-        case GameState.IN_LOBBY:
-            return(
+    const { user, groupData } = useContext(AppContext);
+    const gameData = JSON.parse(groupData!.gameJSON) as AmobaGameDTO;
+    const lobbyData = JSON.parse(groupData!.lobbyJSON) as AmobaLobbyDTO;
+    const endData = JSON.parse(groupData!.endJSON) as AmobaEndDTO;
+    const myMove = gameData && gameData.nextPlayer && gameData.nextPlayer.id === user!.id;
+
+    return(
+        <div className={"amoba"}>
+            <Content/>
+        </div>
+    );
+
+    function Content () {
+        switch (groupData!.gameState) {
+            case GameState.IN_LOBBY:
+                return(
                     <AmobaLobby/>
                 );
-        case GameState.IN_GAME:
-        case GameState.GAME_END:
-            return(
-                <Table/>
-            );
-        default:
-            return null;
+            case GameState.IN_GAME:
+                return(
+                    <AmobaGame/>
+                );
+            case GameState.GAME_END:
+                return(
+                    <AmobaEnd/>
+                );
+            default:
+                return null;
+        }
     }
 
     function AmobaLobby () {
-        if (amobaLobbyData == null){
-            return null;
-        }
         return (
             <div className={"lobby"}>
                 <div className={"caption"}>AmobaLobby</div>
-
                 <div className={"row"}>
                     <div className={"key"}>
                         Owner:
                     </div>
                     <div className={"value"}>
-                        <span>{gameData!.owner.name}</span>
+                        <span>{groupData!.owner.name}</span>
                     </div>
-
                     <div className={"key"}>
                         as:
                     </div>
                     <div className={"value"}>
-                        <select disabled={! (user!.id == gameData!.owner.id)} onChange={(e:ChangeEvent<HTMLSelectElement>)=> {setOwnerAs(e.target.value as OwnerAs)}} value={amobaLobbyData.ownerAs}>
+                        <select disabled={! (user!.id == groupData!.owner.id)} onChange={(e:ChangeEvent<HTMLSelectElement>)=> {setOwnerAs(e.target.value as OwnerAs)}} value={lobbyData.ownerAs}>
                             <option value = {OwnerAs.Random}>{OwnerAs.Random}</option>
                             <option value = {OwnerAs.X}>{OwnerAs.X}</option>
                             <option value = {OwnerAs.O}>{OwnerAs.O}</option>
                         </select>
                     </div>
                 </div>
-
                 <div className={"row"}>
                     <div className={"key"}>
                         Players:
                     </div>
                     <div className={"value"}>
-                        {gameData!.players.map((user, key)=>
+                        {groupData!.players.map((user, key)=>
                             <div><span>{user.name}</span></div>
                         )}
                     </div>
                 </div>
-
-                {
-                    gameData!.owner.id === user!.id && <StartGameButton text={"START"} enabled={user!.id === gameData!.owner.id && gameData!.startable === true}/>
+                {groupData!.owner.id === user!.id &&
+                    <StartGameButton text={"START"} enabled={user!.id === groupData!.owner.id && groupData!.startable === true}/>
                 }
-
             </div>
         );
 
@@ -117,48 +108,61 @@ export function Amoba () {
 
     }
 
-
-    function Table() {
+    function AmobaGame () {
         return (
-            <div className={"amoba"}>
-                <div >
-                    <Squire index={0}/>
-                    <Squire index={1}/>
-                    <Squire index={2}/>
-                </div>
-                <div >
-                    <Squire index={3}/>
-                    <Squire index={4}/>
-                    <Squire index={5}/>
-                </div>
-                <div >
-                    <Squire index={6}/>
-                    <Squire index={7}/>
-                    <Squire index={8}/>
-                </div>
-
-                <div className={"system-message"}>
-                    {amobaGameData.nextPlayer === null ? (amobaEndData.winner.id === user!.id ? "You won" : "You lost") : (myMove ? "Your move" : "Waiting for the opponent")}
-                </div>
+            <div className={"game"}>
+                <Table/>
+                <SystemMessage text = {gameData.nextPlayer && gameData.nextPlayer.id === user!.id ? "Your move" : "Waiting for opponent"}/>
             </div>
         );
     }
 
+    function AmobaEnd () {
+        return (
+            <div className={"end"}>
+                <Table/>
+                <SystemMessage text = {!endData.winner ? "Draw" : endData.winner.id === user!.id ? "You won" : "You lost"}/>
+                <QuitButton/>
+            </div>
+        );
+    }
+
+    function Table() {
+        return (
+            <div className={"table"}>
+                <div className={"row"}>
+                    <Squire index={0}/>
+                    <Squire index={1}/>
+                    <Squire index={2}/>
+                </div>
+                <div className={"row"}>
+                    <Squire index={3}/>
+                    <Squire index={4}/>
+                    <Squire index={5}/>
+                </div>
+                <div className={"row"}>
+                    <Squire index={6}/>
+                    <Squire index={7}/>
+                    <Squire index={8}/>
+                </div>
+            </div>
+        );
+    }
 
     type SquireProps = {
         index: number
     }
 
     function Squire({index}: SquireProps) {
-        const { user, gameData} = useContext(AppContext);
-        const value = amobaGameData.table[index];
-        const clickable = amobaGameData && amobaGameData.nextPlayer && amobaGameData.nextPlayer.id === user!.id && value === null && gameData && gameData.gameState === GameState.IN_GAME;
+        const value = gameData.table[index];
+        const clickable = myMove && value === null;
+        const size = 50;
 
         return(
-          <div className={"squire" + (clickable ? " clickable" : "")} onClick={()=> myMove && clickable && move()}>
-              {value === true && <Squire_X/>}
-              {value === false && <Squire_O/>}
-          </div>
+            <div className={"squire" + (clickable ? " clickable" : "")} onClick={()=> clickable && move()}>
+                {value === true && <Squire_X/>}
+                {value === false && <Squire_O/>}
+            </div>
         );
 
         function move() {
@@ -167,20 +171,18 @@ export function Amoba () {
         }
 
         function Squire_X() {
-            const size = 50;
             return(
                 <svg height={size} width={size} className={"amoba_x"}>
-                    <line x1={size/10}  y1={size/10}  x2={size/10*9}  y2={size/10*9} strokeWidth={size/5} stroke-linecap="round" />
-                    <line x1={size/10} y1={size/10*9} x2={size/10*9} y2={size/10} strokeWidth={size/5} stroke-linecap="round" />
+                    <line x1={size/10}  y1={size/10}  x2={size/10*9}  y2={size/10*9} strokeWidth={size/5} strokeLinecap="round" />
+                    <line x1={size/10} y1={size/10*9} x2={size/10*9} y2={size/10} strokeWidth={size/5} strokeLinecap="round" />
                 </svg>
             );
         }
 
         function Squire_O() {
-            const size = 50;
             return(
                 <svg className="amoba_o">
-                    <circle cx={size/2} cy={size/2} stroke-width={size/5} r={size/100*40} />
+                    <circle cx={size/2} cy={size/2} strokeWidth={size/5} r={size/100*40} />
                 </svg>
             );
         }

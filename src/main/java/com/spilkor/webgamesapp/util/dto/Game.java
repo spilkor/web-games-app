@@ -16,15 +16,9 @@ public abstract class Game {
     public abstract String getLobbyJSON(UserDTO user);
     public abstract String getGameJSON(UserDTO user);
     public abstract String getEndJSON(UserDTO user);
-
     public abstract boolean isStartable();
-
     public abstract boolean updateLobby(String lobbyDataJSON);
-
     public abstract void startGame();
-
-
     public abstract boolean legal(UserDTO userDTO, String moveJSON);
-
     public abstract void move(UserDTO userDTO, String moveJSON);
 }

@@ -40,7 +40,7 @@ export function Users () {
 
     const [addNewFriendOpen, setAddNewFriendOpen] = useState<boolean>(false);
     const [removeFriendActive, setRemoveFriendActive] = useState<boolean>(false);
-    const {friends, gameData, user}  = useContext(AppContext);
+    const {friends, groupData, user}  = useContext(AppContext);
     const addFriendLogo =
         <div className={"add-friend-logo"} onClick={()=> {setAddNewFriendOpen(!addNewFriendOpen);setRemoveFriendActive(false)}}>
             <PlusLogo/>
@@ -65,17 +65,17 @@ export function Users () {
 
                         <UserCard cardUser={user!}/>
 
-                        {gameData && gameData.owner.id !== user!.id &&
-                        <UserCard cardUser={gameData.owner!}/>
+                        {groupData && groupData.owner.id !== user!.id &&
+                        <UserCard cardUser={groupData.owner!}/>
                         }
 
-                        {gameData && gameData.players.filter((player) => player.id !== user!.id && player.id !== gameData.owner.id).sort((a, b) => a.name < b.name ? 1 : -1).sort((a, b) => a.userState===UserState.ONLINE ? -1 : 1).map((player, key) =>
+                        {groupData && groupData.players.filter((player) => player.id !== user!.id && player.id !== groupData.owner.id).sort((a, b) => a.name < b.name ? 1 : -1).sort((a, b) => a.userState===UserState.ONLINE ? -1 : 1).map((player, key) =>
                             <UserCard key={key} cardUser={player} />
                         )}
                     </div>
 
                     <div className={"friends-background"}>
-                        {friends && friends.filter((friend) => !gameData || gameData.players.filter((p)=> p.id === friend.id).length === 0).sort((a, b) => a.name < b.name ? 1 : -1).sort((a, b) => a.userState===UserState.ONLINE ? -1 : 1).map((friend, key) =>
+                        {friends && friends.filter((friend) => !groupData || groupData.players.filter((p)=> p.id === friend.id).length === 0).sort((a, b) => a.name < b.name ? 1 : -1).sort((a, b) => a.userState===UserState.ONLINE ? -1 : 1).map((friend, key) =>
                             <UserCard key={key} cardUser={friend} />
                         )}
                     </div>
@@ -159,7 +159,7 @@ export function Users () {
         );
 
         function Crown() {
-            if (gameData && gameData.owner.id === cardUser.id){
+            if (groupData && groupData.owner.id === cardUser.id){
                 return (
                     <div>
                         <div className={"crown"}>
@@ -173,7 +173,7 @@ export function Users () {
         }
 
         function Kick() {
-            if (gameData && gameData.owner.id === user!.id && gameData.players.filter((player) => player.id === cardUser.id ).length == 1){
+            if (groupData && groupData.owner.id === user!.id && groupData.players.filter((player) => player.id === cardUser.id ).length == 1){
                 return (
                     <div className={"friend-sign"}>
                         <div className={"kick"}>
@@ -188,7 +188,7 @@ export function Users () {
 
         function Invite() {
 
-            if (gameData && gameData.owner.id === user!.id && gameData.players.filter((player) => player.id === cardUser.id ).length == 0){
+            if (groupData && groupData.owner.id === user!.id && groupData.players.filter((player) => player.id === cardUser.id ).length == 0){
                 return (
                     <div className={"friend-sign"}>
                         <div className={"invite"} onClick={()=>{invite()}}>

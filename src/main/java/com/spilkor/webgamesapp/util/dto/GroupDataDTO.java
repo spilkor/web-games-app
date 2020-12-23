@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GameDataDTO implements Serializable {
+public class GroupDataDTO implements Serializable {
 
     private Boolean startable;
     private GameType gameType;
@@ -19,7 +19,7 @@ public class GameDataDTO implements Serializable {
     private String gameJSON;
     private String endJSON;
 
-    public boolean getStartable() {
+    public Boolean getStartable() {
         return startable;
     }
 

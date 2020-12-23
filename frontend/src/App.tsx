@@ -31,7 +31,7 @@ export enum GameType  {
     CHESS = "CHESS"
 }
 
-export type GameData = {
+export type GroupData = {
     startable: Boolean
     gameType: GameType
     gameState: GameState
@@ -46,7 +46,7 @@ export type GameData = {
 export type ContextProps = {
     user: User | null,
 
-    gameData: GameData | null | undefined
+    groupData: GroupData | null | undefined
 
     reconnect: () => void
 
@@ -70,7 +70,7 @@ export function App () {
     const [user, setUser] = useState<User | null | undefined>(undefined);
     const [webSocket, setWebsocket] = useState<WebSocket | null>(null);
 
-    const [gameData, setGameData] = useState<GameData | null>(null);
+    const [groupData, setGroupData] = useState<GroupData | null>(null);
 
     const [friends, setFriends] = useState<User[]>([]);
 
@@ -114,7 +114,7 @@ export function App () {
 
         fetchInvites();
 
-        fetchGameData();
+        fetchGroupData();
 
     }, [user]);
 
@@ -130,7 +130,7 @@ export function App () {
                     friends,
                     gameTypes,
                     setContentMode,
-                    gameData,
+                    groupData,
                     usersOpen,
                     setUsersOpen,
 
@@ -151,7 +151,7 @@ export function App () {
                             <Header />
                             <Controls/>
 
-                            <div className={"content " + contentMode.toLowerCase()}>
+                            <div className={"content " + contentMode.toLowerCase() + "-content"}>
                                 <Content />
                             </div>
                         </Route>
@@ -194,10 +194,10 @@ export function App () {
         setUser(user);
     }
 
-    async function fetchGameData(){
-        let gameData = await API.getGameData() as GameData;
-        log("fetchGameData: " + gameData);
-        setGameData(gameData);
+    async function fetchGroupData(){
+        let groupData = await API.getGroupData() as GroupData;
+        log("fetchGroupData: " + groupData);
+        setGroupData(groupData);
     }
 
     async function fetchInvites(){
@@ -232,7 +232,8 @@ export function App () {
 
         setContentMode(ContentMode.HOME);
 
-        setGameData(null);
+
+        setGroupData(null);
         setInvites([]);
     }
 
@@ -256,8 +257,8 @@ export function App () {
                         let friends = JSON.parse(message.data) as User[];
                         setFriends(friends);
                         break;
-                    case MessageType.GAME_DATA.valueOf():
-                        setGameData(JSON.parse(message.data) as GameData);
+                    case MessageType.GROUP_DATA.valueOf():
+                        setGroupData(JSON.parse(message.data) as GroupData);
                         break;
 
                     case MessageType.INVITE_LIST.valueOf():

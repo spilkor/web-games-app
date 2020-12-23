@@ -10,6 +10,7 @@
     transition: all .3s;
     width: 50px;
     height: 40px;
+    z-index: 100;
 }
 
 .friends-logo:hover{

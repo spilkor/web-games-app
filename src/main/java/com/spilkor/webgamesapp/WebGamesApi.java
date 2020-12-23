@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spilkor.webgamesapp.model.User;
 import com.spilkor.webgamesapp.util.GroupHandler;
 import com.spilkor.webgamesapp.util.InviteHandler;
-import com.spilkor.webgamesapp.util.ServiceHelper;
 import com.spilkor.webgamesapp.util.dto.*;
 import com.spilkor.webgamesapp.util.enums.GameState;
 import com.spilkor.webgamesapp.util.enums.GameType;
@@ -171,6 +170,31 @@ public class WebGamesApi {
         }
 
         group.startGame();
+        GroupHandler.updateGroup(group);
+    }
+
+    @GetMapping(path = "/restart-game")
+    public void restartGame(HttpServletResponse response, HttpServletRequest request) {
+        UserDTO user = getUserDTOFromRequest(request);
+        Group group = GroupHandler.getGroupOfUser(user);
+
+        if (group == null){
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        if (!group.getOwner().equals(user)){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        if (!GameState.GAME_END.equals(group.getGameState())){
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+
+        }
+
+        group.restartGame();
         GroupHandler.updateGroup(group);
     }
 
@@ -349,8 +373,8 @@ public class WebGamesApi {
         }
     }
 
-    @GetMapping("/game")
-    public String getGameData(HttpServletRequest request) {
+    @GetMapping("/group")
+    public String getGroupDataDTO(HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
 
         Group group = GroupHandler.getGroupOfUser(user);
@@ -359,10 +383,10 @@ public class WebGamesApi {
             return null;
         }
 
-        GameDataDTO gameDataDTO = group.getGameDataDTO(user);
+        GroupDataDTO groupDataDTO = group.getGroupDataDTO(user);
 
         try {
-            return mapper.writeValueAsString(gameDataDTO);
+            return mapper.writeValueAsString(groupDataDTO);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -394,7 +418,8 @@ public class WebGamesApi {
             return;
         }
 
-        GroupHandler.createGroup(user, gameType);
+        group = GroupHandler.createGroup(user, gameType);
+        GroupHandler.updateGroup(group);
     }
 
     @PostMapping(path = "/lobby", consumes = MediaType.APPLICATION_JSON_VALUE )

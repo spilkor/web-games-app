@@ -214,7 +214,7 @@ input{
 }
 
 
-.amoba div{
+.amoba{
     display: flex;
 }
 
@@ -222,21 +222,9 @@ input{
     border: 3px solid cyan;
     height: 100px;
     width: 100px;
-}
-
-.amoba .square{
     padding: 10px;
 }
 
-
-.square.empty:hover{
-
-}
-
-.square.empty:hover{
-    background: rgba(255,255,255, 0.5);
-    cursor: pointer;
-}
 
 .amoba .row{
     display: flex;
@@ -255,38 +243,37 @@ input{
 
 
 
-.amoba-header{
-    position: absolute;
+/*.amoba-header{*/
+    /*position: absolute;*/
 
-    top: 10px;
-    left: 10px;
+    /*top: 10px;*/
+    /*left: 10px;*/
 
-    display: grid!important;
-    width: unset!important;
+    /*display: grid!important;*/
+    /*width: unset!important;*/
 
-    border: none!important;
-    width: 200px;
-    z-index: 10;
-}
+    /*border: none!important;*/
+    /*width: 200px;*/
+    /*z-index: 10;*/
+/*}*/
 
-.amoba-header .amoba-header-row{
-    white-space: nowrap;
-    font-size: 30px;
-    height: 40px;
-}
+/*.amoba-header .amoba-header-row{*/
+    /*white-space: nowrap;*/
+    /*font-size: 30px;*/
+    /*height: 40px;*/
+/*}*/
 
-.amoba-header svg{
-    margin-left: 10px;
-    margin-top: 8px;
-}
+/*.amoba-header svg{*/
+    /*margin-left: 10px;*/
+    /*margin-top: 8px;*/
+/*}*/
 
-.amoba-board{
+.amoba .board{
 
     display: grid!important;
 }
 
 .amoba{
-    stroke: yellow;
     -webkit-user-select: none;
     user-select: none;
 }
@@ -404,11 +391,12 @@ input{
 }
 
 
-.game{
+.game-content{
     display: flex;
     justify-content: center;
     align-items: center;
-    text-align: center
+    text-align: center;
+    position: relative;
 }
 .game-button{
     background: white;
@@ -487,4 +475,21 @@ input{
     display: block;
     margin-top: 10px;
     color: #87C3E9;
+}
+
+
+
+
+.quit-logo{
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.quit-logo path{
+    fill: #87C3E9;
+}
+
+.quit-logo:hover path{
+    fill: white;
 }

@@ -51,7 +51,7 @@ export function InvitesLogo(){
 
 export function Invites () {
 
-    const { user, gameData, setInvitesOpen, invites} = useContext(AppContext);
+    const { user, setInvitesOpen, invites} = useContext(AppContext);
 
 
 

@@ -1,6 +1,6 @@
-import { GameState, User} from "./types";
+import { User} from "./types";
 import {log} from "../index";
-import {GameData, GameType} from "../App";
+import { GameType, GroupData} from "../App";
 import {Invite} from "../components/Invites";
 
 function returnResponse (response: any){
@@ -34,14 +34,14 @@ export default class API {
     }
 
 
-    public static async getGameData(): Promise<GameData>{
-        let res = await fetch('/api/game', {
+    public static async getGroupData(): Promise<GroupData>{
+        let res = await fetch('/api/group', {
             method: 'GET',
             credentials: 'include'
         }).then(translateJSON)
             .then(returnResponse)
             .catch((error=>{return null}));
-        return res as GameData;
+        return res as GroupData;
     }
 
     public static async getInvites(): Promise<Invite[]>{
@@ -81,7 +81,7 @@ export default class API {
             if (response.ok) {
                 return;
             } else {
-                if (response.status == 404) {
+                if (response.status === 404) {
                     return Error("Invalid UserName / Password");
                 } else {
                     return Error("Unknown Error");
@@ -117,13 +117,13 @@ export default class API {
             if (response.ok) {
                 return;
             } else {
-                if (response.status == 409) {
+                if (response.status === 409) {
                     return Error("You cannot add yourself as friend");
-                } else if (response.status == 404) {
+                } else if (response.status === 404) {
                     return Error("There is no user with this name");
-                } else if (response.status == 302) {
+                } else if (response.status === 302) {
                     return Error("You are already friends");
-                } else if (response.status == 403) {
+                } else if (response.status === 403) {
                     return Error("You already sent a request to this user");
                 } else {
                     return Error("Unknown Error");
@@ -150,9 +150,9 @@ export default class API {
             if (response.ok) {
                 return;
             } else {
-                if (response.status == 409) {
+                if (response.status === 409) {
                     return Error("UserName already taken");
-                } else if (response.status == 406) {
+                } else if (response.status === 406) {
                     return Error("UserName and Password must be between 3 and 10 letters");
                 } else {
                     return Error("Unknown Error");
@@ -218,6 +218,14 @@ export default class API {
     public static async startGame() {
         console.log("start-game");
         await fetch('/api/start-game', {
+            method: 'GET',
+            credentials: 'include'
+        });
+    }
+
+    public static async restartGame() {
+        console.log("restart-game");
+        await fetch('/api/restart-game', {
             method: 'GET',
             credentials: 'include'
         });

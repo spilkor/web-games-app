@@ -1,22 +1,24 @@
 import React, {useContext, useState} from 'react';
 import {Amoba} from "./game/Amoba";
-import {GameButtonProps, GameState, StartGameButtonProps} from "../util/types";
+import {GameButtonProps, StartGameButtonProps} from "../util/types";
 import {AppContext, GameType} from "../App";
-import {Simulate} from "react-dom/test-utils";
 import API from "../util/API";
+
+import {ReactComponent as QuitLogo} from '../svg/quit.svg';
 
 export function Game () {
 
-    const { gameData, gameTypes } = useContext(AppContext);
+    const { groupData, gameTypes } = useContext(AppContext);
 
-    if (!gameData){
+    if (!groupData){
         return(
             <LocalLobby/>
         );
+
     }
 
 
-    switch (gameData.gameType) {
+    switch (groupData.gameType) {
         case GameType.AMOBA:
             return(
                 <Amoba/>
@@ -102,4 +104,34 @@ export function StartGameButton({text, enabled}: StartGameButtonProps) {
             {text}
         </div>
     );
+}
+
+
+type SystemMessageProps = {
+    text : string
+}
+
+export function SystemMessage({text}:SystemMessageProps) {
+
+    return(
+        <div className={"system-message"}>
+            {text}
+            {/*{amobaGameData.nextPlayer === null ? (amobaEndData.winner.id === user!.id ? "You won" : "You lost") : (myMove ? "Your move" : "Waiting for the opponent")}*/}
+        </div>
+    );
+
+}
+
+type QuitButtonProps = {
+
+}
+
+export function QuitButton({}:QuitButtonProps) {
+
+    return(
+        <div className={"quit-logo"} onClick={()=> API.restartGame()}>
+            <QuitLogo/>
+        </div>
+    );
+
 }

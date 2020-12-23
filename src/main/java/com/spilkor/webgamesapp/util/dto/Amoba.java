@@ -2,11 +2,13 @@ package com.spilkor.webgamesapp.util.dto;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.spilkor.webgamesapp.util.Matek;
+import com.spilkor.webgamesapp.util.WebMathUtil;
 import com.spilkor.webgamesapp.util.enums.GameState;
 import com.spilkor.webgamesapp.util.enums.OwnerAs;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 
 
 //        0 1 2            null: empty,  true: X,  false: O
@@ -17,13 +19,9 @@ import java.io.Serializable;
 public class Amoba extends Game {
 
     private UserDTO nextPlayer = null;
-
     private UserDTO winner = null;
-
     private UserDTO startingPlayer = null;
-
     private Boolean[] table = null;
-
     private OwnerAs ownerAs = OwnerAs.Random;
 
     private Amoba(Group group){
@@ -76,7 +74,7 @@ public class Amoba extends Game {
                 startingPlayer = group.getSecondPlayer();
                 break;
             case Random:
-                if (Matek.coinToss()){
+                if (WebMathUtil.coinToss()){
                     startingPlayer = group.getOwner();
                 } else {
                     startingPlayer = group.getSecondPlayer();
@@ -186,11 +184,13 @@ public class Amoba extends Game {
 
             table[amobaMoveDTO.getIndex()] = startingPlayer.equals(userDTO);
 
-            boolean gameEnded = hasRow();
+            boolean hasRow = hasRow();
+            boolean tableIsFull = tableIsFull();
+            boolean gameEnded = hasRow || tableIsFull;
 
             if (gameEnded){
                 group.setGameState(GameState.GAME_END);
-                winner = nextPlayer.equals(group.getOwner()) ? group.getOwner() : group.getSecondPlayer();
+                winner = hasRow ? nextPlayer.equals(group.getOwner()) ? group.getOwner() : group.getSecondPlayer() : null;
                 nextPlayer = null;
             } else {
                 nextPlayer = nextPlayer.equals(group.getOwner()) ? group.getSecondPlayer() : group.getOwner();
@@ -201,18 +201,30 @@ public class Amoba extends Game {
         }
     }
 
-    int[][] rows = new int[][]{
-            {0, 1, 2},
-            {3, 4, 5},
-            {6, 7, 8},
-            {0, 3, 6},
-            {1, 4, 7},
-            {2, 5, 8},
-            {0, 4, 8},
-            {2, 4, 6},
-    };
+    private boolean tableIsFull() {
+        return
+                table[0] != null &&
+                table[1] != null &&
+                table[2] != null &&
+                table[3] != null &&
+                table[4] != null &&
+                table[5] != null &&
+                table[6] != null &&
+                table[7] != null &&
+                table[8] != null;
+    }
 
     private boolean hasRow() {
+        int[][] rows = new int[][]{
+                {0, 1, 2},
+                {3, 4, 5},
+                {6, 7, 8},
+                {0, 3, 6},
+                {1, 4, 7},
+                {2, 5, 8},
+                {0, 4, 8},
+                {2, 4, 6},
+        };
         for (int[] row: rows){
             if (table[row[0]]!=null && table[row[0]]==table[row[1]] && table[row[0]]==table[row[2]]){
                 return true;

@@ -29,36 +29,41 @@ public class Group {
         players.add(owner);
         this.gameType = gameType;
         gameState = GameState.IN_LOBBY;
+        game = getNewGameInstance();
+    }
 
+    private Game getNewGameInstance(){
         switch (gameType){
             case AMOBA:
-                game = Amoba.newInstance(Group.this);
+                return Amoba.newInstance(Group.this);
 //            case CHESS:
-//                game = Chess.newInstance(owner);
+//                return Chess.newInstance(owner);
+            default:
+                return null;
         }
     }
 
-    public GameDataDTO getGameDataDTO(UserDTO user) {
-        GameDataDTO gameDataDTO = new GameDataDTO();
+    public GroupDataDTO getGroupDataDTO(UserDTO user) {
+        GroupDataDTO groupDataDTO = new GroupDataDTO();
 
-        gameDataDTO.setStartable(game == null ? null : owner.equals(user) && GameState.IN_LOBBY.equals(gameState) && game.isStartable());
+        groupDataDTO.setStartable(game == null ? null : owner.equals(user) && GameState.IN_LOBBY.equals(gameState) && game.isStartable());
         owner.setUserState(ConnectionHandler.getConnectionsByUserId(owner.getId()).isEmpty() ? UserState.offline : UserState.online);
-        gameDataDTO.setOwner(owner);
+        groupDataDTO.setOwner(owner);
         players.forEach(player-> player.setUserState(ConnectionHandler.getConnectionsByUserId(player.getId()).isEmpty() ? UserState.offline : UserState.online));
-        gameDataDTO.setPlayers(players);
-        gameDataDTO.setGameType(gameType);
-        gameDataDTO.setGameState(gameState);
+        groupDataDTO.setPlayers(players);
+        groupDataDTO.setGameType(gameType);
+        groupDataDTO.setGameState(gameState);
 
         switch (gameState){ //no break!
             case GAME_END:
-                gameDataDTO.setEndJSON(game.getEndJSON(user));
+                groupDataDTO.setEndJSON(game.getEndJSON(user));
             case IN_GAME:
-                gameDataDTO.setGameJSON(game.getGameJSON(user));
+                groupDataDTO.setGameJSON(game.getGameJSON(user));
             case IN_LOBBY:
-                gameDataDTO.setLobbyJSON(game == null ? null : game.getLobbyJSON(user));
+                groupDataDTO.setLobbyJSON(game == null ? null : game.getLobbyJSON(user));
         }
 
-        return gameDataDTO;
+        return groupDataDTO;
     }
 
     public Game getGame() {
@@ -172,5 +177,11 @@ public class Group {
         gameState = GameState.IN_GAME;
         game.startGame();
     }
+
+    public void restartGame(){
+        gameState = GameState.IN_LOBBY;
+        game = getNewGameInstance();
+    }
+
 
 }

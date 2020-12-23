@@ -4,13 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.spilkor.webgamesapp.WebSocketMessageSender;
-import com.spilkor.webgamesapp.util.dto.GameDataDTO;
+import com.spilkor.webgamesapp.util.dto.GroupDataDTO;
 import com.spilkor.webgamesapp.util.dto.Group;
 import com.spilkor.webgamesapp.util.dto.UserDTO;
 import com.spilkor.webgamesapp.util.dto.WebSocketMessage;
 import com.spilkor.webgamesapp.util.enums.GameType;
 import com.spilkor.webgamesapp.util.enums.WebSocketMessageType;
-import org.java_websocket.WebSocket;
 
 
 import java.util.ArrayList;
@@ -26,9 +25,6 @@ public class GroupHandler {
     public static Group createGroup(UserDTO owner, GameType gameType){
         Group group = new Group(owner, gameType);
         groups.add(group);
-
-        updateUser(owner);
-
         return group;
     }
 
@@ -73,17 +69,17 @@ public class GroupHandler {
     }
 
     private static void updateUser(UserDTO userDTO) {
-        GameDataDTO gameDataDTO = null;
+        GroupDataDTO groupDataDTO = null;
 
         Group group = getGroupOfUser(userDTO);
         if (group != null){
-            gameDataDTO = group.getGameDataDTO(userDTO);
+            groupDataDTO = group.getGroupDataDTO(userDTO);
         }
 
         WebSocketMessage webSocketMessage = new WebSocketMessage();
-        webSocketMessage.setMessageType(WebSocketMessageType.GAME_DATA);
+        webSocketMessage.setMessageType(WebSocketMessageType.GROUP_DATA);
         try {
-            webSocketMessage.setData(mapper.writeValueAsString(gameDataDTO));
+            webSocketMessage.setData(mapper.writeValueAsString(groupDataDTO));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
