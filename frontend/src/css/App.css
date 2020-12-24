@@ -214,17 +214,6 @@ input{
 }
 
 
-.amoba{
-    display: flex;
-}
-
-.amoba .square{
-    border: 3px solid cyan;
-    height: 100px;
-    width: 100px;
-    padding: 10px;
-}
-
 
 
 
@@ -234,51 +223,8 @@ input{
 }
 
 
-.amoba_x{
-    stroke: #87C3E9;
-}
 
 
-
-/*.amoba-header{*/
-    /*position: absolute;*/
-
-    /*top: 10px;*/
-    /*left: 10px;*/
-
-    /*display: grid!important;*/
-    /*width: unset!important;*/
-
-    /*border: none!important;*/
-    /*width: 200px;*/
-    /*z-index: 10;*/
-/*}*/
-
-/*.amoba-header .amoba-header-row{*/
-    /*white-space: nowrap;*/
-    /*font-size: 30px;*/
-    /*height: 40px;*/
-/*}*/
-
-/*.amoba-header svg{*/
-    /*margin-left: 10px;*/
-    /*margin-top: 8px;*/
-/*}*/
-
-.amoba .board{
-
-    display: grid!important;
-}
-
-.amoba{
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-.amoba_o{
-    fill: none;
-    stroke: #87C3E9;
-}
 
 
 .sign{
@@ -468,13 +414,6 @@ input{
     transition: all.2s;
 }
 
-.amoba .system-message{
-    display: block;
-    margin-top: 10px;
-    color: #87C3E9;
-}
-
-
 
 
 .quit-logo{
@@ -489,4 +428,9 @@ input{
 
 .quit-logo:hover path{
     fill: white;
+}
+
+.system-message{
+    display: block;
+    color: #87C3E9;
 }
