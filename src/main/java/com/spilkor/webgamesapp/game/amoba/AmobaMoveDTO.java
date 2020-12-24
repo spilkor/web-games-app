@@ -1,4 +1,4 @@
-package com.spilkor.webgamesapp.util.dto;
+package com.spilkor.webgamesapp.game.amoba;
 
 import java.io.Serializable;
 

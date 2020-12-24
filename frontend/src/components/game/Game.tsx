@@ -1,10 +1,10 @@
 import React, {useContext, useState} from 'react';
-import {Amoba} from "./game/Amoba";
-import {GameButtonProps, StartGameButtonProps} from "../util/types";
-import {AppContext, GameType} from "../App";
-import API from "../util/API";
+import {Amoba} from "./amoba/Amoba";
+import {GameButtonProps, StartGameButtonProps} from "../../util/types";
+import {AppContext, GameType} from "../../App";
+import API from "../../util/API";
 
-import {ReactComponent as QuitLogo} from '../svg/quit.svg';
+import {ReactComponent as QuitLogo} from '../../svg/quit.svg';
 
 export function Game () {
 
@@ -16,7 +16,6 @@ export function Game () {
         );
 
     }
-
 
     switch (gameData.gameType) {
         case GameType.AMOBA:

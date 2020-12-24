@@ -1,6 +1,6 @@
 package com.spilkor.webgamesapp;
 
-import com.spilkor.webgamesapp.util.dto.UserDTO;
+import com.spilkor.webgamesapp.model.dto.UserDTO;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;

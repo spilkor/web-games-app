@@ -1,15 +1,12 @@
-package com.spilkor.webgamesapp.util;
+package com.spilkor.webgamesapp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spilkor.webgamesapp.BusinessManager;
-import com.spilkor.webgamesapp.WebSocketMessageSender;
+import com.spilkor.webgamesapp.model.dto.UserDTO;
+import com.spilkor.webgamesapp.model.dto.UserTokenDTO;
+import com.spilkor.webgamesapp.model.dto.WebSocketMessage;
 import com.spilkor.webgamesapp.model.User;
-import com.spilkor.webgamesapp.util.dto.WebSocketMessage;
-import com.spilkor.webgamesapp.util.enums.WebSocketMessageType;
-import com.spilkor.webgamesapp.util.dto.UserDTO;
-import com.spilkor.webgamesapp.util.enums.UserState;
-import com.spilkor.webgamesapp.util.dto.UserTokenDTO;
+import com.spilkor.webgamesapp.util.Mapper;
+import com.spilkor.webgamesapp.util.ServiceHelper;
 
 import javax.websocket.Session;
 import java.io.IOException;
@@ -17,7 +14,6 @@ import java.util.*;
 
 public abstract class ConnectionHandler {
 
-    private static ObjectMapper mapper = new ObjectMapper();
     private static Map<Long, List<Session>> userConnections = new HashMap<>();
     private static List<UserTokenDTO> userTokens = new ArrayList<>();
     private static UserTokenRemover userTokenRemover = null;
@@ -62,14 +58,14 @@ public abstract class ConnectionHandler {
         List<UserDTO> friends = new ArrayList<>();
         for (User friend: user.getFriends()){
             UserDTO userDTO = new UserDTO(friend);
-            userDTO.setUserState(ConnectionHandler.getConnectionsByUserId(friend.getId()).isEmpty() ? UserState.offline : UserState.online);
+            userDTO.setUserState(ConnectionHandler.getConnectionsByUserId(friend.getId()).isEmpty() ? UserDTO.UserState.offline : UserDTO.UserState.online);
             friends.add(userDTO);
         }
 
         WebSocketMessage webSocketMessage = new WebSocketMessage();
-        webSocketMessage.setMessageType(WebSocketMessageType.FRIEND_LIST);
+        webSocketMessage.setMessageType(WebSocketMessage.MessageType.FRIEND_LIST);
         try {
-            webSocketMessage.setData(mapper.writeValueAsString(friends));
+            webSocketMessage.setData(Mapper.writeValueAsString(friends));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -130,8 +126,8 @@ public abstract class ConnectionHandler {
         return userConnections.containsKey(userId) ? userConnections.get(userId) : new ArrayList<>();
     }
 
-    public static UserState getUserState(Long userId){
-        return ConnectionHandler.getConnectionsByUserId(userId).isEmpty() ? UserState.offline : UserState.online;
+    public static UserDTO.UserState getUserState(Long userId){
+        return ConnectionHandler.getConnectionsByUserId(userId).isEmpty() ? UserDTO.UserState.offline : UserDTO.UserState.online;
     }
 
     public static Set<Long> getAllUserIds() {

@@ -1,11 +1,9 @@
 package com.spilkor.webgamesapp;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spilkor.webgamesapp.util.ConnectionHandler;
-import com.spilkor.webgamesapp.util.dto.UserTokenDTO;
-import com.spilkor.webgamesapp.util.dto.WebSocketMessage;
-import com.spilkor.webgamesapp.util.enums.WebSocketMessageType;
+import com.spilkor.webgamesapp.model.dto.UserTokenDTO;
+import com.spilkor.webgamesapp.model.dto.WebSocketMessage;
+import com.spilkor.webgamesapp.util.Mapper;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -14,7 +12,6 @@ import javax.websocket.server.ServerEndpoint;
 @ServerEndpoint(value = "/websocket")
 public class WebGamesWebSocketEndPoint {
 
-    private ObjectMapper mapper = new ObjectMapper();
     private Session session = null;
 
     @OnOpen
@@ -29,11 +26,11 @@ public class WebGamesWebSocketEndPoint {
         }
 
         try {
-            WebSocketMessage webSocketMessage = mapper.readValue(message, WebSocketMessage.class);
+            WebSocketMessage webSocketMessage = Mapper.readValue(message, WebSocketMessage.class);
             Long userId = ConnectionHandler.getUserIdByConnection(session);
             if (userId == null) {
-                if (webSocketMessage.getMessageType() == WebSocketMessageType.USER_TOKEN) {
-                    ConnectionHandler.authenticate(mapper.readValue(webSocketMessage.getData(), UserTokenDTO.class), session);
+                if (webSocketMessage.getMessageType() == WebSocketMessage.MessageType.USER_TOKEN) {
+                    ConnectionHandler.authenticate(Mapper.readValue(webSocketMessage.getData(), UserTokenDTO.class), session);
                 }
             }
         } catch (Exception e) {

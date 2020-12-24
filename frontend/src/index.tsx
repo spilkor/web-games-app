@@ -7,12 +7,12 @@ import * as serviceWorker from './serviceWorker';
 import { Route} from "react-router-dom";
 
 
-export const IP = 'localhost'; export const PORT = ':8080';
-// export const IP = '84.3.87.47'; export const PORT = '';
+export const IP = 'localhost';// export const IP = '84.3.87.47';
+export const PORT = ':8080';// export const PORT = '';
 
 
-export function log(content : string) {
-    console.log(content);
+export function log(message?: any, ...optionalParams: any[]) {
+    console.log(message, ...optionalParams);
 }
 
 ReactDOM.render(

@@ -20,8 +20,6 @@ export type ChatMessage = {
     user: User
 }
 
-
-
 export enum GameState  {
     IN_LOBBY = "IN_LOBBY",
     IN_GAME = "IN_GAME",

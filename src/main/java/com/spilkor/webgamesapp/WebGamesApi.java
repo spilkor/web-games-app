@@ -1,15 +1,10 @@
 package com.spilkor.webgamesapp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spilkor.webgamesapp.model.dto.*;
+import com.spilkor.webgamesapp.game.Game;
 import com.spilkor.webgamesapp.model.User;
-import com.spilkor.webgamesapp.util.GameHandler;
-import com.spilkor.webgamesapp.util.dto.*;
-import com.spilkor.webgamesapp.util.enums.GameState;
-import com.spilkor.webgamesapp.util.enums.GameType;
-import com.spilkor.webgamesapp.util.enums.UserState;
-import com.spilkor.webgamesapp.util.enums.WebSocketMessageType;
-import com.spilkor.webgamesapp.util.ConnectionHandler;
+import com.spilkor.webgamesapp.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -28,10 +23,13 @@ import java.util.UUID;
 @RequestMapping(value = "/api")
 public class WebGamesApi {
 
-    @Autowired
+    final
     BusinessManager businessManager;
 
-    ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    public WebGamesApi(BusinessManager businessManager) {
+        this.businessManager = businessManager;
+    }
 
     @GetMapping("/userToken")
     public String getUserToken(HttpServletRequest request) {
@@ -44,10 +42,10 @@ public class WebGamesApi {
         ConnectionHandler.addUserToken(userToken);
 
         WebSocketMessage webSocketMessage = new WebSocketMessage();
-        webSocketMessage.setMessageType(WebSocketMessageType.USER_TOKEN);
+        webSocketMessage.setMessageType(WebSocketMessage.MessageType.USER_TOKEN);
         try {
-            webSocketMessage.setData(mapper.writeValueAsString(userToken.getToken()));
-            return mapper.writeValueAsString(webSocketMessage);
+            webSocketMessage.setData(Mapper.writeValueAsString(userToken.getToken()));
+            return Mapper.writeValueAsString(webSocketMessage);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -77,7 +75,7 @@ public class WebGamesApi {
             return;
         }
 
-        session.setAttribute("user", new UserDTO(foundUser, UserState.online));
+        session.setAttribute("user", new UserDTO(foundUser, UserDTO.UserState.online));
     }
 
 
@@ -172,7 +170,7 @@ public class WebGamesApi {
         newUser.setPassword(userNameAndPassword.getPassword());
         businessManager.save(newUser);
 
-        session.setAttribute("user", new UserDTO(newUser, UserState.online));
+        session.setAttribute("user", new UserDTO(newUser, UserDTO.UserState.online));
     }
 
     @PostMapping(path = "/remove-friend", consumes = MediaType.APPLICATION_JSON_VALUE )
@@ -268,12 +266,12 @@ public class WebGamesApi {
             WebSocketMessage webSocketMessage = new WebSocketMessage();
             String data = null;
             try {
-                data = mapper.writeValueAsString(chatMessageDTO);
+                data = Mapper.writeValueAsString(chatMessageDTO);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
             webSocketMessage.setData(data);
-            webSocketMessage.setMessageType(WebSocketMessageType.CHAT_MESSAGE);
+            webSocketMessage.setMessageType(WebSocketMessage.MessageType.CHAT_MESSAGE);
 
             WebSocketMessageSender.broadcastMessage(webSocketMessage);
         }
@@ -298,7 +296,7 @@ public class WebGamesApi {
         }
 
         try {
-            return mapper.writeValueAsString(user);
+            return Mapper.writeValueAsString(user);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -318,7 +316,7 @@ public class WebGamesApi {
         GameDTO gameDTO = game.getGameDTO(user);
 
         try {
-            return mapper.writeValueAsString(gameDTO);
+            return Mapper.writeValueAsString(gameDTO);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -332,7 +330,7 @@ public class WebGamesApi {
         Set<UserDTO> invites = GameHandler.getInvites(user);
 
         try {
-            return mapper.writeValueAsString(invites);
+            return Mapper.writeValueAsString(invites);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -340,7 +338,7 @@ public class WebGamesApi {
     }
 
     @GetMapping(path = "/create-game/{gameType}")
-    public void createGame(@PathVariable GameType gameType, HttpServletResponse response, HttpServletRequest request) {
+    public void createGame(@PathVariable Game.GameType gameType, HttpServletResponse response, HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
 
         Game game = GameHandler.getGameOfUser(user);

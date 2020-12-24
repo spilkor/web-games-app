@@ -1,15 +1,20 @@
-package com.spilkor.webgamesapp.util.dto;
+package com.spilkor.webgamesapp.model.dto;
 
 import com.spilkor.webgamesapp.model.User;
-import com.spilkor.webgamesapp.util.enums.UserState;
 
 import java.util.Objects;
 
 public class UserDTO {
 
-    Long id;
-    String name;
-    UserState userState;
+    public enum UserState {
+        online,
+        offline
+    }
+
+
+    private Long id;
+    private String name;
+    private UserState userState;
 
     public UserDTO() {
     }

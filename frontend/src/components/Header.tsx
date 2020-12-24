@@ -1,13 +1,11 @@
 import React, {useContext, useEffect} from 'react';
 import API from "../util/API";
-
 import {AppContext, ContentMode} from "../App";
 import '../css/header.css';
-
 import {ReactComponent as LogoutLogo} from '../svg/logout.svg';
 import {ReactComponent as ReconnectLogo} from '../svg/reconnect.svg';
-
 import {Key} from "ts-keycode-enum";
+
 
 type MenuButtonProps = {
     text: string
@@ -20,20 +18,17 @@ export function Header () {
 
     return (
         <div className={"header"}>
-
             <div className={"header-buttons"}>
                 <HeaderButton text={"HOME"} contentMode={ContentMode.HOME} />
                 <HeaderButton text={"GAME"} contentMode={ContentMode.GAME} />
                 <HeaderButton text={"CHAT"} contentMode={ContentMode.CHAT}/>
             </div>
-
             <div className={"header-left"}>
                 <div className={"welcome"}>Welcome, {user!.name}</div>
                 <div className={"reconnect"} onClick={()=> reconnect!()}>
                     <ReconnectLogo />
                 </div>
             </div>
-
             <Logout/>
         </div>
     );

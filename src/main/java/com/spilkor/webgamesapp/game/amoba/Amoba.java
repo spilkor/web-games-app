@@ -1,11 +1,11 @@
-package com.spilkor.webgamesapp.util.dto;
+package com.spilkor.webgamesapp.game.amoba;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.spilkor.webgamesapp.game.Game;
+import com.spilkor.webgamesapp.model.dto.UserDTO;
+import com.spilkor.webgamesapp.util.Mapper;
 import com.spilkor.webgamesapp.util.WebMathUtil;
-import com.spilkor.webgamesapp.util.enums.GameState;
-import com.spilkor.webgamesapp.util.enums.GameType;
-import com.spilkor.webgamesapp.util.enums.OwnerAs;
 
 import java.io.Serializable;
 
@@ -17,6 +17,12 @@ public class Amoba extends Game {
 //    6 7 8]
 //    null: empty,  true: X,  false: O
 //    X starts
+
+    public enum OwnerAs {
+        Random,
+        X,
+        O
+    }
 
     private UserDTO nextPlayer = null;
     private UserDTO winner = null;
@@ -40,7 +46,7 @@ public class Amoba extends Game {
     @Override
     public boolean updateLobby(String lobbyJSON) {
         try {
-            AmobaLobbyDTO amobaLobbyDTO = mapper.readValue(lobbyJSON, AmobaLobbyDTO.class);
+            AmobaLobbyDTO amobaLobbyDTO = Mapper.readValue(lobbyJSON, AmobaLobbyDTO.class);
 
             if (amobaLobbyDTO.getOwnerAs() == null){
                 return false;
@@ -101,7 +107,7 @@ public class Amoba extends Game {
         amobaGameDTO.setOwnerAs(ownerAs);
         amobaGameDTO.setNextSign(nextSign);
         try {
-            return mapper.writeValueAsString(amobaGameDTO);
+            return Mapper.writeValueAsString(amobaGameDTO);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -111,7 +117,7 @@ public class Amoba extends Game {
     @Override
     public boolean legal(UserDTO userDTO, String moveJSON) {
         try {
-            AmobaMoveDTO amobaMoveDTO = mapper.readValue(moveJSON, AmobaMoveDTO.class);
+            AmobaMoveDTO amobaMoveDTO = Mapper.readValue(moveJSON, AmobaMoveDTO.class);
             if (nextPlayer.equals(userDTO)){
                 if (amobaMoveDTO.getIndex()>=0 && amobaMoveDTO.getIndex()<=8){
                     return table[amobaMoveDTO.getIndex()] == null;
@@ -126,7 +132,7 @@ public class Amoba extends Game {
     @Override
     public void move(UserDTO userDTO, String moveJSON) {
         try {
-            AmobaMoveDTO amobaMoveDTO = mapper.readValue(moveJSON, AmobaMoveDTO.class);
+            AmobaMoveDTO amobaMoveDTO = Mapper.readValue(moveJSON, AmobaMoveDTO.class);
 
             table[amobaMoveDTO.getIndex()] = nextSign;
             nextSign = !nextSign;

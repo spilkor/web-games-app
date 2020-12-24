@@ -1,17 +1,25 @@
-package com.spilkor.webgamesapp.util.dto;
+package com.spilkor.webgamesapp.game;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spilkor.webgamesapp.util.ConnectionHandler;
-import com.spilkor.webgamesapp.util.enums.GameState;
-import com.spilkor.webgamesapp.util.enums.GameType;
+import com.spilkor.webgamesapp.model.dto.GameDTO;
+import com.spilkor.webgamesapp.model.dto.UserDTO;
+import com.spilkor.webgamesapp.ConnectionHandler;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public abstract class Game {
 
-    protected final static ObjectMapper mapper = new ObjectMapper();
+    public enum GameState {
+        IN_LOBBY,
+        IN_GAME,
+        ENDED
+    }
+
+    public enum GameType {
+        AMOBA,
+        CHESS
+    }
 
     protected UserDTO owner;
     protected Set<UserDTO> players = new HashSet<>();
@@ -95,4 +103,6 @@ public abstract class Game {
     public void setInvitedUsers(Set<UserDTO> invitedUsers) {
         this.invitedUsers = invitedUsers;
     }
+
+
 }

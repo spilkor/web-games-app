@@ -12,12 +12,12 @@ import {Chat} from "./components/Chat";
 import {Users, UsersLogo} from "./components/Users";
 import {Home} from "./components/Home";
 import {IP, log, PORT} from "./index";
-import {Game} from "./components/Game";
-import {Invite, Invites, InvitesLogo} from "./components/Invites";
+import {Game} from "./components/game/Game";
+import {Invites, InvitesLogo} from "./components/Invites";
+import {async} from "q";
 
 
 export const AppContext = React.createContext<Partial<ContextProps>>({});
-
 
 
 export enum ContentMode  {
@@ -63,17 +63,12 @@ export type ContextProps = {
 };
 
 
-
 export function App () {
 
     const [user, setUser] = useState<User | null | undefined>(undefined);
     const [webSocket, setWebsocket] = useState<WebSocket | null>(null);
-
     const [gameData, setGameData] = useState<GameData | null>(null);
-
     const [friends, setFriends] = useState<User[]>([]);
-
-
     const [contentMode, setContentMode] = useState<ContentMode>(ContentMode.HOME);
     const [chatMessages, _setChatMessages] = useState<ChatMessage[]>([]);
     const chatMessagesRef = React.useRef(chatMessages);
@@ -81,15 +76,11 @@ export function App () {
         chatMessagesRef.current = chatMessages;
         _setChatMessages(chatMessages);
     };
-
     const [gameTypes, setGameTypes] = useState<GameType[]>([GameType.AMOBA, GameType.CHESS]); // TODO fetch + cache
-
     const [usersOpen, setUsersOpen2] = useState<boolean>(false);
-
     function setUsersOpen(usersOpen: boolean){
         setUsersOpen2(usersOpen);
     }
-
     const [invitesOpen, setInvitesOpen2] = useState<boolean>(false);
     const [invites, setInvites] = useState<User[]>();
     function setInvitesOpen(invitesOpen: boolean){
@@ -97,6 +88,7 @@ export function App () {
     }
 
     useEffect(() => {
+
         setInitialState();
 
         if(user === undefined){
@@ -131,29 +123,24 @@ export function App () {
                     gameData,
                     usersOpen,
                     setUsersOpen,
-
                     invites,
                     setInvitesOpen,
                     invitesOpen
                 }}>
                 <div className="app">
                     <Switch>
-
                         { !user &&
                         <Route>
                             <Login/>
                         </Route>
                         }
-
                         <Route exact={true} path={"/"} >
                             <Header />
                             <Controls/>
-
                             <div className={"content " + contentMode.toLowerCase() + "-content"}>
                                 <Content />
                             </div>
                         </Route>
-
                         <Redirect to="" />
                     </Switch>
                 </div>
@@ -162,7 +149,6 @@ export function App () {
     }
 
      function Controls () {
-
         return (
             <>
                 {usersOpen ? <Users/> : <UsersLogo/>}
@@ -170,7 +156,6 @@ export function App () {
             </>
         );
      }
-
 
 
     function Content() {
@@ -181,9 +166,9 @@ export function App () {
                 return(<Chat/>);
             case ContentMode.GAME:
                 return(<Game/>);
+            default:
+                return null;
         }
-
-        return null;
     }
 
     async function fetchUser(){
@@ -194,7 +179,7 @@ export function App () {
 
     async function fetchGameData(){
         let gameData = await API.getGameData() as GameData;
-        log("fetchGameData: " + gameData);
+        log("fetchGameData: ", gameData);
         setGameData(gameData);
     }
 
@@ -203,7 +188,6 @@ export function App () {
         log("fetchInvites: " + invites);
         setInvites(invites);
     }
-
 
     function reconnect(){
         setUser(undefined);
@@ -235,7 +219,7 @@ export function App () {
     }
 
     async function createNewWebSocket(){
-        log("reConnect");
+        log("createNewWebSocket");
 
         let token = await API.getUserToken();
 

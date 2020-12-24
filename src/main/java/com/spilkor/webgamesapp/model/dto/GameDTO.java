@@ -1,7 +1,6 @@
-package com.spilkor.webgamesapp.util.dto;
+package com.spilkor.webgamesapp.model.dto;
 
-import com.spilkor.webgamesapp.util.enums.GameState;
-import com.spilkor.webgamesapp.util.enums.GameType;
+import com.spilkor.webgamesapp.game.Game;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -10,8 +9,8 @@ import java.util.Set;
 public class GameDTO implements Serializable {
 
     private Boolean startable;
-    private GameType gameType;
-    private GameState gameState;
+    private Game.GameType gameType;
+    private Game.GameState gameState;
     private Set<UserDTO> players = new HashSet<>();
     private UserDTO owner;
     private Set<UserDTO> invitedUsers = new HashSet<>();
@@ -27,19 +26,19 @@ public class GameDTO implements Serializable {
         this.startable = startable;
     }
 
-    public GameType getGameType() {
+    public Game.GameType getGameType() {
         return gameType;
     }
 
-    public void setGameType(GameType gameType) {
+    public void setGameType(Game.GameType gameType) {
         this.gameType = gameType;
     }
 
-    public GameState getGameState() {
+    public Game.GameState getGameState() {
         return gameState;
     }
 
-    public void setGameState(GameState gameState) {
+    public void setGameState(Game.GameState gameState) {
         this.gameState = gameState;
     }
 

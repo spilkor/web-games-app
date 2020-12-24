@@ -1,8 +1,10 @@
 import React, {ChangeEvent, useContext} from 'react';
-import {AppContext} from "../../App";
+import {AppContext} from "../../../App";
 import {QuitButton, StartGameButton, SystemMessage} from "../Game";
-import API from "../../util/API";
-import {GameState, User} from "../../util/types";
+import API from "../../../util/API";
+import {GameState, User} from "../../../util/types";
+
+import './amoba.css';
 
 enum OwnerAs {
     Random = "Random",

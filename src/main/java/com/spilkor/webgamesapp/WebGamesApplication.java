@@ -1,7 +1,6 @@
 package com.spilkor.webgamesapp;
 
 
-import com.spilkor.webgamesapp.util.ConnectionHandler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

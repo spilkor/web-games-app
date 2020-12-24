@@ -1,21 +1,31 @@
-package com.spilkor.webgamesapp.util.dto;
+package com.spilkor.webgamesapp.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.spilkor.webgamesapp.util.enums.WebSocketMessageType;
 
 import java.io.Serializable;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WebSocketMessage implements Serializable{
 
-    private WebSocketMessageType messageType;
+    public enum MessageType {
+        STATE,
+        USER_TOKEN,
+        CHAT_MESSAGE,
+        LOBBY,
+        INVITE,
+        FRIEND_LIST,
+        GAME,
+        INVITE_LIST
+    }
+
+    private MessageType messageType;
     private String data;
 
-    public WebSocketMessageType getMessageType() {
+    public MessageType getMessageType() {
         return messageType;
     }
 
-    public void setMessageType(WebSocketMessageType messageType) {
+    public void setMessageType(MessageType messageType) {
         this.messageType = messageType;
     }
 

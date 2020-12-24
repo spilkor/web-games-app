@@ -1,7 +1,6 @@
 import { User} from "./types";
 import {log} from "../index";
 import {GameData, GameType } from "../App";
-import {Invite} from "../components/Invites";
 
 function returnResponse (response: any){
     return response;
@@ -53,8 +52,6 @@ export default class API {
             .catch((error=>{return null}));
         return res as User[];
     }
-
-
 
     public static async logout() {
         await fetch('/api/logout', {
