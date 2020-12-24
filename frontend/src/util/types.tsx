@@ -25,7 +25,7 @@ export type ChatMessage = {
 export enum GameState  {
     IN_LOBBY = "IN_LOBBY",
     IN_GAME = "IN_GAME",
-    GAME_END = "GAME_END"
+    ENDED = "ENDED"
 }
 
 export type MenuButtonProps = {

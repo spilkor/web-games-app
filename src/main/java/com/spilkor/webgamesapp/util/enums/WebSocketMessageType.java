@@ -7,6 +7,6 @@ public enum WebSocketMessageType {
     LOBBY,
     INVITE,
     FRIEND_LIST,
-    GROUP_DATA,
+    GAME,
     INVITE_LIST
 }

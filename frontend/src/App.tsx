@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Redirect, Route, Switch} from "react-router-dom";
 import './css/app.css';
 
-import {ChatMessage, GameState, User, UserState, WSMessage} from "./util/types";
+import {ChatMessage, GameState, User, WSMessage} from "./util/types";
 import {Login} from "./components/Login";
 import {MessageType} from "./util/enums";
 import API from "./util/API";
@@ -31,22 +31,21 @@ export enum GameType  {
     CHESS = "CHESS"
 }
 
-export type GroupData = {
+export type GameData = {
     startable: Boolean
     gameType: GameType
     gameState: GameState
     players: User[]
     owner: User
+    invitedUsers: User[]
 
-    lobbyJSON: string
     gameJSON: string
-    endJSON: string
 }
 
 export type ContextProps = {
     user: User | null,
 
-    groupData: GroupData | null | undefined
+    gameData: GameData | null | undefined
 
     reconnect: () => void
 
@@ -58,7 +57,7 @@ export type ContextProps = {
     usersOpen: boolean
     setUsersOpen: (usersOpen: boolean) => any
 
-    invites: Invite[]
+    invites: User[]
     setInvitesOpen: (invitesOpen: boolean) => any
     invitesOpen: boolean
 };
@@ -70,7 +69,7 @@ export function App () {
     const [user, setUser] = useState<User | null | undefined>(undefined);
     const [webSocket, setWebsocket] = useState<WebSocket | null>(null);
 
-    const [groupData, setGroupData] = useState<GroupData | null>(null);
+    const [gameData, setGameData] = useState<GameData | null>(null);
 
     const [friends, setFriends] = useState<User[]>([]);
 
@@ -85,7 +84,6 @@ export function App () {
 
     const [gameTypes, setGameTypes] = useState<GameType[]>([GameType.AMOBA, GameType.CHESS]); // TODO fetch + cache
 
-
     const [usersOpen, setUsersOpen2] = useState<boolean>(false);
 
     function setUsersOpen(usersOpen: boolean){
@@ -93,7 +91,7 @@ export function App () {
     }
 
     const [invitesOpen, setInvitesOpen2] = useState<boolean>(false);
-    const [invites, setInvites] = useState<Invite[]>();
+    const [invites, setInvites] = useState<User[]>();
     function setInvitesOpen(invitesOpen: boolean){
         setInvitesOpen2(invitesOpen);
     }
@@ -102,7 +100,7 @@ export function App () {
         setInitialState();
 
         if(user === undefined){
-            fetchUser(); //will be null, not undefined if guest
+            fetchUser();
             return;
         }
 
@@ -114,7 +112,7 @@ export function App () {
 
         fetchInvites();
 
-        fetchGroupData();
+        fetchGameData();
 
     }, [user]);
 
@@ -130,7 +128,7 @@ export function App () {
                     friends,
                     gameTypes,
                     setContentMode,
-                    groupData,
+                    gameData,
                     usersOpen,
                     setUsersOpen,
 
@@ -194,14 +192,14 @@ export function App () {
         setUser(user);
     }
 
-    async function fetchGroupData(){
-        let groupData = await API.getGroupData() as GroupData;
-        log("fetchGroupData: " + groupData);
-        setGroupData(groupData);
+    async function fetchGameData(){
+        let gameData = await API.getGameData() as GameData;
+        log("fetchGameData: " + gameData);
+        setGameData(gameData);
     }
 
     async function fetchInvites(){
-        let invites = await API.getInvites() as Invite[];
+        let invites = await API.getInvites() as User[];
         log("fetchInvites: " + invites);
         setInvites(invites);
     }
@@ -232,8 +230,7 @@ export function App () {
 
         setContentMode(ContentMode.HOME);
 
-
-        setGroupData(null);
+        setGameData(null);
         setInvites([]);
     }
 
@@ -257,12 +254,12 @@ export function App () {
                         let friends = JSON.parse(message.data) as User[];
                         setFriends(friends);
                         break;
-                    case MessageType.GROUP_DATA.valueOf():
-                        setGroupData(JSON.parse(message.data) as GroupData);
+                    case MessageType.GAME.valueOf():
+                        setGameData(JSON.parse(message.data) as GameData);
                         break;
 
                     case MessageType.INVITE_LIST.valueOf():
-                        setInvites(JSON.parse(message.data) as Invite[]);
+                        setInvites(JSON.parse(message.data) as User[]);
                         break;
 
                 }

@@ -130,6 +130,10 @@ public abstract class ConnectionHandler {
         return userConnections.containsKey(userId) ? userConnections.get(userId) : new ArrayList<>();
     }
 
+    public static UserState getUserState(Long userId){
+        return ConnectionHandler.getConnectionsByUserId(userId).isEmpty() ? UserState.offline : UserState.online;
+    }
+
     public static Set<Long> getAllUserIds() {
         return userConnections.keySet();
     }

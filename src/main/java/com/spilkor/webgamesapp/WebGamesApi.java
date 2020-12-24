@@ -3,8 +3,7 @@ package com.spilkor.webgamesapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spilkor.webgamesapp.model.User;
-import com.spilkor.webgamesapp.util.GroupHandler;
-import com.spilkor.webgamesapp.util.InviteHandler;
+import com.spilkor.webgamesapp.util.GameHandler;
 import com.spilkor.webgamesapp.util.dto.*;
 import com.spilkor.webgamesapp.util.enums.GameState;
 import com.spilkor.webgamesapp.util.enums.GameType;
@@ -22,6 +21,7 @@ import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -85,35 +85,20 @@ public class WebGamesApi {
     public void invite(@PathVariable Long friendId, HttpServletResponse response, HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
 
-        Group groupOfUser = GroupHandler.getGroupOfUser(user);
-        if (groupOfUser == null || !GameState.IN_LOBBY.equals(groupOfUser.getGameState())){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        if (!groupOfUser.getOwner().getId().equals(user.getId())){
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
         User friend = businessManager.findUserById(friendId);
         if (friend == null){
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
-        if (!businessManager.friends(user.getId(), friendId)){
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+        UserDTO friendDTO = new UserDTO(friend);
 
         try {
-            groupOfUser.invite(user.getId(), friendId);
-        } catch (Group.InviteException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+            GameHandler.invite(user, friendDTO);
+        } catch (WebGamesApiException webGamesApiException){
+            response.setStatus(webGamesApiException.getStatus());
         }
     }
+
     @GetMapping(path = "/accept-invite/{ownerId}")
     public void acceptInvite(@PathVariable Long ownerId, HttpServletResponse response, HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
@@ -125,77 +110,31 @@ public class WebGamesApi {
         }
         UserDTO ownerDTO = new UserDTO(owner);
 
-        Group groupOfOwner = GroupHandler.getGroupOfUser(ownerDTO);
-        if (groupOfOwner == null){
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        if (!groupOfOwner.getOwner().equals(ownerDTO)){
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        if (!businessManager.friends(user.getId(), ownerId)){
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
         try {
-            groupOfOwner.acceptInvite(ownerDTO, user);
-        } catch (Group.InviteException e){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+            GameHandler.acceptInvite(user, ownerDTO);
+        } catch (WebGamesApiException webGamesApiException){
+            response.setStatus(webGamesApiException.getStatus());
         }
     }
 
     @GetMapping(path = "/start-game")
     public void startGame(HttpServletResponse response, HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
-        Group group = GroupHandler.getGroupOfUser(user);
-
-        if (group == null){
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
+        try {
+            GameHandler.startGame(user);
+        } catch (WebGamesApiException webGamesApiException){
+            response.setStatus(webGamesApiException.getStatus());
         }
-
-        if (!group.getOwner().equals(user)){
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        if (!group.isStartable()){
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return;
-
-        }
-
-        group.startGame();
-        GroupHandler.updateGroup(group);
     }
 
     @GetMapping(path = "/restart-game")
     public void restartGame(HttpServletResponse response, HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
-        Group group = GroupHandler.getGroupOfUser(user);
-
-        if (group == null){
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
+        try {
+            GameHandler.restartGame(user);
+        } catch (WebGamesApiException webGamesApiException){
+            response.setStatus(webGamesApiException.getStatus());
         }
-
-        if (!group.getOwner().equals(user)){
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        if (!GameState.GAME_END.equals(group.getGameState())){
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return;
-
-        }
-
-        group.restartGame();
-        GroupHandler.updateGroup(group);
     }
 
     @PostMapping(path = "/create-account", consumes = MediaType.APPLICATION_JSON_VALUE )
@@ -261,18 +200,11 @@ public class WebGamesApi {
 
     @PostMapping(path = "/move", consumes = MediaType.APPLICATION_JSON_VALUE )
     public void move(@RequestBody String moveJSON, HttpServletResponse response, HttpServletRequest request) {
-        UserDTO userDTO = getUserDTOFromRequest(request);
-        Group group = GroupHandler.getGroupOfUser(userDTO);
-
-        if (group == null || group.getGame() == null || !GameState.IN_GAME.equals(group.getGameState())){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        Game game = group.getGame();
-        if (game.legal(userDTO, moveJSON)){
-            game.move(userDTO, moveJSON);
-            GroupHandler.updateGroup(group);
+        UserDTO user = getUserDTOFromRequest(request);
+        try {
+            GameHandler.move(user, moveJSON);
+        } catch (WebGamesApiException webGamesApiException){
+            response.setStatus(webGamesApiException.getStatus());
         }
     }
 
@@ -373,20 +305,20 @@ public class WebGamesApi {
         }
     }
 
-    @GetMapping("/group")
-    public String getGroupDataDTO(HttpServletRequest request) {
+    @GetMapping("/game")
+    public String getGameData(HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
 
-        Group group = GroupHandler.getGroupOfUser(user);
+        Game game = GameHandler.getGameOfUser(user);
 
-        if (group == null){
+        if (game == null){
             return null;
         }
 
-        GroupDataDTO groupDataDTO = group.getGroupDataDTO(user);
+        GameDTO gameDTO = game.getGameDTO(user);
 
         try {
-            return mapper.writeValueAsString(groupDataDTO);
+            return mapper.writeValueAsString(gameDTO);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -397,7 +329,7 @@ public class WebGamesApi {
     public String getMyInvites(HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
 
-        List<Invite> invites = InviteHandler.getInvites(user);
+        Set<UserDTO> invites = GameHandler.getInvites(user);
 
         try {
             return mapper.writeValueAsString(invites);
@@ -407,47 +339,45 @@ public class WebGamesApi {
         }
     }
 
-    @GetMapping(path = "/create-group/{gameType}")
-    public void createGroup(@PathVariable GameType gameType, HttpServletResponse response, HttpServletRequest request) {
+    @GetMapping(path = "/create-game/{gameType}")
+    public void createGame(@PathVariable GameType gameType, HttpServletResponse response, HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
 
-        Group group = GroupHandler.getGroupOfUser(user);
+        Game game = GameHandler.getGameOfUser(user);
 
-        if (group != null){
+        if (game != null){
             response.setStatus(HttpServletResponse.SC_FOUND);
             return;
         }
 
-        group = GroupHandler.createGroup(user, gameType);
-        GroupHandler.updateGroup(group);
+        game = GameHandler.createGame(user, gameType);
+        GameHandler.updatePlayers(game);
     }
 
     @PostMapping(path = "/lobby", consumes = MediaType.APPLICATION_JSON_VALUE )
-    public void updateLobby(@RequestBody String lobbyDataJSON, HttpServletResponse response, HttpServletRequest request) {
+    public void updateLobby(@RequestBody String lobbyJSON, HttpServletResponse response, HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
 
-        Group group = GroupHandler.getGroupOfUser(user);
+        Game game = GameHandler.getGameOfUser(user);
 
-
-        if (group == null || group.getGame() == null){
+        if (game == null){
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        if (!group.getOwner().equals(user)){
+        if (!game.getOwner().equals(user)){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        boolean success = group.getGame().updateLobby(lobbyDataJSON);
-        if (success){
-            GroupHandler.updateGroup(group);
-        }
+        boolean success = game.updateLobby(lobbyJSON);
 
         if (!success){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+
+        GameHandler.updatePlayers(game);
     }
 
     private UserDTO getUserDTOFromRequest(HttpServletRequest request) {
@@ -472,5 +402,25 @@ public class WebGamesApi {
             this.password = password;
         }
     }
+
+
+    public static class WebGamesApiException extends Exception{
+
+        public WebGamesApiException(int status) {
+            this.status = status;
+        }
+
+        private int status;
+
+
+        public int getStatus() {
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
+        }
+    }
+
 
 }

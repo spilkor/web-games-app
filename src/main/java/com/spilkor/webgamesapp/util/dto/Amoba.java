@@ -4,45 +4,43 @@ package com.spilkor.webgamesapp.util.dto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spilkor.webgamesapp.util.WebMathUtil;
 import com.spilkor.webgamesapp.util.enums.GameState;
+import com.spilkor.webgamesapp.util.enums.GameType;
 import com.spilkor.webgamesapp.util.enums.OwnerAs;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-
-
-//        0 1 2            null: empty,  true: X,  false: O
-//        3 4 5
-//        6 7 8            X starts
 
 
 public class Amoba extends Game {
 
+//    [0 1 2
+//    3 4 5
+//    6 7 8]
+//    null: empty,  true: X,  false: O
+//    X starts
+
     private UserDTO nextPlayer = null;
     private UserDTO winner = null;
     private UserDTO startingPlayer = null;
-    private Boolean[] table = null;
-    private OwnerAs ownerAs = OwnerAs.Random;
+    private Boolean[] table;
+    private OwnerAs ownerAs;
+    private Boolean nextSign = null;
 
-    private Amoba(Group group){
-        super(group);
+    public Amoba(UserDTO owner, GameType gameType){
+        super(owner, gameType);
+
+        ownerAs = OwnerAs.Random;
+        table = new Boolean[] {
+                null,null,null,
+                null,null,null,
+                null,null,null
+        };
     }
 
-    public static Amoba newInstance(Group group){
-        Amoba amoba = new Amoba(group);
-        amoba.ownerAs = OwnerAs.Random;
-        return amoba;
-    }
 
     @Override
-    public boolean isStartable() {
-        return group.getPlayers().size() == 2;
-    }
-
-    @Override
-    public boolean updateLobby(String lobbyDataJSON) {
+    public boolean updateLobby(String lobbyJSON) {
         try {
-            AmobaLobbyDTO amobaLobbyDTO = mapper.readValue(lobbyDataJSON, AmobaLobbyDTO.class);
+            AmobaLobbyDTO amobaLobbyDTO = mapper.readValue(lobbyJSON, AmobaLobbyDTO.class);
 
             if (amobaLobbyDTO.getOwnerAs() == null){
                 return false;
@@ -58,39 +56,50 @@ public class Amoba extends Game {
     }
 
     @Override
-    public void startGame() {
+    public boolean isStartable() {
+        return players.size() == 2;// && ownerAs != null;
+    }
 
+    @Override
+    public void start() {
+        switch (ownerAs){
+            case X:
+                startingPlayer = owner;
+                break;
+            case O:
+                startingPlayer = getSecondPlayer();
+                break;
+            case Random:
+                if (WebMathUtil.coinToss()){
+                    startingPlayer = owner;
+                } else {
+                    startingPlayer = getSecondPlayer();
+                }
+        }
+        nextPlayer = startingPlayer;
+        nextSign = true;
+    }
+
+    @Override
+    public void restart() {
         table = new Boolean[] {
                 null,null,null,
                 null,null,null,
                 null,null,null
         };
-
-        switch (ownerAs){
-            case X:
-                startingPlayer = group.getOwner();
-                break;
-            case O:
-                startingPlayer = group.getSecondPlayer();
-                break;
-            case Random:
-                if (WebMathUtil.coinToss()){
-                    startingPlayer = group.getOwner();
-                } else {
-                    startingPlayer = group.getSecondPlayer();
-                }
-                break;
-        }
-
-        nextPlayer = startingPlayer;
+        winner = null;
+        nextPlayer = null;
+        nextSign = true;
     }
-
 
     @Override
     public String getGameJSON(UserDTO user) {
         AmobaGameDTO amobaGameDTO = new AmobaGameDTO();
         amobaGameDTO.setNextPlayer(nextPlayer);
         amobaGameDTO.setTable(table);
+        amobaGameDTO.setWinner(winner);
+        amobaGameDTO.setOwnerAs(ownerAs);
+        amobaGameDTO.setNextSign(nextSign);
         try {
             return mapper.writeValueAsString(amobaGameDTO);
         } catch (JsonProcessingException e) {
@@ -100,68 +109,6 @@ public class Amoba extends Game {
     }
 
     @Override
-    public String getEndJSON(UserDTO user) {
-        AmobaEndDTO amobaEndDTO = new AmobaEndDTO();
-        amobaEndDTO.setWinner(winner);
-        try {
-            return mapper.writeValueAsString(amobaEndDTO);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public String getLobbyJSON(UserDTO user) {
-        AmobaLobbyDTO amobaLobbyDTO = new AmobaLobbyDTO();
-        amobaLobbyDTO.setOwnerAs(ownerAs);
-        try {
-            return mapper.writeValueAsString(amobaLobbyDTO);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-
-    public static class AmobaGameDTO implements Serializable {
-
-        private UserDTO nextPlayer;
-
-        private Boolean[] table;
-
-        public UserDTO getNextPlayer() {
-            return nextPlayer;
-        }
-
-        public void setNextPlayer(UserDTO nextPlayer) {
-            this.nextPlayer = nextPlayer;
-        }
-
-        public Boolean[] getTable() {
-            return table;
-        }
-
-        public void setTable(Boolean[] table) {
-            this.table = table;
-        }
-    }
-
-    public static class AmobaEndDTO implements Serializable {
-        private UserDTO winner;
-
-        public UserDTO getWinner() {
-            return winner;
-        }
-
-        public void setWinner(UserDTO winner) {
-            this.winner = winner;
-        }
-    }
-
-
-    @Override
     public boolean legal(UserDTO userDTO, String moveJSON) {
         try {
             AmobaMoveDTO amobaMoveDTO = mapper.readValue(moveJSON, AmobaMoveDTO.class);
@@ -169,7 +116,6 @@ public class Amoba extends Game {
                 if (amobaMoveDTO.getIndex()>=0 && amobaMoveDTO.getIndex()<=8){
                     return table[amobaMoveDTO.getIndex()] == null;
                 }
-
             }
         } catch (JsonProcessingException e) {
             return false;
@@ -182,18 +128,19 @@ public class Amoba extends Game {
         try {
             AmobaMoveDTO amobaMoveDTO = mapper.readValue(moveJSON, AmobaMoveDTO.class);
 
-            table[amobaMoveDTO.getIndex()] = startingPlayer.equals(userDTO);
+            table[amobaMoveDTO.getIndex()] = nextSign;
+            nextSign = !nextSign;
 
             boolean hasRow = hasRow();
             boolean tableIsFull = tableIsFull();
             boolean gameEnded = hasRow || tableIsFull;
 
             if (gameEnded){
-                group.setGameState(GameState.GAME_END);
-                winner = hasRow ? nextPlayer.equals(group.getOwner()) ? group.getOwner() : group.getSecondPlayer() : null;
+                gameState = GameState.ENDED;
+                winner = hasRow ? nextPlayer.equals(owner) ? owner : getSecondPlayer() : null;
                 nextPlayer = null;
             } else {
-                nextPlayer = nextPlayer.equals(group.getOwner()) ? group.getSecondPlayer() : group.getOwner();
+                nextPlayer = nextPlayer.equals(owner) ? getSecondPlayer() : owner;
             }
 
         } catch (JsonProcessingException e) {
@@ -233,5 +180,55 @@ public class Amoba extends Game {
         return false;
     }
 
+
+    public static class AmobaGameDTO implements Serializable {
+
+        private UserDTO nextPlayer;
+        private Boolean[] table;
+        private UserDTO winner;
+        private OwnerAs ownerAs;
+        private Boolean nextSign;
+
+
+        public UserDTO getNextPlayer() {
+            return nextPlayer;
+        }
+
+        public void setNextPlayer(UserDTO nextPlayer) {
+            this.nextPlayer = nextPlayer;
+        }
+
+        public Boolean[] getTable() {
+            return table;
+        }
+
+        public void setTable(Boolean[] table) {
+            this.table = table;
+        }
+
+        public UserDTO getWinner() {
+            return winner;
+        }
+
+        public void setWinner(UserDTO winner) {
+            this.winner = winner;
+        }
+
+        public OwnerAs getOwnerAs() {
+            return ownerAs;
+        }
+
+        public void setOwnerAs(OwnerAs ownerAs) {
+            this.ownerAs = ownerAs;
+        }
+
+        public Boolean getNextSign() {
+            return nextSign;
+        }
+
+        public void setNextSign(Boolean nextSign) {
+            this.nextSign = nextSign;
+        }
+    }
 
 }

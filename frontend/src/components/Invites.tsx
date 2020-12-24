@@ -34,7 +34,9 @@ export function InvitesLogo(){
 
     const { user, invitesOpen, setInvitesOpen, invites} = useContext(AppContext);
 
-    const hasInvite = invites && invites.filter(i=>i.owner.id !== user!.id).length != 0;
+    // const hasInvite = invites && invites.filter(i=>i.owner.id !== user!.id).length != 0;
+
+    const hasInvite = invites && invites.length != 0;
 
     if (hasInvite || invitesOpen){
         return(
@@ -53,15 +55,13 @@ export function Invites () {
 
     const { user, setInvitesOpen, invites} = useContext(AppContext);
 
-
-
     return (
         <Modal isOpen={true} closeOnBackGroundClick={true} close={()=> {setInvitesOpen!(false)}}>
 
             <div className={"invites"}>
                 <div className={"invite-list"}>
 
-                    {invites && invites.filter((i) => i.owner.id !== user!.id).map((invite, key) =>
+                    {invites && invites.map((invite, key) =>
                         <InviteCard key = {key} invite={invite} />
                     )}
 
@@ -77,7 +77,7 @@ export function Invites () {
 
         return (
             <div className={"invite-card"}>
-                <span className={"friend-name"}>{invite.owner.name}</span>
+                <span className={"friend-name"}>{invite.name}</span>
                 <Accept/>
                 <Decline/>
             </div>
@@ -93,7 +93,7 @@ export function Invites () {
         }
 
         function accept() {
-            API.accept(invite.owner.id);
+            API.accept(invite.id);
         }
 
         function Decline() {
@@ -108,7 +108,7 @@ export function Invites () {
 
 
     type InviteCardProps = {
-        invite: Invite
+        invite: User
     }
 
 }

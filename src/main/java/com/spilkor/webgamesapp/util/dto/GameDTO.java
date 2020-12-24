@@ -7,17 +7,17 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GroupDataDTO implements Serializable {
+public class GameDTO implements Serializable {
 
     private Boolean startable;
     private GameType gameType;
     private GameState gameState;
     private Set<UserDTO> players = new HashSet<>();
     private UserDTO owner;
+    private Set<UserDTO> invitedUsers = new HashSet<>();
 
-    private String lobbyJSON;
     private String gameJSON;
-    private String endJSON;
+
 
     public Boolean getStartable() {
         return startable;
@@ -59,14 +59,6 @@ public class GroupDataDTO implements Serializable {
         this.owner = owner;
     }
 
-    public String getLobbyJSON() {
-        return lobbyJSON;
-    }
-
-    public void setLobbyJSON(String lobbyJSON) {
-        this.lobbyJSON = lobbyJSON;
-    }
-
     public String getGameJSON() {
         return gameJSON;
     }
@@ -75,11 +67,11 @@ public class GroupDataDTO implements Serializable {
         this.gameJSON = gameJSON;
     }
 
-    public String getEndJSON() {
-        return endJSON;
+    public Set<UserDTO> getInvitedUsers() {
+        return invitedUsers;
     }
 
-    public void setEndJSON(String endJSON) {
-        this.endJSON = endJSON;
+    public void setInvitedUsers(Set<UserDTO> invitedUsers) {
+        this.invitedUsers = invitedUsers;
     }
 }

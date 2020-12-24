@@ -1,6 +1,6 @@
 import { User} from "./types";
 import {log} from "../index";
-import { GameType, GroupData} from "../App";
+import {GameData, GameType } from "../App";
 import {Invite} from "../components/Invites";
 
 function returnResponse (response: any){
@@ -34,24 +34,24 @@ export default class API {
     }
 
 
-    public static async getGroupData(): Promise<GroupData>{
-        let res = await fetch('/api/group', {
+    public static async getGameData(): Promise<GameData>{
+        let res = await fetch('/api/game', {
             method: 'GET',
             credentials: 'include'
         }).then(translateJSON)
             .then(returnResponse)
             .catch((error=>{return null}));
-        return res as GroupData;
+        return res as GameData;
     }
 
-    public static async getInvites(): Promise<Invite[]>{
+    public static async getInvites(): Promise<User[]>{
         let res = await fetch('/api/my-invites', {
             method: 'GET',
             credentials: 'include'
         }).then(translateJSON)
             .then(returnResponse)
             .catch((error=>{return null}));
-        return res as Invite[];
+        return res as User[];
     }
 
 
@@ -178,11 +178,11 @@ export default class API {
         });
     }
 
-    public static async createGroup(gameType: GameType) {
-        await fetch('/api/create-group/' + gameType, {
-                    method: 'GET',
-                    credentials: 'include'
-                });
+    public static async createGame(gameType: GameType) {
+        await fetch('/api/create-game/' + gameType, {
+            method: 'GET',
+            credentials: 'include'
+        });
     }
 
     public static async sendLobbyData(lobbyJSON: string) {

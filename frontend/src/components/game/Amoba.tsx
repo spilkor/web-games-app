@@ -18,7 +18,10 @@ export function Amoba () {
 
     type AmobaGameDTO = {
         nextPlayer: User | null,
-        table: Boolean[]
+        table: Boolean[],
+        ownerAs: OwnerAs,
+        winner: User,
+        nextSign: Boolean
     }
 
     type AmobaEndDTO = {
@@ -29,11 +32,11 @@ export function Amoba () {
         index: number
     }
 
-    const { user, groupData } = useContext(AppContext);
-    const gameData = JSON.parse(groupData!.gameJSON) as AmobaGameDTO;
-    const lobbyData = JSON.parse(groupData!.lobbyJSON) as AmobaLobbyDTO;
-    const endData = JSON.parse(groupData!.endJSON) as AmobaEndDTO;
-    const myMove = gameData && gameData.nextPlayer && gameData.nextPlayer.id === user!.id;
+    const { user, gameData } = useContext(AppContext);
+    const amobaGameDTO = JSON.parse(gameData!.gameJSON) as AmobaGameDTO;
+    // const lobbyData = JSON.parse(groupData!.lobbyJSON) as AmobaLobbyDTO;
+    // const endData = JSON.parse(groupData!.endJSON) as AmobaEndDTO;
+    const myMove = amobaGameDTO && amobaGameDTO.nextPlayer && amobaGameDTO.nextPlayer.id === user!.id;
 
     return(
         <div className={"amoba"}>
@@ -42,7 +45,7 @@ export function Amoba () {
     );
 
     function Content () {
-        switch (groupData!.gameState) {
+        switch (gameData!.gameState) {
             case GameState.IN_LOBBY:
                 return(
                     <AmobaLobby/>
@@ -51,7 +54,7 @@ export function Amoba () {
                 return(
                     <AmobaGame/>
                 );
-            case GameState.GAME_END:
+            case GameState.ENDED:
                 return(
                     <AmobaEnd/>
                 );
@@ -69,13 +72,13 @@ export function Amoba () {
                         Owner:
                     </div>
                     <div className={"value"}>
-                        <span>{groupData!.owner.name}</span>
+                        <span>{gameData!.owner.name}</span>
                     </div>
                     <div className={"key"}>
                         as:
                     </div>
                     <div className={"value"}>
-                        <select disabled={! (user!.id == groupData!.owner.id)} onChange={(e:ChangeEvent<HTMLSelectElement>)=> {setOwnerAs(e.target.value as OwnerAs)}} value={lobbyData.ownerAs}>
+                        <select disabled={! (user!.id == gameData!.owner.id)} onChange={(e:ChangeEvent<HTMLSelectElement>)=> {setOwnerAs(e.target.value as OwnerAs)}} value={amobaGameDTO.ownerAs}>
                             <option value = {OwnerAs.Random}>{OwnerAs.Random}</option>
                             <option value = {OwnerAs.X}>{OwnerAs.X}</option>
                             <option value = {OwnerAs.O}>{OwnerAs.O}</option>
@@ -87,13 +90,13 @@ export function Amoba () {
                         Players:
                     </div>
                     <div className={"value"}>
-                        {groupData!.players.map((user, key)=>
-                            <div><span>{user.name}</span></div>
+                        {gameData!.players.map((user, key)=>
+                            <div key={key}><span>{user.name}</span></div>
                         )}
                     </div>
                 </div>
-                {groupData!.owner.id === user!.id &&
-                    <StartGameButton text={"START"} enabled={user!.id === groupData!.owner.id && groupData!.startable === true}/>
+                {gameData!.owner.id === user!.id &&
+                    <StartGameButton text={"START"} enabled={gameData!.startable === true}/>
                 }
             </div>
         );
@@ -109,10 +112,11 @@ export function Amoba () {
     }
 
     function AmobaGame () {
+        const nextSign = amobaGameDTO.nextSign ? "X" : "O";
         return (
             <div className={"game"}>
                 <Table/>
-                <SystemMessage text = {gameData.nextPlayer && gameData.nextPlayer.id === user!.id ? "Your move" : "Waiting for opponent"}/>
+                <SystemMessage text = {amobaGameDTO.nextPlayer && amobaGameDTO.nextPlayer.id === user!.id ? ("Your move (" + nextSign + ")") : ("Waiting for opponent (" + nextSign + ")")}/>
             </div>
         );
     }
@@ -121,7 +125,7 @@ export function Amoba () {
         return (
             <div className={"end"}>
                 <Table/>
-                <SystemMessage text = {!endData.winner ? "Draw" : endData.winner.id === user!.id ? "You won" : "You lost"}/>
+                <SystemMessage text = {!amobaGameDTO.winner ? "Game ended in a draw" : amobaGameDTO.winner.id === user!.id ? "You won" : "You lost"}/>
                 <QuitButton/>
             </div>
         );
@@ -129,23 +133,23 @@ export function Amoba () {
 
     function Table() {
         return (
-            <div className={"table"}>
-                <div className={"row"}>
+            <table>
+                <tr>
                     <Squire index={0}/>
                     <Squire index={1}/>
                     <Squire index={2}/>
-                </div>
-                <div className={"row"}>
+                </tr>
+                <tr>
                     <Squire index={3}/>
                     <Squire index={4}/>
                     <Squire index={5}/>
-                </div>
-                <div className={"row"}>
+                </tr>
+                <tr>
                     <Squire index={6}/>
                     <Squire index={7}/>
                     <Squire index={8}/>
-                </div>
-            </div>
+                </tr>
+            </table>
         );
     }
 
@@ -154,15 +158,15 @@ export function Amoba () {
     }
 
     function Squire({index}: SquireProps) {
-        const value = gameData.table[index];
+        const value = amobaGameDTO.table[index];
         const clickable = myMove && value === null;
         const size = 50;
 
         return(
-            <div className={"squire" + (clickable ? " clickable" : "")} onClick={()=> clickable && move()}>
+            <td className={"squire" + (clickable ? " clickable" : "")} onClick={()=> clickable && move()}>
                 {value === true && <Squire_X/>}
                 {value === false && <Squire_O/>}
-            </div>
+            </td>
         );
 
         function move() {

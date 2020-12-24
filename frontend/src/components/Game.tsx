@@ -8,9 +8,9 @@ import {ReactComponent as QuitLogo} from '../svg/quit.svg';
 
 export function Game () {
 
-    const { groupData, gameTypes } = useContext(AppContext);
+    const { gameData, gameTypes } = useContext(AppContext);
 
-    if (!groupData){
+    if (!gameData){
         return(
             <LocalLobby/>
         );
@@ -18,7 +18,7 @@ export function Game () {
     }
 
 
-    switch (groupData.gameType) {
+    switch (gameData.gameType) {
         case GameType.AMOBA:
             return(
                 <Amoba/>
@@ -65,15 +65,15 @@ export function Game () {
             return (
                 <div>
                     {gameTypes!.map((gameType, key)=>
-                        <GameButton enabled={true} key={key} text={gameType} onClick={()=> {createGroup(gameType)}}/>
+                        <GameButton enabled={true} key={key} text={gameType} onClick={()=> {createGame(gameType)}}/>
                     )}
                 </div>
             );
 
-            function createGroup(gameType: GameType) {
+            function createGame(gameType: GameType) {
                 // TODO
 
-                API.createGroup(gameType);
+                API.createGame(gameType);
             }
         }
 

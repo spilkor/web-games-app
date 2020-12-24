@@ -226,10 +226,7 @@ input{
 }
 
 
-.amoba .row{
-    display: flex;
-    z-index: 100;
-}
+
 
 
 .game-settings{
