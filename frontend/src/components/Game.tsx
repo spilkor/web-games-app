@@ -1,10 +1,15 @@
 import React, {useContext, useState} from 'react';
-import {Amoba} from "./amoba/Amoba";
-import {GameButtonProps, StartGameButtonProps} from "../../util/types";
-import {AppContext, GameType} from "../../App";
-import API from "../../util/API";
+import {Amoba} from "../amoba/Amoba";
+import {GameButtonProps, StartGameButtonProps} from "../util/types";
+import {AppContext } from "../App";
+import API from "../util/API";
 
-import {ReactComponent as QuitLogo} from '../../svg/quit.svg';
+import {ReactComponent as QuitLogo} from '../svg/quit.svg';
+
+export enum GameType  {
+    AMOBA = "AMOBA",
+    CHESS = "CHESS"
+}
 
 export function Game () {
 

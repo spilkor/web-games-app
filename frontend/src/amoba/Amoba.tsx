@@ -1,10 +1,10 @@
 import React, {ChangeEvent, useContext} from 'react';
-import {AppContext} from "../../../App";
-import {QuitButton, StartGameButton, SystemMessage} from "../Game";
-import API from "../../../util/API";
-import {GameState, User} from "../../../util/types";
+import {AppContext} from "../App";
+import {QuitButton, StartGameButton, SystemMessage} from "../components/Game";
+import API from "../util/API";
+import {GameState, User} from "../util/types";
 
-import './amoba.css';
+import './amoba.scss';
 
 enum OwnerAs {
     Random = "Random",
@@ -12,32 +12,26 @@ enum OwnerAs {
     O = "O"
 }
 
+type AmobaLobbyDTO = {
+    ownerAs: OwnerAs
+}
+
+type AmobaGameDTO = {
+    nextPlayer: User | null,
+    table: Boolean[],
+    ownerAs: OwnerAs,
+    winner: User,
+    nextSign: Boolean
+}
+
+type AmobaMoveDTO = {
+    index: number
+}
+
 export function Amoba () {
-
-    type AmobaLobbyDTO = {
-        ownerAs: OwnerAs
-    }
-
-    type AmobaGameDTO = {
-        nextPlayer: User | null,
-        table: Boolean[],
-        ownerAs: OwnerAs,
-        winner: User,
-        nextSign: Boolean
-    }
-
-    type AmobaEndDTO = {
-        winner: User | null
-    }
-
-    type AmobaMoveDTO = {
-        index: number
-    }
 
     const { user, gameData } = useContext(AppContext);
     const amobaGameDTO = JSON.parse(gameData!.gameJSON) as AmobaGameDTO;
-    // const lobbyData = JSON.parse(groupData!.lobbyJSON) as AmobaLobbyDTO;
-    // const endData = JSON.parse(groupData!.endJSON) as AmobaEndDTO;
     const myMove = amobaGameDTO && amobaGameDTO.nextPlayer && amobaGameDTO.nextPlayer.id === user!.id;
 
     return(
@@ -165,7 +159,7 @@ export function Amoba () {
         const size = 50;
 
         return(
-            <td className={"squire" + (clickable ? " clickable" : "")} onClick={()=> clickable && move()}>
+            <td className={clickable ? " clickable" : ""} onClick={()=> clickable && move()}>
                 {value === true && <Squire_X/>}
                 {value === false && <Squire_O/>}
             </td>
@@ -178,7 +172,7 @@ export function Amoba () {
 
         function Squire_X() {
             return(
-                <svg height={size} width={size} className={"amoba_x"}>
+                <svg height={size} width={size}>
                     <line x1={size/10}  y1={size/10}  x2={size/10*9}  y2={size/10*9} strokeWidth={size/5} strokeLinecap="round" />
                     <line x1={size/10} y1={size/10*9} x2={size/10*9} y2={size/10} strokeWidth={size/5} strokeLinecap="round" />
                 </svg>
@@ -187,7 +181,7 @@ export function Amoba () {
 
         function Squire_O() {
             return(
-                <svg className="amoba_o">
+                <svg>
                     <circle cx={size/2} cy={size/2} strokeWidth={size/5} r={size/100*40} />
                 </svg>
             );

@@ -1,6 +1,7 @@
 import { User} from "./types";
 import {log} from "../index";
-import {GameData, GameType } from "../App";
+import {GameData } from "../App";
+import {GameType} from "../components/Game";
 
 function returnResponse (response: any){
     return response;

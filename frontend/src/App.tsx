@@ -12,9 +12,8 @@ import {Chat} from "./components/Chat";
 import {Users, UsersLogo} from "./components/Users";
 import {Home} from "./components/Home";
 import {IP, log, PORT} from "./index";
-import {Game} from "./components/game/Game";
+import {Game, GameType} from "./components/Game";
 import {Invites, InvitesLogo} from "./components/Invites";
-import {async} from "q";
 
 
 export const AppContext = React.createContext<Partial<ContextProps>>({});
@@ -24,11 +23,6 @@ export enum ContentMode  {
     HOME = "HOME",
     CHAT = "CHAT",
     GAME = "GAME"
-}
-
-export enum GameType  {
-    AMOBA = "AMOBA",
-    CHESS = "CHESS"
 }
 
 export type GameData = {
