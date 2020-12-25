@@ -1,0 +1,436 @@
+/*.App {*/
+/*text-align: center;*/
+/*}*/
+
+/*.App-logo {*/
+/*height: 40vmin;*/
+/*}*/
+
+/*.App-header {*/
+/*background-color: #282c34;*/
+/*min-height: 100vh;*/
+/*display: flex;*/
+/*flex-direction: column;*/
+/*align-items: center;*/
+/*justify-content: center;*/
+/*font-size: calc(10px + 2vmin);*/
+/*color: white;*/
+/*}*/
+
+/*.App-link {*/
+/*color: #09d3ac;*/
+/*}*/
+
+.app{
+
+    height: 100vh;
+}
+
+.user-list{
+    background: red;
+    width: 500px;
+    margin: 20px;
+}
+
+.user-list{
+    padding-bottom: 0.5px;
+}
+
+.user{
+    margin: 2px;
+    background: black;
+}
+
+.user:hover{
+    cursor: pointer;
+    background: lightpink;
+}
+
+.user-list div:first-child{
+    font-weight: bold;
+    color: white;
+    background: red;
+}
+
+/*LOGIN*/
+.login-wrapper{
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login{
+    border-radius: 10px;
+    color: white;
+    background: gray;
+    padding: 10px;
+    display: grid;
+    border: 1px solid black;
+    box-shadow: 5px 5px 5px 5px rgba(0,0,0 , .3);
+}
+
+.login-z{
+    position: relative;
+}
+
+.login.active{
+    background: lightgray;
+    cursor: pointer;
+    color: black;
+}
+
+input{
+    margin: 5px auto;
+    font-size: 30px;
+    border-radius: 6px;
+}
+
+.login div{
+    text-align: center;
+    margin: auto;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+.login-z .error{
+    background: rgb(222, 118, 118);
+    width: 80%;
+    margin: auto;
+    text-align: center;
+    border-radius: 0 0 5px 5px;
+    padding: 5px;
+    transition: all .3s;
+}
+
+.login-z .error:hover{
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+/*LOGIN*/
+
+
+
+
+
+.game-button:not(.disabled):hover{
+    cursor: pointer;
+}
+
+
+/*!*CHAT*!*/
+.chat{
+    height: 100%;
+    width: 1000px;
+    margin: auto;
+    border: 1px solid white;
+    box-shadow: inset 0 0 10px rgb(255, 255, 255);
+}
+
+.chat .messages{
+    /*     display: revert; */
+    height: 40vh;
+    height: calc(100% - 160px);
+    overflow-y: auto;
+    /*! margin: -20px; */
+    /*! margin: 0; */
+
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*justify-content: flex-end;*/
+    padding: 20px;
+    scrollbar-color: white transparent;
+
+}
+
+.chat .message-box{
+    color: white;
+}
+
+.message-box.mine{
+    margin-right: 0;
+    margin-left: auto;
+    text-align: right;
+    border-radius: 10px 0 10px 10px;
+}
+
+.message-box{
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 500px;
+    border-radius: 0 10px 10px 10px;
+
+}
+
+.chat .message-user{
+    font-weight: bold;
+}
+
+.chat input{
+    margin-top: 20px;
+    display: block;
+    font-size: 2rem;
+}
+
+
+/*!*CHAT*!*/
+
+/*MENU*/
+.menu-container{
+    display: flex
+}
+
+.menu-element{
+    margin: 10px;
+    padding: 10px;
+    background: gray;
+    color: black;
+}
+
+.menu-element.active{
+    background: white;
+}
+/*MENU*/
+
+/*GROUP*/
+.group{
+    border: 2px solid yellow;
+}
+/*GROUP*/
+
+.users{
+    border: 2px solid green;
+}
+
+.invites{
+    border: 2px solid white;
+}
+
+.game-component{
+    border: 2px solid coral;
+}
+
+
+
+
+
+
+.game-settings{
+    border: 2px solid red;
+}
+
+
+
+
+
+
+.sign{
+    position: absolute;
+    right: 40px;
+    top: -40px;
+    background: lightgray;
+    border-radius: 4px 4px 0 0;
+    z-index: 1;
+    transition: .3s ease;
+    height: 80px;
+}
+
+.sign:hover{
+    cursor: pointer;
+    transform: scale(1.2);
+    top: -43px;
+}
+
+.login{
+    position: relative;
+    z-index: 2;
+}
+
+
+
+.input-with-default-value input:not(:valid):not(:focus) + div:after{
+    position: absolute;
+    top: 15px;
+    left: 8px;
+    color: gray;
+    font-size: 30px;
+    opacity: .5;
+    font-weight: normal;
+    pointer-events: none;
+}
+
+.input-with-default-value{
+    position: relative;
+}
+
+
+.user-name input:not(:valid):not(:focus) + div:after{
+    content: "UserName";
+}
+
+.user-name-new input:not(:valid):not(:focus) + div:after{
+    content: "UserName (3+)";
+}
+
+.password input:not(:valid):not(:focus) + div:after{
+    content: "Password";
+}
+
+.password-new input:not(:valid):not(:focus) + div:after{
+    content: "Password (3+)";
+}
+
+.password-again input:not(:valid):not(:focus) + div:after{
+    content: "Password again";
+}
+
+.hello-button{
+    background: red;
+    padding: 10px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.modal{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+.modal-background{
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 99;
+    background: rgba(0,0,0, .3);
+}
+
+.modal-content{
+    height: 0;
+    position: relative;
+    z-index: 100;
+}
+
+.modal-background .modal-background{
+    z-index: 101;
+}
+
+.modal-content .modal-content{
+    z-index: 102;
+}
+
+.content{
+    height: calc(100% - 120px);
+    width: calc(100% - 20px);
+    /*position: relative;*/
+    padding: 10px;
+}
+
+
+.game-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+.game-button{
+    background: white;
+    color: black;
+    font-weight: bold;
+    padding: 10px 100px;
+    margin: 10px;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.game-button.disabled{
+    background: lightgray
+}
+
+.lobby{
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.lobby .caption{
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.lobby .row {
+    display: flex;
+    padding: 5px;
+}
+
+.lobby .row .key{
+    padding: 5px;
+}
+
+.lobby .row .value{
+    padding: 5px;
+}
+
+.lobby span{
+    font-weight: bold;
+}
+
+.friend-card.remove{
+    background: rgb(222, 118, 118);
+    color: white;
+}
+
+.yellow{
+    color: rgba( 253, 255, 100 , 0.8 ) !important;
+    background: rgba( 253, 255, 100 , 0.8 ) !important;
+}
+
+.controls{
+    position: absolute;
+    top: 100px;
+    height: calc(100% - 100px);
+    overflow: hidden;
+    width: 100%;
+}
+
+.start-button{
+    border: 1px solid;
+    background: rgba( 253, 255, 100 , 0.8 );
+}
+
+
+.start-button:not(.disabled):hover{
+    transform: scale(1.05);
+    /*background: rgba(0,0,0, .5);*/
+    transition: all.2s;
+}
+
+
+
+.quit-logo{
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.quit-logo path{
+    fill: #87C3E9;
+}
+
+.quit-logo:hover path{
+    fill: white;
+}
+
+.system-message{
+    display: block;
+    color: #87C3E9;
+}
