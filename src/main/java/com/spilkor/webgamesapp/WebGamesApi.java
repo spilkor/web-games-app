@@ -116,6 +116,43 @@ public class WebGamesApi {
         }
     }
 
+    @GetMapping(path = "/kick-player/{playerId}")
+    public void kickPlayer(@PathVariable Long playerId, HttpServletResponse response, HttpServletRequest request) {
+        UserDTO user = getUserDTOFromRequest(request);
+
+        User player = businessManager.findUserById(playerId);
+        if (player == null){
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        UserDTO playerDTO = new UserDTO(player);
+
+        try {
+            GameHandler.kickPlayer(user, playerDTO);
+        } catch (WebGamesApiException webGamesApiException){
+            response.setStatus(webGamesApiException.getStatus());
+        }
+    }
+
+
+    @GetMapping(path = "/decline-invite/{ownerId}")
+    public void declineInvite(@PathVariable Long ownerId, HttpServletResponse response, HttpServletRequest request) {
+        UserDTO user = getUserDTOFromRequest(request);
+
+        User owner = businessManager.findUserById(ownerId);
+        if (owner == null){
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        UserDTO ownerDTO = new UserDTO(owner);
+
+        try {
+            GameHandler.declineInvite(user, ownerDTO);
+        } catch (WebGamesApiException webGamesApiException){
+            response.setStatus(webGamesApiException.getStatus());
+        }
+    }
+
     @GetMapping(path = "/start-game")
     public void startGame(HttpServletResponse response, HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
@@ -350,6 +387,16 @@ public class WebGamesApi {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @GetMapping("/leave-game")
+    public void leaveGame(HttpServletRequest request) {
+        UserDTO user = getUserDTOFromRequest(request);
+        try {
+            GameHandler.leaveGame(user);
+        } catch (WebGamesApiException e) {
+            e.printStackTrace();
         }
     }
 

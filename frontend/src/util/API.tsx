@@ -224,6 +224,27 @@ export default class API {
         });
     }
 
+    public static async decline(ownerId: string) {
+        await fetch('/api/decline-invite/' + ownerId, {
+            method: 'GET',
+            credentials: 'include'
+        });
+    }
+
+    public static async kickPlayer(playerId: string) {
+        await fetch('/api/kick-player/' + playerId, {
+            method: 'GET',
+            credentials: 'include'
+        });
+    }
+
+    public static async leaveGame() {
+        await fetch('/api/leave-game', {
+            method: 'GET',
+            credentials: 'include'
+        });
+    }
+
     public static async startGame() {
         console.log("start-game");
         await fetch('/api/start-game', {

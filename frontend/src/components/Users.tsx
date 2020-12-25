@@ -12,15 +12,9 @@ import {ReactComponent as MinusLogo40} from '../svg/minus40.svg';
 import {ReactComponent as PlusLogo70} from '../svg/plus70.svg';
 import {ReactComponent as CrownLogo} from '../svg/crown.svg';
 
-
-import {ReactComponent as Pawn} from '../svg/pawn2.svg';
-
-import {User, UserState} from "../util/types";
+import {GameState, User, UserState} from "../util/types";
 import {AppContext} from "../App";
 import API from "../util/API";
-import {placeholder} from "@babel/types";
-import {func} from "prop-types";
-import {InvitesLogo} from "./Invites";
 
 
 export function UsersLogo(){
@@ -54,8 +48,6 @@ export function Users () {
         owner: User,
         friend: User
     }
-
-    const [invites, setInvites] = useState<Invite[]>([{owner: user!, friend: user!},{owner: user!, friend: user!}]);
 
     return (
         <div className={"friends"}>
@@ -175,7 +167,7 @@ export function Users () {
         function Kick() {
             if (gameData && gameData.owner.id === user!.id && gameData.players.filter((player) => player.id === cardUser.id ).length == 1){
                 return (
-                    <div className={"friend-sign"}>
+                    <div className={"friend-sign"} onClick={()=> {cardUser.id === user!.id ? leaveGame() : kickPlayer()}}>
                         <div className={"kick"}>
                             <KickLogo/>
                         </div>
@@ -184,11 +176,19 @@ export function Users () {
             } else {
                 return null;
             }
+
+            async function leaveGame() {
+                await API.leaveGame();
+            }
+
+            async function kickPlayer() {
+                await API.kickPlayer(cardUser.id);
+            }
         }
 
         function Invite() {
 
-            if (gameData && gameData.owner.id === user!.id && gameData.players.filter((player) => player.id === cardUser.id ).length == 0){
+            if (gameData && gameData.gameState !== GameState.IN_GAME &&  gameData.owner.id === user!.id && gameData.players.filter((player) => player.id === cardUser.id ).length == 0 && gameData.invitedUsers.filter((player) => player.id === cardUser.id ).length == 0){
                 return (
                     <div className={"friend-sign"}>
                         <div className={"invite"} onClick={()=>{invite()}}>

@@ -1,27 +1,14 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import '../css/friends.css';
 import {Modal} from "./Modal";
 import {ReactComponent as Logo} from '../svg/questionmark.svg';
-import {ReactComponent as PlusLogo} from '../svg/plus2.svg';
-
-import {ReactComponent as InviteLogo} from '../svg/invite.svg';
-
-import {ReactComponent as KickLogo} from '../svg/kick.svg';
-
-import {ReactComponent as MinusLogo40} from '../svg/minus40.svg';
 import {ReactComponent as AcceptInviteLogo} from '../svg/acceptinvite.svg';
 
 import {ReactComponent as DeclineInviteLogo} from '../svg/declineinvite.svg';
 
-
-
-import {ReactComponent as Pawn} from '../svg/pawn2.svg';
-
-import {User, UserState} from "../util/types";
-import {AppContext} from "../App";
+import {User} from "../util/types";
+import {AppContext, ContentMode} from "../App";
 import API from "../util/API";
-import {placeholder} from "@babel/types";
-import {func} from "prop-types";
 
 export type Invite = {
     owner: User,
@@ -53,7 +40,7 @@ export function InvitesLogo(){
 
 export function Invites () {
 
-    const { user, setInvitesOpen, invites} = useContext(AppContext);
+    const { user, setInvitesOpen, invites, setContentMode} = useContext(AppContext);
 
     return (
         <Modal isOpen={true} closeOnBackGroundClick={true} close={()=> {setInvitesOpen!(false)}}>
@@ -92,17 +79,24 @@ export function Invites () {
             );
         }
 
-        function accept() {
-            API.accept(invite.id);
+        async function accept() {
+            await API.accept(invite.id);
+            setInvitesOpen!(false);
+            setContentMode!(ContentMode.GAME);
         }
 
         function Decline() {
 
             return (
-                <div className={"decline-invite-logo"}>
+                <div className={"decline-invite-logo"} onClick={()=> decline()}>
                     <DeclineInviteLogo/>
                 </div>
             );
+        }
+
+
+        async function decline() {
+            await API.decline(invite.id);
         }
     }
 
