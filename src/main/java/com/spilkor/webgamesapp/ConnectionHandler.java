@@ -42,14 +42,13 @@ public abstract class ConnectionHandler {
 
             List<User> toUpdate = new ArrayList<>();
             User user = ServiceHelper.getService(BusinessManager.class).findEagerUserById(userId);
-            toUpdate.add(user);
             toUpdate.addAll(user.getFriends());
             updateFriendList(toUpdate);
         }
     }
 
     public static void updateFriendList(List<User> userList) {
-        userList.forEach(user -> updateFriendList(user));
+        userList.forEach(ConnectionHandler::updateFriendList);
     }
 
     private static void updateFriendList(User user) {
@@ -58,7 +57,7 @@ public abstract class ConnectionHandler {
         List<UserDTO> friends = new ArrayList<>();
         for (User friend: user.getFriends()){
             UserDTO userDTO = new UserDTO(friend);
-            userDTO.setUserState(ConnectionHandler.getConnectionsByUserId(friend.getId()).isEmpty() ? UserDTO.UserState.offline : UserDTO.UserState.online);
+            userDTO.setUserState(ConnectionHandler.getUserState(friend.getId()));
             friends.add(userDTO);
         }
 

@@ -1,9 +1,9 @@
 package com.spilkor.webgamesapp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.spilkor.webgamesapp.model.dto.*;
 import com.spilkor.webgamesapp.game.Game;
 import com.spilkor.webgamesapp.model.User;
+import com.spilkor.webgamesapp.model.dto.*;
 import com.spilkor.webgamesapp.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -331,6 +332,21 @@ public class WebGamesApi {
 
         try {
             return Mapper.writeValueAsString(invites);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @GetMapping("/my-friends")
+    public String getMyFriends(HttpServletRequest request) {
+        UserDTO user = getUserDTOFromRequest(request);
+
+        List<UserDTO> friendDTOs = businessManager.findUserById(user.getId()).getFriends().stream().map(UserDTO::new).collect(Collectors.toList());
+        friendDTOs.forEach(friendDTO-> friendDTO.setUserState(ConnectionHandler.getUserState(friendDTO.getId())));
+
+        try {
+            return Mapper.writeValueAsString(friendDTOs);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;

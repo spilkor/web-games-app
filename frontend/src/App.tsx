@@ -82,6 +82,7 @@ export function App () {
     }
 
     useEffect(() => {
+        log("useEffect");
 
         setInitialState();
 
@@ -94,11 +95,13 @@ export function App () {
             return;
         }
 
-        createNewWebSocket();
+        fetchFriends();
 
         fetchInvites();
 
         fetchGameData();
+
+        createNewWebSocket();
 
     }, [user]);
 
@@ -167,7 +170,7 @@ export function App () {
 
     async function fetchUser(){
         let user = await API.getUser() as User;
-        log("fetchUser: " + (user && user.name));
+        log("fetchUser: " , user);
         setUser(user);
     }
 
@@ -177,9 +180,15 @@ export function App () {
         setGameData(gameData);
     }
 
+    async function fetchFriends(){
+        let friends = await API.getFriends() as User[];
+        log("fetchFriends: " , friends);
+        setFriends(friends);
+    }
+
     async function fetchInvites(){
         let invites = await API.getInvites() as User[];
-        log("fetchInvites: " + invites);
+        log("fetchInvites: " , invites);
         setInvites(invites);
     }
 
@@ -188,7 +197,7 @@ export function App () {
     }
 
     function sendMessage(data: any, messageType: MessageType){
-        log("sendMessage: " + messageType + data);
+        log("sendMessage: " , messageType , data);
         let messageDto = JSON.stringify({
             data: JSON.stringify(data),
             messageType: messageType
@@ -222,7 +231,7 @@ export function App () {
         newWebSocket.onmessage = (json) => {
             try{
                 let message = JSON.parse(json.data) as WSMessage;
-                log("onMessage: " + message.messageType + message.data);
+                log("onMessage: ", message);
 
                 switch (message.messageType) {
                     case MessageType.CHAT_MESSAGE.valueOf():

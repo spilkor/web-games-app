@@ -54,6 +54,17 @@ export default class API {
         return res as User[];
     }
 
+
+    public static async getFriends(): Promise<User[]>{
+        let res = await fetch('/api/my-friends', {
+            method: 'GET',
+            credentials: 'include'
+        }).then(translateJSON)
+            .then(returnResponse)
+            .catch((error=>{return null}));
+        return res as User[];
+    }
+
     public static async logout() {
         await fetch('/api/logout', {
             method: 'GET',
@@ -161,7 +172,7 @@ export default class API {
 
 
     public static async sendChatMessage(text: string) {
-        log("api.sendChatMessage: " + text);
+        log("api.sendChatMessage: " , text);
         return await fetch('/api/chat-message', {
             mode: 'cors',
             credentials: 'include',
@@ -184,7 +195,7 @@ export default class API {
     }
 
     public static async sendLobbyData(lobbyJSON: string) {
-        log("api.sendLobbyData: " + lobbyJSON);
+        log("api.sendLobbyData: " , lobbyJSON);
         return await fetch('/api/lobby', {
             mode: 'cors',
             credentials: 'include',
