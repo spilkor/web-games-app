@@ -76,6 +76,7 @@ public class WebGamesApi {
             return;
         }
 
+        session.setMaxInactiveInterval(-1);
         session.setAttribute("user", new UserDTO(foundUser, UserDTO.UserState.online));
     }
 
