@@ -153,6 +153,28 @@ public abstract class ConnectionHandler {
         }
     }
 
+    public static void updateFriendRequestList(User user) {
+
+        user = ServiceHelper.getService(BusinessManager.class).findEagerUserById(user.getId());
+
+        List<UserDTO> friendRequestList = new ArrayList<>();
+        for (User request: user.getRequestedBy()){
+            UserDTO userDTO = new UserDTO(request);
+            friendRequestList.add(userDTO);
+        }
+
+        WebSocketMessage webSocketMessage = new WebSocketMessage();
+        webSocketMessage.setMessageType(WebSocketMessage.MessageType.FRIEND_REQUEST_LIST);
+        try {
+            webSocketMessage.setData(Mapper.writeValueAsString(friendRequestList));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        WebSocketMessageSender.sendMessage(user.getId(), webSocketMessage);
+
+    }
+
     private static class UserTokenRemover extends Thread {
 
         private List<UserTokenDTO> toRemove = new ArrayList<>();

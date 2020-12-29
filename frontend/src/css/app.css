@@ -205,10 +205,6 @@ input{
     border: 2px solid green;
 }
 
-.invites{
-    border: 2px solid white;
-}
-
 .game-component{
     border: 2px solid coral;
 }
@@ -384,9 +380,14 @@ input{
     font-weight: bold;
 }
 
-.friend-card.remove{
-    background: rgb(222, 118, 118);
+.friend-card.remove {
+    background: rgb(222, 118, 118) !important;
     color: white;
+    cursor: pointer;
+}
+
+.friend-card.remove:hover{
+    margin-right: 5px !important;
 }
 
 .yellow{

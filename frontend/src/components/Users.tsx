@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import '../css/friends.css';
 import {Modal} from "./Modal";
 import {ReactComponent as FriendsLogo} from '../svg/friends.svg';
@@ -19,10 +19,10 @@ import API from "../util/API";
 
 export function UsersLogo(){
 
-    const { setUsersOpen, usersOpen, invites} = useContext(AppContext);
+    const { setUsersOpen, usersOpen, setAddNewFriendOpen, setRemoveFriendActive} = useContext(AppContext);
 
     return(
-        <div className={"friends-logo"} onClick={()=> {setUsersOpen!(!usersOpen)}}>
+        <div className={"friends-logo" + (usersOpen ? " open" : "")} onClick={()=> {setAddNewFriendOpen!(false);setRemoveFriendActive!(false);setUsersOpen!(!usersOpen)}}>
             <FriendsLogo/>
         </div>
     );
@@ -30,17 +30,14 @@ export function UsersLogo(){
 
 export function Users () {
 
-    const { usersOpen, setUsersOpen} = useContext(AppContext);
+    const { usersOpen, setUsersOpen, addNewFriendOpen, setAddNewFriendOpen, removeFriendActive, setRemoveFriendActive, friends, gameData, user} = useContext(AppContext);
 
-    const [addNewFriendOpen, setAddNewFriendOpen] = useState<boolean>(false);
-    const [removeFriendActive, setRemoveFriendActive] = useState<boolean>(false);
-    const {friends, gameData, user}  = useContext(AppContext);
     const addFriendLogo =
-        <div className={"add-friend-logo"} onClick={()=> {setAddNewFriendOpen(!addNewFriendOpen);setRemoveFriendActive(false)}}>
+        <div className={"add-friend-logo"} onClick={()=> {setAddNewFriendOpen!(!addNewFriendOpen);setRemoveFriendActive!(false)}}>
             <PlusLogo/>
         </div>;
     const removeFriendLogo =
-        <div className={"remove-friend-logo" + (removeFriendActive ? " active" : "")} onClick={()=> {setRemoveFriendActive(!removeFriendActive);setAddNewFriendOpen(false)}}>
+        <div className={"remove-friend-logo" + (removeFriendActive ? " active" : "")} onClick={()=> {setRemoveFriendActive!(!removeFriendActive);setAddNewFriendOpen!(false)}}>
             <MinusLogo40/>
         </div>;
 
@@ -51,7 +48,7 @@ export function Users () {
 
     return (
         <div className={"friends"}>
-            <Modal isOpen={!!usersOpen} closeOnBackGroundClick={true} close={()=> {setUsersOpen!(false); setAddNewFriendOpen(false); setRemoveFriendActive(false)}}>
+            <Modal isOpen={!!usersOpen} closeOnBackGroundClick={true} close={()=> {setUsersOpen!(false); setAddNewFriendOpen!(false); setRemoveFriendActive!(false)}}>
                 <div className={"friend-list"}>
                     <div className={"lobby-background"}>
 
@@ -88,68 +85,38 @@ export function Users () {
         </div>
     );
 
-    function InviteCard({invite}: InviteCardProps) {
-
-        return (
-            <div className={"invite-card"}>
-                <span className={"friend-name"}>{invite.friend.name}</span>
-
-                <Accept/>
-                <Decline/>
-            </div>
-        );
-
-        function Accept() {
-
-            return (
-                <div>
-                    ACCEPT
-                </div>
-            );
-        }
-
-        function Decline() {
-
-            return (
-                <div>
-                    DECLINE
-                </div>
-            );
-        }
-    }
-
-    async function removeFriend(friend: User) {
-        await API.removeFriend(friend.id);
-    }
-
-
 
     type UserCardProps = {
         cardUser: User
     }
 
-
-    type InviteCardProps = {
-        invite: Invite
-    }
-
     function UserCard({cardUser}: UserCardProps) {
 
         const { user }  = useContext(AppContext);
+        const isRemove = removeFriendActive && cardUser.id !== user!.id;
 
         return (
-            <div className={"friend-card" + (removeFriendActive ? " remove" : "")} onClick={()=> removeFriendActive && removeFriend(cardUser)}>
+            <div className={"friend-card" + (isRemove ? " remove" : "")} onClick={()=> isRemove && removeFriend()}>
                 <div className={"name-and-crown"}>
                     <div className={"friend-name"}>{cardUser!.name}</div>
-                    <Crown/>
+                    {isRemove || <Crown/>}
                 </div>
 
-                <Leave/>
-                <Kick/>
-                <Invite/>
-                <UserStateSign/>
+                {isRemove ||
+                <>
+                    <Leave/>
+                    <Kick/>
+                    <Invite/>
+                    <UserStateSign/>
+                </>
+                }
+
             </div>
         );
+
+        async function removeFriend() {
+            await API.removeFriend(cardUser.id);
+        }
 
         function Crown() {
             if (gameData && gameData.owner.id === cardUser.id){
@@ -203,7 +170,7 @@ export function Users () {
 
         function Invite() {
 
-            if (gameData && gameData.gameState !== GameState.IN_GAME &&  gameData.owner.id === user!.id && gameData.players.filter((player) => player.id === cardUser.id ).length == 0 && gameData.invitedUsers.filter((player) => player.id === cardUser.id ).length == 0){
+            if (gameData && gameData.gameState === GameState.IN_LOBBY &&  gameData.owner.id === user!.id && gameData.players.filter((player) => player.id === cardUser.id ).length == 0 && gameData.invitedUsers.filter((player) => player.id === cardUser.id ).length == 0){
                 return (
                     <div className={"friend-sign"}>
                         <div className={"invite"} onClick={()=>{invite()}}>
@@ -258,7 +225,7 @@ export function Users () {
             let error = await API.requestFriend(userName);
             if(!error){
                 setUserName("");
-                setAddNewFriendOpen(false);
+                setAddNewFriendOpen!(false);
             } else {
                 setError(error.message);
             }

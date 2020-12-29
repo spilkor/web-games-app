@@ -285,11 +285,16 @@ public class WebGamesApi {
             toUpdate.add(currentUser);
             toUpdate.add(foundUser);
             ConnectionHandler.updateFriendList(toUpdate);
+
+            ConnectionHandler.updateFriendRequestList(currentUser);
+
             return;
         }
 
         currentUser.getFriendRequests().add(foundUser);
         businessManager.save(currentUser);
+
+        ConnectionHandler.updateFriendRequestList(foundUser);
     }
 
     @PostMapping(path = "/chat-message", consumes = MediaType.APPLICATION_JSON_VALUE  )
@@ -369,6 +374,21 @@ public class WebGamesApi {
 
         try {
             return Mapper.writeValueAsString(invites);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @GetMapping("/my-friend-requests")
+    public String getMyFriendRequests(HttpServletRequest request) {
+        UserDTO userDTO = getUserDTOFromRequest(request);
+        User user = businessManager.findUserById(userDTO.getId());
+        List<UserDTO> friendRequests = new ArrayList<>();
+        user.getRequestedBy().forEach(friendRequest -> friendRequests.add(new UserDTO(friendRequest)));
+
+        try {
+            return Mapper.writeValueAsString(friendRequests);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;

@@ -14,6 +14,7 @@ import {Home} from "./components/Home";
 import {IP, log, PORT} from "./index";
 import {Game, GameType} from "./components/Game";
 import {Invites, InvitesLogo} from "./components/Invites";
+import {FriendRequests, FriendRequestsLogo} from "./components/FriendRequests";
 
 
 export const AppContext = React.createContext<Partial<ContextProps>>({});
@@ -51,11 +52,19 @@ export type ContextProps = {
     usersOpen: boolean
     setUsersOpen: (usersOpen: boolean) => any
 
+    addNewFriendOpen: boolean
+    setAddNewFriendOpen: (addNewFriendOpen: boolean) => any
+    removeFriendActive: boolean
+    setRemoveFriendActive: (removeFriendActive: boolean) => any
+
     invites: User[]
     setInvitesOpen: (invitesOpen: boolean) => any
     invitesOpen: boolean
-};
 
+    friendRequests: User[]
+    setFriendRequestsOpen: (invitesOpen: boolean) => any
+    friendRequestsOpen: boolean
+};
 
 export function App () {
 
@@ -75,11 +84,28 @@ export function App () {
     function setUsersOpen(usersOpen: boolean){
         setUsersOpen2(usersOpen);
     }
-    const [invitesOpen, setInvitesOpen2] = useState<boolean>(false);
-    const [invites, setInvites] = useState<User[]>();
-    function setInvitesOpen(invitesOpen: boolean){
-        setInvitesOpen2(invitesOpen);
+    const [addNewFriendOpen, _setAddNewFriendOpen] = useState<boolean>(false);
+    function setAddNewFriendOpen(addNewFriendOpen: boolean){
+        _setAddNewFriendOpen(addNewFriendOpen);
     }
+    const [removeFriendActive, _setRemoveFriendActive] = useState<boolean>(false);
+    function setRemoveFriendActive(removeFriendActive: boolean){
+        _setRemoveFriendActive(removeFriendActive);
+    }
+
+
+    const [invitesOpen, _setInvitesOpen] = useState<boolean>(false);
+    function setInvitesOpen(invitesOpen: boolean){
+        _setInvitesOpen(invitesOpen);
+    }
+    const [invites, setInvites] = useState<User[]>();
+
+
+    const [friendRequestsOpen, _setFriendRequestsOpen] = useState<boolean>(false);
+    function setFriendRequestsOpen(friendRequestsOpen: boolean){
+        _setFriendRequestsOpen(friendRequestsOpen);
+    }
+    const [friendRequests, setFriendRequests] = useState<User[]>([]);
 
     useEffect(() => {
         log("useEffect");
@@ -98,6 +124,8 @@ export function App () {
         fetchFriends();
 
         fetchInvites();
+
+        fetchFriendRequests();
 
         fetchGameData();
 
@@ -120,9 +148,16 @@ export function App () {
                     gameData,
                     usersOpen,
                     setUsersOpen,
+                    addNewFriendOpen,
+                    setAddNewFriendOpen,
+                    removeFriendActive,
+                    setRemoveFriendActive,
                     invites,
                     setInvitesOpen,
-                    invitesOpen
+                    invitesOpen,
+                    friendRequests,
+                    friendRequestsOpen,
+                    setFriendRequestsOpen
                 }}>
                 <div className="app">
                     <Switch>
@@ -150,6 +185,7 @@ export function App () {
             <>
                 {usersOpen ? <Users/> : <UsersLogo/>}
                 {invitesOpen ? <Invites/> : <InvitesLogo/>}
+                {friendRequestsOpen ? <FriendRequests/> : <FriendRequestsLogo/>}
             </>
         );
      }
@@ -190,6 +226,12 @@ export function App () {
         let invites = await API.getInvites() as User[];
         log("fetchInvites: " , invites);
         setInvites(invites);
+    }
+
+    async function fetchFriendRequests(){
+        let friendRequests = await API.getFriendRequests() as User[];
+        log("fetchFriendRequests: " , friendRequests);
+        setFriendRequests(friendRequests);
     }
 
     function reconnect(){
@@ -244,11 +286,12 @@ export function App () {
                     case MessageType.GAME.valueOf():
                         setGameData(JSON.parse(message.data) as GameData);
                         break;
-
                     case MessageType.INVITE_LIST.valueOf():
                         setInvites(JSON.parse(message.data) as User[]);
                         break;
-
+                    case MessageType.FRIEND_REQUEST_LIST.valueOf():
+                        setFriendRequests(JSON.parse(message.data) as User[]);
+                        break;
                 }
             } catch (e) {
                 log("ERROR in onMessage");

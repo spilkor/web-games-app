@@ -54,6 +54,16 @@ export default class API {
         return res as User[];
     }
 
+    public static async getFriendRequests(): Promise<User[]>{
+        let res = await fetch('/api/my-friend-requests', {
+            method: 'GET',
+            credentials: 'include'
+        }).then(translateJSON)
+            .then(returnResponse)
+            .catch((error=>{return null}));
+        return res as User[];
+    }
+
 
     public static async getFriends(): Promise<User[]>{
         let res = await fetch('/api/my-friends', {

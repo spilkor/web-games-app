@@ -14,6 +14,7 @@ public class WebSocketMessage implements Serializable{
         LOBBY,
         INVITE,
         FRIEND_LIST,
+        FRIEND_REQUEST_LIST,
         GAME,
         INVITE_LIST
     }

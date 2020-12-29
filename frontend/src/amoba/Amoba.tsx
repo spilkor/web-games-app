@@ -122,7 +122,7 @@ export function Amoba () {
             <div className={"end"}>
                 <Table/>
                 <SystemMessage text = {!amobaGameDTO.winner ? "Game ended in a draw" : amobaGameDTO.winner.id === user!.id ? "You won" : "You lost"}/>
-                <QuitButton/>
+                {gameData!.owner.id === user!.id && <QuitButton/>}
             </div>
         );
     }
