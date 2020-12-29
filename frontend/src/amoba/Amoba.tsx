@@ -130,21 +130,23 @@ export function Amoba () {
     function Table() {
         return (
             <table>
-                <tr>
-                    <Squire index={0}/>
-                    <Squire index={1}/>
-                    <Squire index={2}/>
-                </tr>
-                <tr>
-                    <Squire index={3}/>
-                    <Squire index={4}/>
-                    <Squire index={5}/>
-                </tr>
-                <tr>
-                    <Squire index={6}/>
-                    <Squire index={7}/>
-                    <Squire index={8}/>
-                </tr>
+                <tbody>
+                    <tr>
+                        <Squire index={0}/>
+                        <Squire index={1}/>
+                        <Squire index={2}/>
+                    </tr>
+                    <tr>
+                        <Squire index={3}/>
+                        <Squire index={4}/>
+                        <Squire index={5}/>
+                    </tr>
+                    <tr>
+                        <Squire index={6}/>
+                        <Squire index={7}/>
+                        <Squire index={8}/>
+                    </tr>
+                </tbody>
             </table>
         );
     }

@@ -391,12 +391,13 @@ public class WebGamesApi {
     }
 
     @GetMapping("/leave-game")
-    public void leaveGame(HttpServletRequest request) {
+    public void leaveGame(HttpServletResponse response, HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);
         try {
             GameHandler.leaveGame(user);
         } catch (WebGamesApiException e) {
-            e.printStackTrace();
+            response.setStatus(e.getStatus());
+            return;
         }
     }
 

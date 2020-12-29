@@ -6,7 +6,7 @@ import {ReactComponent as AcceptInviteLogo} from '../svg/acceptinvite.svg';
 
 import {ReactComponent as DeclineInviteLogo} from '../svg/declineinvite.svg';
 
-import {User} from "../util/types";
+import {GameState, User} from "../util/types";
 import {AppContext, ContentMode} from "../App";
 import API from "../util/API";
 
@@ -19,15 +19,14 @@ export type Invite = {
 
 export function InvitesLogo(){
 
-    const { user, invitesOpen, setInvitesOpen, invites} = useContext(AppContext);
-
-    // const hasInvite = invites && invites.filter(i=>i.owner.id !== user!.id).length != 0;
+    const { user, invitesOpen, setInvitesOpen, invites, gameData} = useContext(AppContext);
 
     const hasInvite = invites && invites.length != 0;
+    const gameInProgress = gameData && gameData.gameState === GameState.IN_GAME;
 
-    if (hasInvite || invitesOpen){
+    if (hasInvite || invitesOpen && !gameInProgress){
         return(
-            <div className={"invites-logo " + (hasInvite && " yellow")} onClick={()=> {(hasInvite || invitesOpen) && setInvitesOpen!(!invitesOpen)}}>
+            <div className={"invites-logo " + (hasInvite && " yellow")} onClick={()=> setInvitesOpen!(!invitesOpen)}>
                 <Logo/>
             </div>
         );

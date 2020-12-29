@@ -161,29 +161,33 @@ public class GameHandler {
     }
 
     static void acceptInvite(UserDTO user, UserDTO owner) throws WebGamesApi.WebGamesApiException {
-        Game game = getGameOfUser(owner);
+        Game gameOfOwner = getGameOfUser(owner);
 
-        if (game == null){
+        if (gameOfOwner == null){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
 
-        if (!Game.GameState.IN_LOBBY.equals(game.getGameState())){
-            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_BAD_REQUEST);
+        if (!Game.GameState.IN_LOBBY.equals(gameOfOwner.getGameState()) || !gameOfOwner.getOwner().equals(owner) || !gameOfOwner.getInvitedUsers().contains(user)){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
         }
 
-        if (!game.getOwner().equals(owner)){
-            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_UNAUTHORIZED);
+
+        Game gameOfUser = GameHandler.getGameOfUser(user);
+        if (gameOfUser != null && Game.GameState.IN_GAME.equals(gameOfUser.getGameState())){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
         }
 
-        if (!game.getInvitedUsers().remove(user)){
-            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
+        if (gameOfUser != null){
+            leaveGame(user);
         }
+
+        gameOfOwner.getInvitedUsers().remove(user);
 
         updateInviteList(user);
 
-        game.getPlayers().add(user);
+        gameOfOwner.getPlayers().add(user);
 
-        updatePlayers(game);
+        updatePlayers(gameOfOwner);
     }
 
     static void declineInvite(UserDTO user, UserDTO owner) throws WebGamesApi.WebGamesApiException {

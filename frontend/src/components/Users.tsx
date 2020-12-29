@@ -144,9 +144,10 @@ export function Users () {
                     <Crown/>
                 </div>
 
+                <Leave/>
                 <Kick/>
                 <Invite/>
-                <UserState/>
+                <UserStateSign/>
             </div>
         );
 
@@ -165,9 +166,27 @@ export function Users () {
         }
 
         function Kick() {
-            if (gameData && gameData.owner.id === user!.id && gameData.players.filter((player) => player.id === cardUser.id ).length == 1){
+            if (gameData && gameData.gameState !== GameState.IN_GAME && gameData.owner.id === user!.id && gameData.owner.id !== cardUser.id && gameData.players.filter((player) => player.id === cardUser.id ).length == 1){
                 return (
-                    <div className={"friend-sign"} onClick={()=> {cardUser.id === user!.id ? leaveGame() : kickPlayer()}}>
+                    <div className={"friend-sign"} onClick={()=> kickPlayer()}>
+                        <div className={"kick"}>
+                            <KickLogo/>
+                        </div>
+                    </div>
+                );
+            } else {
+                return null;
+            }
+
+            async function kickPlayer() {
+                await API.kickPlayer(cardUser.id);
+            }
+        }
+
+        function Leave() {
+            if (gameData && gameData.gameState !== GameState.IN_GAME && cardUser.id === user!.id){
+                return (
+                    <div className={"friend-sign"} onClick={()=> leaveGame()}>
                         <div className={"kick"}>
                             <KickLogo/>
                         </div>
@@ -179,10 +198,6 @@ export function Users () {
 
             async function leaveGame() {
                 await API.leaveGame();
-            }
-
-            async function kickPlayer() {
-                await API.kickPlayer(cardUser.id);
             }
         }
 
@@ -205,10 +220,10 @@ export function Users () {
             }
         }
 
-        function UserState() {
+        function UserStateSign() {
 
             let friend = friends && friends.find((f)=>{return f.id === cardUser.id});
-            let userState = friend ? friend.userState : cardUser.userState;
+            let userState = user!.id === cardUser.id ? UserState.ONLINE : friend ? friend.userState : cardUser.userState;
 
             return(
                 <div className={"friend-sign"}>
@@ -216,16 +231,6 @@ export function Users () {
                 </div>
             );
 
-            function UserSign(contant: any) {
-
-                return (
-                    <div className={"friend-sign"}>
-                        <div>
-                            {contant}
-                        </div>
-                    </div>
-                );
-            }
         }
 
 
