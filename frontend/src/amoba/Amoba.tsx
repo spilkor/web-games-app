@@ -350,7 +350,7 @@ export function Amoba () {
                     {
                         num_x: num_x + 2,
                         middle_x: (middle_x + ((num_x + 2) -1 ) / 2 > 199) ? (middle_x - 1) : (middle_x - ((num_x + 2) -1 ) / 2 < 0) ? (middle_x + 1) : middle_x,
-                        middle_y: (middle_y + ((num_x + 2) -1) > 199) ? (199 - (num_x + 2 - 1)) : (middle_y - ((num_x + 2) -1 ) < 0) ? (num_x + 2 - 1) : middle_x
+                        middle_y: (middle_y + ((num_x + 2) -1) > 199) ? (199 - (num_x + 2 - 1)) : (middle_y - ((num_x + 2) -1 ) < 0) ? (num_x + 2 - 1) : middle_y
                     } as AmobaGameSettings
                 );
             }
