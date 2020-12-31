@@ -139,3 +139,8 @@ export function QuitButton({}:QuitButtonProps) {
     );
 
 }
+
+export type Position = {
+    x: number,
+    y: number
+}

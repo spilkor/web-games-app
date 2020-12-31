@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Redirect, Route, Switch} from "react-router-dom";
 import './css/app.css';
 
@@ -64,6 +64,9 @@ export type ContextProps = {
     friendRequests: User[]
     setFriendRequestsOpen: (invitesOpen: boolean) => any
     friendRequestsOpen: boolean
+
+    gameSettings: any
+    setGameSettings: (gameSettings: any) => void
 };
 
 export function App () {
@@ -106,6 +109,16 @@ export function App () {
         _setFriendRequestsOpen(friendRequestsOpen);
     }
     const [friendRequests, setFriendRequests] = useState<User[]>([]);
+
+    const [gameSettings, _setGameSettings] = useState<any>(null);
+    function setGameSettings(gameSettings: any){
+        _setGameSettings(gameSettings);
+    }
+
+    const gameType = gameData && gameData.gameType;
+    useEffect(() => {
+        setGameSettings(null);
+    }, [gameType]);
 
     useEffect(() => {
         log("useEffect");
@@ -157,7 +170,9 @@ export function App () {
                     invitesOpen,
                     friendRequests,
                     friendRequestsOpen,
-                    setFriendRequestsOpen
+                    setFriendRequestsOpen,
+                    gameSettings,
+                    setGameSettings
                 }}>
                 <div className="app">
                     <Switch>

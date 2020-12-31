@@ -1,17 +1,19 @@
 package com.spilkor.webgamesapp.game.amoba;
 
+import com.spilkor.webgamesapp.model.dto.Position;
+
 import java.io.Serializable;
 
 public class AmobaMoveDTO implements Serializable {
 
-    private int index;
+    private Position position;
 
-    public int getIndex() {
-        return index;
+    public Position getPosition() {
+        return position;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 }
 

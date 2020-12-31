@@ -3,56 +3,54 @@ package com.spilkor.webgamesapp.game.amoba;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spilkor.webgamesapp.game.Game;
+import com.spilkor.webgamesapp.model.dto.Position;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
-import com.spilkor.webgamesapp.util.WebMathUtil;
+import com.spilkor.webgamesapp.util.MathUtil;
 
-import java.io.Serializable;
+//    2|2 2|1 2|0
+//    1|2 1|1 1|0
+//    0|2 0|1 0|0
 
-
-public class Amoba extends Game {
-
-//    [0 1 2
-//    3 4 5
-//    6 7 8]
-//    null: empty,  true: X,  false: O
+//    null: empty
+//    true: X
+//    false: O
 //    X starts
 
-    public enum OwnerAs {
-        Random,
-        X,
-        O
-    }
+public class Amoba extends Game {
 
     private UserDTO nextPlayer = null;
     private UserDTO winner = null;
     private UserDTO startingPlayer = null;
-    private Boolean[] table;
     private OwnerAs ownerAs;
     private Boolean nextSign = null;
+    private AmobaSize amobaSize;
+    private Boolean[][] table;
+    private Position lastPosition = null;
 
     public Amoba(UserDTO owner, GameType gameType){
         super(owner, gameType);
 
         ownerAs = OwnerAs.Random;
-        table = new Boolean[] {
-                null,null,null,
-                null,null,null,
-                null,null,null
-        };
+        amobaSize = AmobaSize.three;
     }
-
 
     @Override
     public boolean updateLobby(String lobbyJSON) {
         try {
             AmobaLobbyDTO amobaLobbyDTO = Mapper.readValue(lobbyJSON, AmobaLobbyDTO.class);
 
-            if (amobaLobbyDTO.getOwnerAs() == null){
+            if (amobaLobbyDTO.getOwnerAs() == null && amobaLobbyDTO.getAmobaSize() == null){
                 return false;
             }
 
-            ownerAs = amobaLobbyDTO.getOwnerAs();
+            if (amobaLobbyDTO.getOwnerAs() != null){
+                ownerAs = amobaLobbyDTO.getOwnerAs();
+            }
+
+            if (amobaLobbyDTO.getAmobaSize() != null){
+                amobaSize = amobaLobbyDTO.getAmobaSize();
+            }
 
             return true;
         } catch (JsonProcessingException e) {
@@ -63,39 +61,57 @@ public class Amoba extends Game {
 
     @Override
     public boolean isStartable() {
-        return players.size() == 2;// && ownerAs != null;
+        return players.size() == 2;
     }
 
     @Override
     public void start() {
-        switch (ownerAs){
-            case X:
-                startingPlayer = owner;
-                break;
-            case O:
-                startingPlayer = getSecondPlayer();
-                break;
-            case Random:
-                if (WebMathUtil.coinToss()){
-                    startingPlayer = owner;
-                } else {
-                    startingPlayer = getSecondPlayer();
+        switch (amobaSize){
+            case three:
+                table = new Boolean[3][3];
+                nextSign = true;
+                switch (ownerAs){
+                    case X:
+                        startingPlayer = owner;
+                        break;
+                    case O:
+                        startingPlayer = getSecondPlayer();
+                        break;
+                    case Random:
+                        startingPlayer = MathUtil.coinToss() ? owner : getSecondPlayer();
+                        break;
                 }
+                break;
+            case twoHundred:
+                table = new Boolean[200][200];
+                table[100][100] = true;
+
+                lastPosition = new Position(100,100);
+                nextSign = false;
+
+                switch (ownerAs){
+                    case X:
+                        startingPlayer = getSecondPlayer();
+                        break;
+                    case O:
+                        startingPlayer = owner;
+                        break;
+                    case Random:
+                        startingPlayer = MathUtil.coinToss() ? owner : getSecondPlayer();
+                        break;
+                }
+                break;
         }
         nextPlayer = startingPlayer;
-        nextSign = true;
     }
 
     @Override
     public void restart() {
-        table = new Boolean[] {
-                null,null,null,
-                null,null,null,
-                null,null,null
-        };
+        table = null;
         winner = null;
         nextPlayer = null;
-        nextSign = true;
+        nextSign = null;
+        lastPosition = null;
     }
 
     @Override
@@ -105,7 +121,9 @@ public class Amoba extends Game {
         amobaGameDTO.setTable(table);
         amobaGameDTO.setWinner(winner);
         amobaGameDTO.setOwnerAs(ownerAs);
+        amobaGameDTO.setAmobaSize(amobaSize);
         amobaGameDTO.setNextSign(nextSign);
+        amobaGameDTO.setLastPosition(lastPosition);
         try {
             return Mapper.writeValueAsString(amobaGameDTO);
         } catch (JsonProcessingException e) {
@@ -118,15 +136,33 @@ public class Amoba extends Game {
     public boolean legal(UserDTO userDTO, String moveJSON) {
         try {
             AmobaMoveDTO amobaMoveDTO = Mapper.readValue(moveJSON, AmobaMoveDTO.class);
-            if (nextPlayer.equals(userDTO)){
-                if (amobaMoveDTO.getIndex()>=0 && amobaMoveDTO.getIndex()<=8){
-                    return table[amobaMoveDTO.getIndex()] == null;
-                }
+
+            if (!nextPlayer.equals(userDTO)){
+                return false;
+            }
+
+            Position position = amobaMoveDTO.getPosition();
+            if (position == null){
+                return false;
+            }
+
+            switch (amobaSize){
+                case three:
+                    if (!MathUtil.inRange(0, position.getX(), 8) || !MathUtil.inRange(0, position.getY(), 8) ){
+                        return false;
+                    }
+                    return table[position.getX()][position.getY()] == null;
+                case twoHundred:
+                    if (!MathUtil.inRange(0, position.getX(), 199) || !MathUtil.inRange(0, position.getY(), 199) ){
+                        return false;
+                    }
+                    return table[position.getX()][position.getY()] == null;
+                default:
+                    return false;
             }
         } catch (JsonProcessingException e) {
             return false;
         }
-        return false;
     }
 
     @Override
@@ -134,107 +170,71 @@ public class Amoba extends Game {
         try {
             AmobaMoveDTO amobaMoveDTO = Mapper.readValue(moveJSON, AmobaMoveDTO.class);
 
-            table[amobaMoveDTO.getIndex()] = nextSign;
+            Position position = amobaMoveDTO.getPosition();
+            table[position.getX()][position.getY()] = nextSign;
             nextSign = !nextSign;
+            lastPosition = new Position(position.getX(), position.getY());
 
-            boolean hasRow = hasRow();
+            boolean hasLine = hasLine(lastPosition, amobaSize.getLineLength());
             boolean tableIsFull = tableIsFull();
-            boolean gameEnded = hasRow || tableIsFull;
+            boolean gameEnded = hasLine || tableIsFull;
 
             if (gameEnded){
                 gameState = GameState.ENDED;
-                winner = hasRow ? nextPlayer.equals(owner) ? owner : getSecondPlayer() : null;
+                winner = hasLine ? nextPlayer.equals(owner) ? owner : getSecondPlayer() : null;
                 nextPlayer = null;
             } else {
                 nextPlayer = nextPlayer.equals(owner) ? getSecondPlayer() : owner;
             }
-
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
 
     private boolean tableIsFull() {
-        return
-                table[0] != null &&
-                table[1] != null &&
-                table[2] != null &&
-                table[3] != null &&
-                table[4] != null &&
-                table[5] != null &&
-                table[6] != null &&
-                table[7] != null &&
-                table[8] != null;
-    }
-
-    private boolean hasRow() {
-        int[][] rows = new int[][]{
-                {0, 1, 2},
-                {3, 4, 5},
-                {6, 7, 8},
-                {0, 3, 6},
-                {1, 4, 7},
-                {2, 5, 8},
-                {0, 4, 8},
-                {2, 4, 6},
-        };
-        for (int[] row: rows){
-            if (table[row[0]]!=null && table[row[0]]==table[row[1]] && table[row[0]]==table[row[2]]){
-                return true;
+        for (int x = 0; x < table.length; x++){
+            for (int y = 0; y < table[0].length; y++){
+                if (table[x][y] == null){
+                    return false;
+                }
             }
         }
-        return false;
+        return true;
     }
 
+    private boolean hasLine(Position lastPosition, int length) {
+        int north = getNumberOfSquaresInDirectionWithSameValue(lastPosition, 1, 0);
+        int northEast = getNumberOfSquaresInDirectionWithSameValue(lastPosition, 1, -1);
+        int east = getNumberOfSquaresInDirectionWithSameValue(lastPosition, 0, -1);
+        int southEast = getNumberOfSquaresInDirectionWithSameValue(lastPosition, -1, -1);
+        int south = getNumberOfSquaresInDirectionWithSameValue(lastPosition, -1, 0);
+        int southWest = getNumberOfSquaresInDirectionWithSameValue(lastPosition, -1, 1);
+        int west = getNumberOfSquaresInDirectionWithSameValue(lastPosition, 0, 1);
+        int northWest = getNumberOfSquaresInDirectionWithSameValue(lastPosition, 1, 1);
 
-    public static class AmobaGameDTO implements Serializable {
+        return north + south + 1 >= length
+                        || northEast + southWest + 1 >= length
+                        || east + west + 1 >= length
+                        || southEast + northWest + 1 >= length;
+    }
 
-        private UserDTO nextPlayer;
-        private Boolean[] table;
-        private UserDTO winner;
-        private OwnerAs ownerAs;
-        private Boolean nextSign;
-
-
-        public UserDTO getNextPlayer() {
-            return nextPlayer;
+    private int getNumberOfSquaresInDirectionWithSameValue(Position position, int x, int y) {
+        Boolean value = table[lastPosition.getX()][lastPosition.getY()];
+        if (value == null){
+            return 0;
         }
 
-        public void setNextPlayer(UserDTO nextPlayer) {
-            this.nextPlayer = nextPlayer;
+        Position positionToCheck = new Position(position.getX() + x, position.getY() + y);
+
+        if (positionToCheck.getX() < 0 || table.length <= positionToCheck.getX() || positionToCheck.getY() < 0 || table[positionToCheck.getX()].length <= positionToCheck.getY()){
+            return 0;
         }
 
-        public Boolean[] getTable() {
-            return table;
+        if (!value.equals(table[positionToCheck.getX()][positionToCheck.getY()])){
+            return 0;
         }
 
-        public void setTable(Boolean[] table) {
-            this.table = table;
-        }
-
-        public UserDTO getWinner() {
-            return winner;
-        }
-
-        public void setWinner(UserDTO winner) {
-            this.winner = winner;
-        }
-
-        public OwnerAs getOwnerAs() {
-            return ownerAs;
-        }
-
-        public void setOwnerAs(OwnerAs ownerAs) {
-            this.ownerAs = ownerAs;
-        }
-
-        public Boolean getNextSign() {
-            return nextSign;
-        }
-
-        public void setNextSign(Boolean nextSign) {
-            this.nextSign = nextSign;
-        }
+        return 1 + getNumberOfSquaresInDirectionWithSameValue(positionToCheck, x, y);
     }
 
 }
