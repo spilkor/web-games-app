@@ -390,7 +390,7 @@ export function Amoba () {
         function Squire_O() {
             return(
                 <svg height={size} width={size}>
-                    <circle cx={size/2} cy={size/2} strokeWidth={size/5} r={size/100*40} />
+                    <circle cx={size/2} cy={size/2} strokeWidth={size/5} r={size/100*35} />
                 </svg>
             );
         }
