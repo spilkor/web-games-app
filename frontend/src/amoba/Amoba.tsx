@@ -145,17 +145,17 @@ export function Amoba () {
         switch (amobaGameDTO.amobaSize) {
             case AmobaSize.three:
                 return (
-                    <div>
+                    <div className={"relative"}>
                         <ThreeTable/>
                         <SystemMessage text = {amobaGameDTO.nextPlayer && amobaGameDTO.nextPlayer.id === user!.id ? ("Your move (" + nextSign + ")") : ("Waiting for opponent (" + nextSign + ")")}/>
                     </div>
                 );
             case AmobaSize.twoHundred:
                 return (
-                    <div>
+                    <>
                         <TwoHundredTable/>
                         <SystemMessage text = {amobaGameDTO.nextPlayer && amobaGameDTO.nextPlayer.id === user!.id ? ("Your move (" + nextSign + ")") : ("Waiting for opponent (" + nextSign + ")")}/>
-                    </div>
+                    </>
                 );
             default:
                 return null;
@@ -165,8 +165,10 @@ export function Amoba () {
     function AmobaEnd () {
         return (
             <div className={"end"}>
-                {amobaGameDTO.amobaSize === AmobaSize.three ? <ThreeTable/> : <TwoHundredTable/>}
-                <SystemMessage text = {!amobaGameDTO.winner ? "Game ended in a draw" : amobaGameDTO.winner.id === user!.id ? "You won" : "You lost"}/>
+                <div className={"relative"}>
+                    {amobaGameDTO.amobaSize === AmobaSize.three ? <ThreeTable/> : <TwoHundredTable/>}
+                    <SystemMessage text = {!amobaGameDTO.winner ? "Game ended in a draw" : amobaGameDTO.winner.id === user!.id ? "You won" : "You lost"}/>
+                </div>
                 {gameData!.owner.id === user!.id && <QuitButton/>}
             </div>
         );
@@ -379,8 +381,8 @@ export function Amoba () {
         function Squire_X() {
             return(
                 <svg height={size} width={size}>
-                    <line x1={size/10}  y1={size/10}  x2={size/10*9}  y2={size/10*9} strokeWidth={size/5} strokeLinecap="round" />
-                    <line x1={size/10} y1={size/10*9} x2={size/10*9} y2={size/10} strokeWidth={size/5} strokeLinecap="round" />
+                    <line x1={size/6} y1={size/6} x2={size/6*5} y2={size/6*5} strokeWidth={size/5} strokeLinecap="round" />
+                    <line x1={size/6} y1={size/6*5} x2={size/6*5} y2={size/6} strokeWidth={size/5} strokeLinecap="round" />
                 </svg>
             );
         }
