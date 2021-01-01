@@ -3,6 +3,7 @@ package com.spilkor.webgamesapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spilkor.webgamesapp.game.Game;
 import com.spilkor.webgamesapp.game.amoba.Amoba;
+import com.spilkor.webgamesapp.game.chess.Chess;
 import com.spilkor.webgamesapp.model.dto.GameDTO;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.model.dto.WebSocketMessage;
@@ -24,8 +25,8 @@ public class GameHandler {
                 game = new Amoba(owner, gameType);
                 break;
             case CHESS:
-//                game = new Chess(owner, gameType);
-//                break;
+                game = new Chess(owner, gameType);
+                break;
         }
 
         games.add(game);
@@ -36,34 +37,6 @@ public class GameHandler {
     static Game getGameOfUser(UserDTO user) {
         return games.stream().filter(game -> game.getPlayers().contains(user)).findFirst().orElse(null);
     }
-
-//    public static void destroyGame(Game game) {
-//        games.remove(game);
-//        //TODO
-////        InviteHandler.removeGroup(group);
-//    }
-
-//    public static void leaveGroup(UserDTO user) {
-//        Group group = getGroupOfUser(user);
-//        Set<UserDTO> users = group.getPlayers();
-//
-//        //Egyszemélyes group-okat megszüntetjük
-//        if (group.getPlayers().size() == 2){
-//            destroyGroup(group);
-//            users.forEach(u-> updateUser(u));
-//            return;
-//        }
-//
-//        //Kivesszük a users-ből
-//        group.setPlayers(group.getPlayers().stream().filter(u-> !u.equals(user)).collect(Collectors.toSet()));
-//
-//        //Ha ő volt az owner, a group-ja owner-t vált
-//        if (group.getOwner().equals(user)){
-//            group.setOwner(new ArrayList<>(group.getPlayers()).get(0));
-//        }
-//
-//        users.forEach(u-> updateUser(u));
-//    }
 
     private static void updateInviteList(UserDTO userDTO) {
         WebSocketMessage webSocketMessage = new WebSocketMessage();

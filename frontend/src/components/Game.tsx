@@ -5,6 +5,7 @@ import {AppContext } from "../App";
 import API from "../util/API";
 
 import {ReactComponent as QuitLogo} from '../svg/quit.svg';
+import {Chess} from "../chess/Chess";
 
 export enum GameType  {
     AMOBA = "AMOBA",
@@ -27,10 +28,10 @@ export function Game () {
             return(
                 <Amoba/>
             );
-        // case GameType.CHESS:
-        // return(
-        //     <Chess/>
-        // );
+        case GameType.CHESS:
+        return(
+            <Chess/>
+        );
     }
 
 
