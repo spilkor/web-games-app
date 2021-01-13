@@ -1,8 +1,8 @@
 import React, {ChangeEvent, useContext} from 'react';
 import {AppContext} from "../App";
-import {Position, QuitButton, StartGameButton, SystemMessage} from "../components/Game";
+import {QuitButton, StartGameButton, SystemMessage} from "../Main Components/Game";
 import API from "../util/API";
-import {GameState} from "../util/types";
+import {GameState, Position} from "../util/types";
 
 import {ReactComponent as ZoomInSVG} from '../svg/zoom-in.svg';
 import {ReactComponent as ZoomOutSVG} from '../svg/zoom-out.svg';

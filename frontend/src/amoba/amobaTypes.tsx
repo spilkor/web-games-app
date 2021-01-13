@@ -1,5 +1,5 @@
-import {Position} from "../components/Game";
-import {User} from "../util/types";
+
+import {Position, User} from "../util/types";
 
 
 export type SquireProps = {

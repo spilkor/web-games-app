@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Redirect, Route, Switch} from "react-router-dom";
 import './css/app.css';
 
@@ -6,16 +6,15 @@ import {ChatMessage, GameState, User, WSMessage} from "./util/types";
 import {Login} from "./components/Login";
 import {MessageType} from "./util/enums";
 import API from "./util/API";
-
-import {Header} from "./components/Header";
-import {Chat} from "./components/Chat";
-import {Users, UsersLogo} from "./components/Users";
-import {Home} from "./components/Home";
+import {Game, GameType} from "./Main Components/Game";
 import {IP, log, PORT} from "./index";
-import {Game, GameType} from "./components/Game";
-import {Invites, InvitesLogo} from "./components/Invites";
-import {FriendRequests, FriendRequestsLogo} from "./components/FriendRequests";
-
+import {Header} from "./Main Components/Header";
+import {UsersLogo} from "./Main Components/Users";
+import {Invites, InvitesLogo} from "./Main Components/Invites";
+import {Home} from "./Main Components/Home";
+import {Chat} from "./Main Components/Chat";
+import {Users} from "./Main Components/Users";
+import {FriendRequests, FriendRequestsLogo} from "./Main Components/FriendRequests";
 
 export const AppContext = React.createContext<Partial<ContextProps>>({});
 
@@ -284,6 +283,8 @@ export function App () {
         let token = await API.getUserToken();
 
         let newWebSocket = new WebSocket('ws://' + IP + PORT + '/websocket') as WebSocket;
+        // let newWebSocket = new WebSocket('ws://192.168.0.16/websocket') as WebSocket;
+        // let newWebSocket = new WebSocket('wsS://192.168.0.16/websocket') as WebSocket;
 
         newWebSocket.onmessage = (json) => {
             try{

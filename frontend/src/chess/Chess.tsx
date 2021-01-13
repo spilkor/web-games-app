@@ -1,8 +1,8 @@
 import React, {ChangeEvent, useContext, useState} from 'react';
 import {AppContext} from "../App";
-import {Position, StartGameButton, SystemMessage} from "../components/Game";
+import {StartGameButton, SystemMessage} from "../Main Components/Game";
 import API from "../util/API";
-import {GameState} from "../util/types";
+import {GameState, Position} from "../util/types";
 
 import {ReactComponent as KingSVG} from './king.svg';
 import {ReactComponent as QueenSVG} from './queen.svg';

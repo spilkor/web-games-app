@@ -1,4 +1,5 @@
 .header{
+    z-index: 200;
     background: rgb(100, 100, 100);
     height: 100px;
     position: relative;
@@ -59,12 +60,11 @@
     margin: auto;
     height: 100%;
 
-    background: lightgray;
+    background: #86C3E9;;
 }
 
 .header-buttons :first-child{
     margin-left: auto;
-
 }
 
 .header-buttons :last-child{
@@ -72,21 +72,21 @@
 }
 
 .header-button{
+    font-family: Tahoma;
     font-size: 2rem;
     margin: auto 1rem;
     padding: 1rem 2em;
-
-    font-weight: bold;
+    font-weight: bolder;
     background-color: black;
     color: transparent;
-    text-shadow: 1px 2px 2px rgba(255,255,255,0.5);
+    text-shadow: 2px 2px 2px rgba(255,255,255,.4);
     -webkit-background-clip: text;
     -moz-background-clip: text;
     background-clip: text;
 }
 
 .header-button:hover{
-    box-shadow:   0 0 10px rgba(0,0,0,0.5);
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
     transition: .2s all;
     cursor: pointer;
 }

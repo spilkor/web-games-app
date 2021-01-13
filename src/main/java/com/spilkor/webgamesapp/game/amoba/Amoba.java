@@ -3,7 +3,7 @@ package com.spilkor.webgamesapp.game.amoba;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spilkor.webgamesapp.game.Game;
-import com.spilkor.webgamesapp.model.dto.Position;
+import com.spilkor.webgamesapp.model.dto.Point;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
 import com.spilkor.webgamesapp.util.MathUtil;
@@ -26,7 +26,7 @@ public class Amoba extends Game {
     private Boolean nextSign = null;
     private AmobaSize amobaSize;
     private Boolean[][] table;
-    private Position lastPosition = null;
+    private Point lastPosition = null;
 
     public Amoba(UserDTO owner, GameType gameType){
         super(owner, gameType);
@@ -86,7 +86,7 @@ public class Amoba extends Game {
                 table = new Boolean[200][200];
                 table[100][100] = true;
 
-                lastPosition = new Position(100,100);
+                lastPosition = new Point(100,100);
                 nextSign = false;
 
                 switch (ownerAs){
@@ -141,7 +141,7 @@ public class Amoba extends Game {
                 return false;
             }
 
-            Position position = amobaMoveDTO.getPosition();
+            Point position = amobaMoveDTO.getPosition();
             if (position == null){
                 return false;
             }
@@ -170,10 +170,10 @@ public class Amoba extends Game {
         try {
             AmobaMoveDTO amobaMoveDTO = Mapper.readValue(moveJSON, AmobaMoveDTO.class);
 
-            Position position = amobaMoveDTO.getPosition();
+            Point position = amobaMoveDTO.getPosition();
             table[position.getX()][position.getY()] = nextSign;
             nextSign = !nextSign;
-            lastPosition = new Position(position.getX(), position.getY());
+            lastPosition = new Point(position.getX(), position.getY());
 
             boolean hasLine = hasLine(lastPosition, amobaSize.getLineLength());
             boolean tableIsFull = tableIsFull();
@@ -202,7 +202,7 @@ public class Amoba extends Game {
         return true;
     }
 
-    private boolean hasLine(Position lastPosition, int length) {
+    private boolean hasLine(Point lastPosition, int length) {
         int north = getNumberOfSquaresInDirectionWithSameValue(lastPosition, 1, 0);
         int northEast = getNumberOfSquaresInDirectionWithSameValue(lastPosition, 1, -1);
         int east = getNumberOfSquaresInDirectionWithSameValue(lastPosition, 0, -1);
@@ -218,13 +218,13 @@ public class Amoba extends Game {
                         || southEast + northWest + 1 >= length;
     }
 
-    private int getNumberOfSquaresInDirectionWithSameValue(Position position, int x, int y) {
+    private int getNumberOfSquaresInDirectionWithSameValue(Point position, int x, int y) {
         Boolean value = table[lastPosition.getX()][lastPosition.getY()];
         if (value == null){
             return 0;
         }
 
-        Position positionToCheck = new Position(position.getX() + x, position.getY() + y);
+        Point positionToCheck = new Point(position.getX() + x, position.getY() + y);
 
         if (positionToCheck.getX() < 0 || table.length <= positionToCheck.getX() || positionToCheck.getY() < 0 || table[positionToCheck.getX()].length <= positionToCheck.getY()){
             return 0;

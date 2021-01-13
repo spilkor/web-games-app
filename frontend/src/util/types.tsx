@@ -42,5 +42,16 @@ export type StartGameButtonProps = {
     enabled: boolean
 }
 
+export type Position = {
+    x: number,
+    y: number
+}
 
+
+export enum PointOfCompass {
+    NORTH = "NORTH",
+    EAST = "EAST",
+    SOUTH = "SOUTH",
+    WEST = "WEST"
+}
 

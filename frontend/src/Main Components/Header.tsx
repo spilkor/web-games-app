@@ -24,7 +24,7 @@ export function Header () {
                 <HeaderButton text={"CHAT"} contentMode={ContentMode.CHAT}/>
             </div>
             <div className={"header-left"}>
-                <div className={"welcome"}>Welcome, {user!.name}</div>
+                {/*<div className={"welcome"}>Welcome, {user!.name}</div>*/}
                 <div className={"reconnect"} onClick={()=> reconnect!()}>
                     <ReconnectLogo />
                 </div>

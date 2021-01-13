@@ -1,13 +1,13 @@
 package com.spilkor.webgamesapp.game.amoba;
 
-import com.spilkor.webgamesapp.model.dto.Position;
+import com.spilkor.webgamesapp.model.dto.Point;
 
 import java.io.Serializable;
 
 public class Square implements Serializable {
 
     private boolean value;
-    private Position position;
+    private Point position;
 
 
     public Square (){
@@ -16,7 +16,7 @@ public class Square implements Serializable {
 
     public Square(int x, int y, boolean value){
         this.value = value;
-        this.position = new Position(x, y);
+        this.position = new Point(x, y);
     }
 
 
@@ -28,11 +28,11 @@ public class Square implements Serializable {
         this.value = value;
     }
 
-    public Position getPosition() {
+    public Point getPosition() {
         return position;
     }
 
-    public void setPosition(Position position) {
+    public void setPosition(Point position) {
         this.position = position;
     }
 }

@@ -323,9 +323,10 @@ input{
 }
 
 .content{
+    position: relative;
+    z-index: 100;
     height: calc(100% - 120px);
     width: calc(100% - 20px);
-    /*position: relative;*/
     padding: 10px;
 }
 

@@ -29,9 +29,9 @@ export function Game () {
                 <Amoba/>
             );
         case GameType.CHESS:
-        return(
-            <Chess/>
-        );
+            return(
+                <Chess/>
+            );
     }
 
 
@@ -141,7 +141,3 @@ export function QuitButton({}:QuitButtonProps) {
 
 }
 
-export type Position = {
-    x: number,
-    y: number
-}

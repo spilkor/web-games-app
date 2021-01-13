@@ -5,6 +5,7 @@ import App from './App';
 import {BrowserRouter} from "react-router-dom";
 import * as serviceWorker from './serviceWorker';
 import { Route} from "react-router-dom";
+import {Dev} from "./Dev";
 
 
 export const IP = 'localhost';// export const IP = '84.3.87.47';
@@ -17,7 +18,8 @@ export function log(message?: any, ...optionalParams: any[]) {
 
 ReactDOM.render(
     <BrowserRouter>
-        <Route component={App}/>
+        {/*<Route component={App}/>*/}
+        <Route component={Dev}/>
     </BrowserRouter>
     , document.getElementById('root')
 );

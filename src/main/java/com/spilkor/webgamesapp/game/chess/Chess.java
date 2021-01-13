@@ -3,7 +3,7 @@ package com.spilkor.webgamesapp.game.chess;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spilkor.webgamesapp.game.Game;
-import com.spilkor.webgamesapp.model.dto.Position;
+import com.spilkor.webgamesapp.model.dto.Point;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
 import com.spilkor.webgamesapp.util.MathUtil;
@@ -141,7 +141,7 @@ public class Chess extends Game {
         }
     }
 
-    private ChessPiece getChessPiece(Position position){
+    private ChessPiece getChessPiece(Point position){
         return table[position.getX()][position.getY()];
     }
 
