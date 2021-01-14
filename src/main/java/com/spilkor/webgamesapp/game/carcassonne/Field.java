@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class Field {
 
-    private Set<HalfSide> halfSides = new HashSet<>();
+    private Set<HalfSide> halfSides;
 
     public Field(Set<HalfSide> halfSides) {
         this.halfSides = halfSides;

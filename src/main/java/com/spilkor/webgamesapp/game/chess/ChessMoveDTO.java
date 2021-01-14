@@ -1,28 +1,28 @@
 package com.spilkor.webgamesapp.game.chess;
 
-import com.spilkor.webgamesapp.model.dto.Point;
+import com.spilkor.webgamesapp.model.dto.Coordinate;
 
 import java.io.Serializable;
 
 public class ChessMoveDTO implements Serializable {
 
-    private Point fromPosition;
-    private Point toPosition;
+    private Coordinate fromPosition;
+    private Coordinate toPosition;
 
 
-    public Point getFromPosition() {
+    public Coordinate getFromPosition() {
         return fromPosition;
     }
 
-    public void setFromPosition(Point fromPosition) {
+    public void setFromPosition(Coordinate fromPosition) {
         this.fromPosition = fromPosition;
     }
 
-    public Point getToPosition() {
+    public Coordinate getToPosition() {
         return toPosition;
     }
 
-    public void setToPosition(Point toPosition) {
+    public void setToPosition(Coordinate toPosition) {
         this.toPosition = toPosition;
     }
 }

@@ -1,13 +1,13 @@
 package com.spilkor.webgamesapp.game.carcassonne;
 
-import com.spilkor.webgamesapp.model.dto.Point;
+import com.spilkor.webgamesapp.model.dto.Coordinate;
 
 import java.io.Serializable;
 
 public class CarcassonneMoveDTO implements Serializable {
 
     private MoveType moveType;
-    private Point point;
+    private Coordinate coordinate;
     private PointOfCompass pointOfCompass;
 
     public MoveType getMoveType() {
@@ -18,12 +18,12 @@ public class CarcassonneMoveDTO implements Serializable {
         this.moveType = moveType;
     }
 
-    public Point getPoint() {
-        return point;
+    public Coordinate getCoordinate() {
+        return coordinate;
     }
 
-    public void setPoint(Point point) {
-        this.point = point;
+    public void setCoordinate(Coordinate coordinate) {
+        this.coordinate = coordinate;
     }
 
     public PointOfCompass getPointOfCompass() {

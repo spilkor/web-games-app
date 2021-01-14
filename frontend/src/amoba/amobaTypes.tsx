@@ -1,9 +1,9 @@
 
-import {Position, User} from "../util/types";
+import {Coordinate, User} from "../util/types";
 
 
 export type SquireProps = {
-    position: Position,
+    position: Coordinate,
     size: number
 }
 
@@ -41,11 +41,11 @@ export type AmobaGameDTO = {
     nextSign: Boolean,
     amobaSize: AmobaSize,
     table: Boolean[][],
-    lastPosition: Position
+    lastPosition: Coordinate
 }
 
 export type AmobaMoveDTO = {
-    position: Position
+    position: Coordinate
 }
 
 export type AmobaGameSettings = {

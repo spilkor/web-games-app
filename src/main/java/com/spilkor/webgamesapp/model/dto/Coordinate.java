@@ -3,20 +3,20 @@ package com.spilkor.webgamesapp.model.dto;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Point implements Serializable {
+public class Coordinate implements Serializable {
 
     private Integer x;
     private Integer y;
 
-    public Point(){
+    public Coordinate(){
 
     }
 
-    public Point(Integer x){
+    public Coordinate(Integer x){
         this.x = x;
     }
 
-    public Point(Integer x, Integer y){
+    public Coordinate(Integer x, Integer y){
         this.x = x;
         this.y = y;
     }
@@ -41,7 +41,7 @@ public class Point implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Point other = (Point) o;
+        Coordinate other = (Coordinate) o;
         return Objects.equals(x, other.x) && Objects.equals(y, other.y);
     }
 }

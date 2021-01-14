@@ -30,7 +30,10 @@ public class WebGamesWebSocketEndPoint {
             Long userId = ConnectionHandler.getUserIdByConnection(session);
             if (userId == null) {
                 if (webSocketMessage.getMessageType() == WebSocketMessage.MessageType.USER_TOKEN) {
-                    ConnectionHandler.authenticate(Mapper.readValue(webSocketMessage.getData(), UserTokenDTO.class), session);
+                    UserTokenDTO userTokenDTO = Mapper.readValue(webSocketMessage.getData(), UserTokenDTO.class);
+                    if(ConnectionHandler.getUserTokens().remove(userTokenDTO)){
+                        ConnectionHandler.addConnection(userTokenDTO.getUserId(), session);
+                    }
                 }
             }
         } catch (Exception e) {

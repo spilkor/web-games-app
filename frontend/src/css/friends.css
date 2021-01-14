@@ -10,11 +10,11 @@
     transition: all .3s;
     width: 50px;
     height: 40px;
-    z-index: 98;
+    z-index: 300;
 }
 
 .friends-logo.open{
-    z-index: 100;
+    z-index: 310;
 }
 
 .friends-logo:hover{
@@ -293,11 +293,11 @@
     transition: all .3s;
     width: 40px;
     height: 40px;
-    z-index: 98;
+    z-index: 300;
 }
 
 .invites-logo.open{
-    z-index: 100;
+    z-index: 310;
 }
 
 .invites-logo svg{

@@ -3,6 +3,7 @@ package com.spilkor.webgamesapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spilkor.webgamesapp.game.Game;
 import com.spilkor.webgamesapp.game.amoba.Amoba;
+import com.spilkor.webgamesapp.game.carcassonne.Carcassonne;
 import com.spilkor.webgamesapp.game.chess.Chess;
 import com.spilkor.webgamesapp.model.dto.GameDTO;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
@@ -26,6 +27,9 @@ public class GameHandler {
                 break;
             case CHESS:
                 game = new Chess(owner, gameType);
+                break;
+            case CARCASSONNE:
+                game = new Carcassonne(owner, gameType);
                 break;
         }
 
@@ -159,6 +163,8 @@ public class GameHandler {
         updateInviteList(user);
 
         gameOfOwner.getPlayers().add(user);
+
+        gameOfOwner.playerJoined(user);
 
         updatePlayers(gameOfOwner);
     }

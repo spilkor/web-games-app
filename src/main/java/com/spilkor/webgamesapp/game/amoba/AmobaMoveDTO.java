@@ -1,18 +1,18 @@
 package com.spilkor.webgamesapp.game.amoba;
 
-import com.spilkor.webgamesapp.model.dto.Point;
+import com.spilkor.webgamesapp.model.dto.Coordinate;
 
 import java.io.Serializable;
 
 public class AmobaMoveDTO implements Serializable {
 
-    private Point position;
+    private Coordinate position;
 
-    public Point getPosition() {
+    public Coordinate getPosition() {
         return position;
     }
 
-    public void setPosition(Point position) {
+    public void setPosition(Coordinate position) {
         this.position = position;
     }
 }

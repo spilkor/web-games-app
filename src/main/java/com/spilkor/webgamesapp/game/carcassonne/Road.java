@@ -5,7 +5,11 @@ import java.util.Set;
 
 public class Road {
 
-    private Set<PointOfCompass> sides = new HashSet<>();
+
+
+    private Set<PointOfCompass> sides;
+    private int position;
+    private Tile tile;
 
     public Road(Set<PointOfCompass> sides) {
         this.sides = sides;
@@ -17,5 +21,21 @@ public class Road {
 
     public void setSides(Set<PointOfCompass> sides) {
         this.sides = sides;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public Tile getTile() {
+        return tile;
+    }
+
+    public void setTile(Tile tile) {
+        this.tile = tile;
     }
 }

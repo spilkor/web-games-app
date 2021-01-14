@@ -1,71 +1,70 @@
 package com.spilkor.webgamesapp.game.carcassonne;
 
-import com.spilkor.webgamesapp.model.dto.Point;
+import com.spilkor.webgamesapp.model.dto.Coordinate;
+import com.spilkor.webgamesapp.model.dto.UserDTO;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.spilkor.webgamesapp.game.carcassonne.PointOfCompass.*;
+
 public class Tile {
 
+    private Carcassonne carcassonne;
+    private TileID id;
+    private Coordinate coordinate;
+    private Set<Road> roads;
+    private Set<City> cities;
+    private Set<Field> fields;
+    private Integer monasteryPosition;
     private PointOfCompass pointOfCompass;
+    private Meeple meeple;
 
-    private Side north;
-    private Side east;
-    private Side south;
-    private Side west;
-
-    private boolean hasMonastery = false;
-
-    private Set<Road> roads = new HashSet<>();
-    private Set<City> cities = new HashSet<>();
-    private Set<Field> fields = new HashSet<>();
-
-    public PointOfCompass getPointOfCompass() {
-        return pointOfCompass;
-    }
-
-    public void setPointOfCompass(PointOfCompass pointOfCompass) {
+    public Tile(Carcassonne carcassonne, TileID id, Coordinate coordinate, Set<Road> roads, Set<City> cities, Set<Field> fields, Integer monasteryPosition, PointOfCompass pointOfCompass, Meeple meeple) {
+        this.carcassonne = carcassonne;
+        this.id = id;
+        this.coordinate = coordinate;
+        this.roads = roads;
+        this.cities = cities;
+        this.fields = fields;
+        this.monasteryPosition = monasteryPosition;
         this.pointOfCompass = pointOfCompass;
+        this.meeple = meeple;
+
+        roads.forEach(road -> road.setTile(this));
     }
 
-    public Side getNorth() {
-        return north;
+    private Object getUpperSide() {
+        return null;
     }
 
-    public void setNorth(Side north) {
-        this.north = north;
+    private Object getRightSide() {
+        return null;
     }
 
-    public Side getEast() {
-        return east;
+    private Object getLowerSide() {
+        return null;
     }
 
-    public void setEast(Side east) {
-        this.east = east;
+    private Object getLeftSide() {
+        return null;
     }
 
-    public Side getSouth() {
-        return south;
+
+    public TileID getId() {
+        return id;
     }
 
-    public void setSouth(Side south) {
-        this.south = south;
+    public void setId(TileID id) {
+        this.id = id;
     }
 
-    public Side getWest() {
-        return west;
+    public Coordinate getCoordinate() {
+        return coordinate;
     }
 
-    public void setWest(Side west) {
-        this.west = west;
-    }
-
-    public boolean isHasMonastery() {
-        return hasMonastery;
-    }
-
-    public void setHasMonastery(boolean hasMonastery) {
-        this.hasMonastery = hasMonastery;
+    public void setCoordinate(Coordinate coordinate) {
+        this.coordinate = coordinate;
     }
 
     public Set<Road> getRoads() {
@@ -92,79 +91,81 @@ public class Tile {
         this.fields = fields;
     }
 
-    public Side getUpperSide() {
-        return getUpperSide(pointOfCompass);
+    public Integer getMonasteryPosition() {
+        return monasteryPosition;
     }
 
-    public Side getRightSide() {
-        return getRightSide(pointOfCompass);
+    public void setMonasteryPosition(Integer monasteryPosition) {
+        this.monasteryPosition = monasteryPosition;
     }
 
-    public Side getLowerSide() {
-        return getLowerSide(pointOfCompass);
+    public PointOfCompass getPointOfCompass() {
+        return pointOfCompass;
     }
 
-    public Side getLeftSide() {
-        return getLeftSide(pointOfCompass);
+    public void setPointOfCompass(PointOfCompass pointOfCompass) {
+        this.pointOfCompass = pointOfCompass;
     }
 
-    public Side getUpperSide(PointOfCompass pointOfCompass) {
+    public Meeple getMeeple() {
+        return meeple;
+    }
+
+    public void setMeeple(Meeple meeple) {
+        this.meeple = meeple;
+    }
+
+    public Road getRoad(PointOfCompass side) {
         switch (pointOfCompass){
             case NORTH:
-                return north;
-            case EAST:
-                return east;
-            case SOUTH:
-                return south;
-            case WEST:
-                return west;
-            default:
-                return null;
-        }
-    }
+                switch (side){
+                    case NORTH:
+                        return roads.stream().filter(road -> road.getSides().contains(NORTH)).findFirst().orElse(null);
+                    case EAST:
+                        return roads.stream().filter(road -> road.getSides().contains(EAST)).findFirst().orElse(null);
+                    case SOUTH:
+                        return roads.stream().filter(road -> road.getSides().contains(SOUTH)).findFirst().orElse(null);
+                    case WEST:
+                        return roads.stream().filter(road -> road.getSides().contains(WEST)).findFirst().orElse(null);
+                }
 
-    public Side getRightSide(PointOfCompass pointOfCompass) {
-        switch (pointOfCompass){
-            case NORTH:
-                return east;
             case EAST:
-                return south;
-            case SOUTH:
-                return west;
-            case WEST:
-                return north;
-            default:
-                return null;
-        }
-    }
+                switch (side){
+                    case NORTH:
+                        return roads.stream().filter(road -> road.getSides().contains(WEST)).findFirst().orElse(null);
+                    case EAST:
+                        return roads.stream().filter(road -> road.getSides().contains(NORTH)).findFirst().orElse(null);
+                    case SOUTH:
+                        return roads.stream().filter(road -> road.getSides().contains(EAST)).findFirst().orElse(null);
+                    case WEST:
+                        return roads.stream().filter(road -> road.getSides().contains(SOUTH)).findFirst().orElse(null);
+                }
 
-    public Side getLowerSide(PointOfCompass pointOfCompass) {
-        switch (pointOfCompass){
-            case NORTH:
-                return south;
-            case EAST:
-                return west;
             case SOUTH:
-                return north;
-            case WEST:
-                return east;
-            default:
-                return null;
-        }
-    }
+                switch (side){
+                    case NORTH:
+                        return roads.stream().filter(road -> road.getSides().contains(SOUTH)).findFirst().orElse(null);
+                    case EAST:
+                        return roads.stream().filter(road -> road.getSides().contains(WEST)).findFirst().orElse(null);
+                    case SOUTH:
+                        return roads.stream().filter(road -> road.getSides().contains(NORTH)).findFirst().orElse(null);
+                    case WEST:
+                        return roads.stream().filter(road -> road.getSides().contains(EAST)).findFirst().orElse(null);
+                }
 
-    public Side getLeftSide(PointOfCompass pointOfCompass) {
-        switch (pointOfCompass){
-            case NORTH:
-                return west;
-            case EAST:
-                return north;
-            case SOUTH:
-                return east;
             case WEST:
-                return south;
-            default:
-                return null;
+                switch (side){
+                    case NORTH:
+                        return roads.stream().filter(road -> road.getSides().contains(EAST)).findFirst().orElse(null);
+                    case EAST:
+                        return roads.stream().filter(road -> road.getSides().contains(SOUTH)).findFirst().orElse(null);
+                    case SOUTH:
+                        return roads.stream().filter(road -> road.getSides().contains(WEST)).findFirst().orElse(null);
+                    case WEST:
+                        return roads.stream().filter(road -> road.getSides().contains(NORTH)).findFirst().orElse(null);
+                }
+
+                default:return null;
         }
     }
 }

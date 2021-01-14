@@ -9,11 +9,10 @@ import API from "./util/API";
 import {Game, GameType} from "./Main Components/Game";
 import {IP, log, PORT} from "./index";
 import {Header} from "./Main Components/Header";
-import {UsersLogo} from "./Main Components/Users";
+import {Users, UsersLogo} from "./Main Components/Users";
 import {Invites, InvitesLogo} from "./Main Components/Invites";
 import {Home} from "./Main Components/Home";
 import {Chat} from "./Main Components/Chat";
-import {Users} from "./Main Components/Users";
 import {FriendRequests, FriendRequestsLogo} from "./Main Components/FriendRequests";
 
 export const AppContext = React.createContext<Partial<ContextProps>>({});
@@ -72,16 +71,16 @@ export function App () {
 
     const [user, setUser] = useState<User | null | undefined>(undefined);
     const [webSocket, setWebsocket] = useState<WebSocket | null>(null);
-    const [gameData, setGameData] = useState<GameData | null>(null);
+    const [gameData, setGameData] = useState<GameData | null | undefined>(undefined);
     const [friends, setFriends] = useState<User[]>([]);
-    const [contentMode, setContentMode] = useState<ContentMode>(ContentMode.HOME);
+    const [contentMode, setContentMode] = useState<ContentMode>(ContentMode.GAME);
     const [chatMessages, _setChatMessages] = useState<ChatMessage[]>([]);
     const chatMessagesRef = React.useRef(chatMessages);
     const setChatMessages = (chatMessages: ChatMessage[]) => {
         chatMessagesRef.current = chatMessages;
         _setChatMessages(chatMessages);
     };
-    const [gameTypes, setGameTypes] = useState<GameType[]>([GameType.AMOBA, GameType.CHESS]); // TODO fetch + cache
+    const [gameTypes, setGameTypes] = useState<GameType[]>([GameType.AMOBA, GameType.CHESS, GameType.CARCASSONNE]); // TODO fetch + cache
     const [usersOpen, setUsersOpen2] = useState<boolean>(false);
     function setUsersOpen(usersOpen: boolean){
         setUsersOpen2(usersOpen);
@@ -271,9 +270,9 @@ export function App () {
         setFriends([]);
         setUsersOpen(false);
 
-        setContentMode(ContentMode.HOME);
+        setContentMode(ContentMode.GAME);
 
-        setGameData(null);
+        setGameData(undefined);
         setInvites([]);
     }
 

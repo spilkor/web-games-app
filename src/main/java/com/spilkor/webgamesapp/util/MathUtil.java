@@ -1,5 +1,7 @@
 package com.spilkor.webgamesapp.util;
 
+import java.util.Collection;
+
 public class MathUtil {
 
     private MathUtil(){};
@@ -12,4 +14,15 @@ public class MathUtil {
         return min <= value && value <= max;
     }
 
+    public static int randomNumberBetween(int min, int max) {
+        return (int) (min + Math.random() * (max - min + 1));
+    }
+
+    public static int randomNumberLowerThan(int than) {
+        return randomNumberBetween(0, than - 1);
+    }
+
+    public static <E> E selectRandom(Collection<E> elements) {
+        return (E) elements.toArray()[randomNumberLowerThan(elements.size())];
+    }
 }

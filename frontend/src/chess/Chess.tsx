@@ -2,7 +2,7 @@ import React, {ChangeEvent, useContext, useState} from 'react';
 import {AppContext} from "../App";
 import {StartGameButton, SystemMessage} from "../Main Components/Game";
 import API from "../util/API";
-import {GameState, Position} from "../util/types";
+import {GameState, Coordinate} from "../util/types";
 
 import {ReactComponent as KingSVG} from './king.svg';
 import {ReactComponent as QueenSVG} from './queen.svg';
@@ -31,7 +31,7 @@ export function Chess () {
     const chessGameDTO = JSON.parse(gameData!.gameJSON) as ChessGameDTO;
     // const myMove = chessGameDTO && chessGameDTO.nextPlayer && chessGameDTO.nextPlayer.id === user!.id;
 
-    const [fromPosition, setFromPosition] = useState<Position | null>(null);
+    const [fromPosition, setFromPosition] = useState<Coordinate | null>(null);
 
     return(
         <div className={"chess"}>
@@ -126,7 +126,7 @@ export function Chess () {
             for (let y = 0; y < 8; y++) {
                 columns.push(
                     <td key={y}>
-                        <Squire key={y + "_" + x} position={{x: isInverse ? 7-x : x, y: isInverse ? 7-y : y} as Position}/>
+                        <Squire key={y + "_" + x} position={{x: isInverse ? 7-x : x, y: isInverse ? 7-y : y} as Coordinate}/>
                     </td>
                 );
             }
@@ -148,7 +148,7 @@ export function Chess () {
 
 
 
-    async function move(fromPosition: Position, toPosition: Position) {
+    async function move(fromPosition: Coordinate, toPosition: Coordinate) {
         let chessMoveDTO = {
             fromPosition,
             toPosition
@@ -156,7 +156,7 @@ export function Chess () {
         API.move(JSON.stringify(chessMoveDTO));
     }
 
-    async function selectSquare(position: Position) {
+    async function selectSquare(position: Coordinate) {
         if (fromPosition === null){
             setFromPosition(position);
         } else {

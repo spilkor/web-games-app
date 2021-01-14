@@ -2,7 +2,7 @@ import React, {ChangeEvent, useContext} from 'react';
 import {AppContext} from "../App";
 import {QuitButton, StartGameButton, SystemMessage} from "../Main Components/Game";
 import API from "../util/API";
-import {GameState, Position} from "../util/types";
+import {GameState, Coordinate} from "../util/types";
 
 import {ReactComponent as ZoomInSVG} from '../svg/zoom-in.svg';
 import {ReactComponent as ZoomOutSVG} from '../svg/zoom-out.svg';
@@ -184,35 +184,35 @@ export function Amoba () {
                 <tbody>
                     <tr>
                         <td>
-                            <Squire position={{x:2, y: 2} as Position} size={50}/>
+                            <Squire position={{x:2, y: 2} as Coordinate} size={50}/>
                         </td>
                         <td>
-                            <Squire position={{x:2, y: 1} as Position} size={50}/>
+                            <Squire position={{x:2, y: 1} as Coordinate} size={50}/>
                         </td>
                         <td>
-                            <Squire position={{x:2, y: 0} as Position} size={50}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <Squire position={{x:1, y: 2} as Position} size={50}/>
-                        </td>
-                        <td>
-                            <Squire position={{x:1, y: 1} as Position} size={50}/>
-                        </td>
-                        <td>
-                            <Squire position={{x:1, y: 0} as Position} size={50}/>
+                            <Squire position={{x:2, y: 0} as Coordinate} size={50}/>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <Squire position={{x:0, y: 2} as Position} size={50}/>
+                            <Squire position={{x:1, y: 2} as Coordinate} size={50}/>
                         </td>
                         <td>
-                            <Squire position={{x:0, y: 1} as Position} size={50}/>
+                            <Squire position={{x:1, y: 1} as Coordinate} size={50}/>
                         </td>
                         <td>
-                            <Squire position={{x:0, y: 0} as Position} size={50}/>
+                            <Squire position={{x:1, y: 0} as Coordinate} size={50}/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <Squire position={{x:0, y: 2} as Coordinate} size={50}/>
+                        </td>
+                        <td>
+                            <Squire position={{x:0, y: 1} as Coordinate} size={50}/>
+                        </td>
+                        <td>
+                            <Squire position={{x:0, y: 0} as Coordinate} size={50}/>
                         </td>
                     </tr>
                 </tbody>
@@ -234,7 +234,7 @@ export function Amoba () {
                 const index_y = middle_y + num_x - 1 - y;
                 columns.push(
                     <td className={(index_x == 199 ? "strong-top" : "") + (index_x == 0 ? " strong-bottom" : "") + (index_y == 199 ? " strong-left" : "") + (index_y == 0 ? " strong-right" : "")} key={y}>
-                        <Squire key={y + "_" + x} position={{x: index_x, y: index_y} as Position} size={actualSize}/>
+                        <Squire key={y + "_" + x} position={{x: index_x, y: index_y} as Coordinate} size={actualSize}/>
                     </td>
                 );
             }
@@ -373,7 +373,7 @@ export function Amoba () {
             </div>
         );
 
-        function move(position: Position) {
+        function move(position: Coordinate) {
             let amobaMoveDTO = { position: position } as AmobaMoveDTO;
             API.move(JSON.stringify(amobaMoveDTO));
         }

@@ -42,7 +42,7 @@ export type StartGameButtonProps = {
     enabled: boolean
 }
 
-export type Position = {
+export type Coordinate = {
     x: number,
     y: number
 }

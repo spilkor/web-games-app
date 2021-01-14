@@ -1,15 +1,22 @@
 import React from 'react';
 
-import {Position} from "../util/types";
-import { MeepleProps, MonasteryProps, ShieldProps, TileID, TileProps} from "./carcassonneTypes";
-import {pointOfCompassMap} from "./Carcassonne";
+import {Coordinate, PointOfCompass} from "../util/types";
+import {
+    MeepleProps,
+    MonasteryProps,
+    pointOfCompassMap,
+    ShieldProps,
+    TileID,
+    TileDTO,
+    MeepleType, Color
+} from "./carcassonneTypes";
 
 export const size = 100;
 
-export default function Tile (tileProps: TileProps) {
+export default function Tile (tileProps: TileDTO) {
 
     switch (tileProps.id) {
-        case TileID.TILE_0: return( <Tile_0 {...tileProps}/>);
+        case TileID.TILE_0: return( <Tile_0 {...tileProps} />);
         case TileID.TILE_1: return( <Tile_1 {...tileProps}/>);
         case TileID.TILE_2: return( <Tile_2 {...tileProps}/>);
         case TileID.TILE_3: return( <Tile_3 {...tileProps}/>);
@@ -31,8 +38,10 @@ export default function Tile (tileProps: TileProps) {
         case TileID.TILE_19: return(<Tile_19 {...tileProps}/>);
         case TileID.TILE_20: return(<Tile_20 {...tileProps}/>);
         case TileID.TILE_21: return(<Tile_21 {...tileProps}/>);
-        case TileID.TILE_22:return(<Tile_22 {...tileProps}/>);
-        case TileID.TILE_23:return(<Tile_23 {...tileProps}/>);
+        case TileID.TILE_22: return(<Tile_22 {...tileProps}/>);
+        case TileID.TILE_23: return(<Tile_23 {...tileProps}/>);
+
+        default: return tileProps.id;
     }
 
 }
@@ -69,17 +78,17 @@ function Meeple({position, color, pointOfCompass}: MeepleProps){
     );
 }
 
-function clickable(legalParts: number[], n: number) {
-    return legalParts.some((legalPart) => legalPart === n) ? " clickable" : "";
+function clickable(legalParts: number[] | null, n: number) {
+    return legalParts && legalParts.some((legalPart) => legalPart === n) ? " clickable" : "";
 }
 
-function Tile_0 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_0 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[2] = {x: 1/5, y: 3/10} as Position;
-    meeplePositionMap[3] = {x: 1/2, y: 3/4} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[2] = {x: 1/5, y: 3/10} as Coordinate;
+    meeplePositionMap[3] = {x: 1/2, y: 3/4} as Coordinate;
 
     return(
         <>
@@ -99,12 +108,12 @@ function Tile_0 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_1 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_1 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/3, y: 1/3} as Position;
-    meeplePositionMap[1] = {x: 3/5, y: 3/5} as Position;
-    meeplePositionMap[2] = {x: 1/5, y: 1/6} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/3, y: 1/3} as Coordinate;
+    meeplePositionMap[1] = {x: 3/5, y: 3/5} as Coordinate;
+    meeplePositionMap[2] = {x: 1/5, y: 1/6} as Coordinate;
 
     return(
         <>
@@ -121,12 +130,12 @@ function Tile_1 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_2 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_2 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 1/5} as Position;
-    meeplePositionMap[2] = {x: 1/2, y: 4/5} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 1/5} as Coordinate;
+    meeplePositionMap[2] = {x: 1/2, y: 4/5} as Coordinate;
 
     return(
         <>
@@ -143,17 +152,17 @@ function Tile_2 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_3 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_3 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 1/5} as Position;
-    meeplePositionMap[1] = {x: 4/5, y: 1/2} as Position;
-    meeplePositionMap[2] = {x: 1/2, y: 4/5} as Position;
-    meeplePositionMap[3] = {x: 1/5, y: 1/2} as Position;
-    meeplePositionMap[4] = {x: 4/5, y: 1/5} as Position;
-    meeplePositionMap[5] = {x: 4/5, y: 4/5} as Position;
-    meeplePositionMap[6] = {x: 1/5, y: 4/5} as Position;
-    meeplePositionMap[7] = {x: 1/5, y: 1/5} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 1/5} as Coordinate;
+    meeplePositionMap[1] = {x: 4/5, y: 1/2} as Coordinate;
+    meeplePositionMap[2] = {x: 1/2, y: 4/5} as Coordinate;
+    meeplePositionMap[3] = {x: 1/5, y: 1/2} as Coordinate;
+    meeplePositionMap[4] = {x: 4/5, y: 1/5} as Coordinate;
+    meeplePositionMap[5] = {x: 4/5, y: 4/5} as Coordinate;
+    meeplePositionMap[6] = {x: 1/5, y: 4/5} as Coordinate;
+    meeplePositionMap[7] = {x: 1/5, y: 1/5} as Coordinate;
 
     return(
         <>
@@ -185,15 +194,15 @@ function Tile_3 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_4 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_4 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 4/5, y: 1/2} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 4/5} as Position;
-    meeplePositionMap[2] = {x: 1/5, y: 1/2} as Position;
-    meeplePositionMap[3] = {x: 1/2, y: 1/5} as Position;
-    meeplePositionMap[4] = {x: 4/5, y: 4/5} as Position;
-    meeplePositionMap[5] = {x: 1/5, y: 4/5} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 4/5, y: 1/2} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 4/5} as Coordinate;
+    meeplePositionMap[2] = {x: 1/5, y: 1/2} as Coordinate;
+    meeplePositionMap[3] = {x: 1/2, y: 1/5} as Coordinate;
+    meeplePositionMap[4] = {x: 4/5, y: 4/5} as Coordinate;
+    meeplePositionMap[5] = {x: 1/5, y: 4/5} as Coordinate;
 
     return(
         <>
@@ -220,11 +229,11 @@ function Tile_4 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_5 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_5 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Position;
-    meeplePositionMap[1] = {x: 1/6, y: 1/6} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Coordinate;
+    meeplePositionMap[1] = {x: 1/6, y: 1/6} as Coordinate;
 
     return(
         <>
@@ -237,12 +246,12 @@ function Tile_5 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_6 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_6 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 4/5} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 1/2} as Position;
-    meeplePositionMap[2] = {x: 1/6, y: 1/6} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 4/5} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 1/2} as Coordinate;
+    meeplePositionMap[2] = {x: 1/6, y: 1/6} as Coordinate;
 
     return(
         <>
@@ -259,11 +268,11 @@ function Tile_6 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_7 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_7 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 0} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 0} as Coordinate;
 
     return(
         <>
@@ -278,11 +287,11 @@ function Tile_7 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_8 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_8 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 0} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 0} as Coordinate;
 
     return(
         <>
@@ -290,7 +299,7 @@ function Tile_8 ({pointOfCompass, meeple, legalParts } : TileProps) {
                 <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size}/>
                 <g className={"city" + clickable(legalParts,0)}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + (size*2) + " " + (size*2) + " L -" + size + " " + (size*2) + " z"} />
-                    <Shield position={{x: 1/6, y: 5/6} as Position}/>
+                    <Shield position={{x: 1/6, y: 5/6} as Coordinate}/>
                 </g>
             </svg>
             {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
@@ -298,17 +307,17 @@ function Tile_8 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_9 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_9 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Coordinate;
 
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
                 <g className={"city" + clickable(legalParts,0)}>
                     <rect x={0} y={0} width={size} height={size}/>
-                    <Shield position={{x: 1/6, y: 5/6} as Position}/>
+                    <Shield position={{x: 1/6, y: 5/6} as Coordinate}/>
                 </g>
             </svg>
             {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
@@ -316,11 +325,11 @@ function Tile_9 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_10 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_10 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/4, y: 1/4} as Position;
-    meeplePositionMap[1] = {x: 3/4, y: 3/4} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/4, y: 1/4} as Coordinate;
+    meeplePositionMap[1] = {x: 3/4, y: 3/4} as Coordinate;
 
     return(
         <>
@@ -335,11 +344,11 @@ function Tile_10 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_11 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_11 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/4, y: 1/4} as Position;
-    meeplePositionMap[1] = {x: 3/4, y: 3/4} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/4, y: 1/4} as Coordinate;
+    meeplePositionMap[1] = {x: 3/4, y: 3/4} as Coordinate;
 
     return(
         <>
@@ -347,7 +356,7 @@ function Tile_11 ({pointOfCompass, meeple, legalParts } : TileProps) {
                 <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size}/>
                 <g className={"city" + clickable(legalParts,0)}>
                     <polygon points={"-5 -5 " + (size + 5) + " -5 -5 " + (size + 5)}/>
-                    <Shield position={{x: 1/6, y: 7/12} as Position}/>
+                    <Shield position={{x: 1/6, y: 7/12} as Coordinate}/>
                 </g>
             </svg>
             {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
@@ -355,13 +364,13 @@ function Tile_11 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_12 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_12 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 2/3, y: 2/3} as Position;
-    meeplePositionMap[1] = {x: 1/4, y: 1/4} as Position;
-    meeplePositionMap[2] = {x: 5/6, y: 1/3} as Position;
-    meeplePositionMap[3] = {x: 5/6, y: 4/5} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 2/3, y: 2/3} as Coordinate;
+    meeplePositionMap[1] = {x: 1/4, y: 1/4} as Coordinate;
+    meeplePositionMap[2] = {x: 5/6, y: 1/3} as Coordinate;
+    meeplePositionMap[3] = {x: 5/6, y: 4/5} as Coordinate;
 
     return(
         <>
@@ -381,13 +390,13 @@ function Tile_12 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_13 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_13 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 2/3, y: 2/3} as Position;
-    meeplePositionMap[1] = {x: 1/4, y: 1/4} as Position;
-    meeplePositionMap[2] = {x: 5/6, y: 1/3} as Position;
-    meeplePositionMap[3] = {x: 5/6, y: 4/5} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 2/3, y: 2/3} as Coordinate;
+    meeplePositionMap[1] = {x: 1/4, y: 1/4} as Coordinate;
+    meeplePositionMap[2] = {x: 5/6, y: 1/3} as Coordinate;
+    meeplePositionMap[3] = {x: 5/6, y: 4/5} as Coordinate;
 
     return(
         <>
@@ -400,7 +409,7 @@ function Tile_13 ({pointOfCompass, meeple, legalParts } : TileProps) {
                 </g>
                 <g className={"city" + clickable(legalParts, 1)}>
                     <polygon points={"-5 -5 " + (size+5) + " -5 -5 " + (size+5)}/>
-                    <Shield position={{x: 1/6, y: 7/12} as Position}/>
+                    <Shield position={{x: 1/6, y: 7/12} as Coordinate}/>
                 </g>
             </svg>
             {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
@@ -408,12 +417,12 @@ function Tile_13 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_14 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_14 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[1] = {x: 0, y: 1/2} as Position;
-    meeplePositionMap[2] = {x: 1/2, y: 1/2} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[1] = {x: 0, y: 1/2} as Coordinate;
+    meeplePositionMap[2] = {x: 1/2, y: 1/2} as Coordinate;
 
     return(
         <>
@@ -431,11 +440,11 @@ function Tile_14 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_15 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_15 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 1/2} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 1/2} as Coordinate;
 
     return(
         <>
@@ -450,16 +459,16 @@ function Tile_15 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_16 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_16 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 4/5, y: 1/2} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 4/5} as Position;
-    meeplePositionMap[2] = {x: 1/5, y: 1/2} as Position;
-    meeplePositionMap[3] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[4] = {x: 1/5, y: 3/10} as Position;
-    meeplePositionMap[5] = {x: 4/5, y: 4/5} as Position;
-    meeplePositionMap[6] = {x: 1/5, y: 4/5} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 4/5, y: 1/2} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 4/5} as Coordinate;
+    meeplePositionMap[2] = {x: 1/5, y: 1/2} as Coordinate;
+    meeplePositionMap[3] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[4] = {x: 1/5, y: 3/10} as Coordinate;
+    meeplePositionMap[5] = {x: 4/5, y: 4/5} as Coordinate;
+    meeplePositionMap[6] = {x: 1/5, y: 4/5} as Coordinate;
 
     return(
         <>
@@ -489,13 +498,13 @@ function Tile_16 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_17 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_17 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 2/3, y: 2/3} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[2] = {x: 2/7, y: 1/2} as Position;
-    meeplePositionMap[3] = {x: 5/6, y: 4/5} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 2/3, y: 2/3} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[2] = {x: 2/7, y: 1/2} as Coordinate;
+    meeplePositionMap[3] = {x: 5/6, y: 4/5} as Coordinate;
 
     return(
         <>
@@ -516,13 +525,13 @@ function Tile_17 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_18 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_18 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/3, y: 2/3} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[2] = {x: 5/7, y: 1/2} as Position;
-    meeplePositionMap[3] = {x: 1/6, y: 4/5} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/3, y: 2/3} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[2] = {x: 5/7, y: 1/2} as Coordinate;
+    meeplePositionMap[3] = {x: 1/6, y: 4/5} as Coordinate;
 
     return(
         <>
@@ -542,12 +551,12 @@ function Tile_18 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_19 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_19 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[1] = {x: 0, y: 1/2} as Position;
-    meeplePositionMap[2] = {x: 1/2, y: 1/2} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[1] = {x: 0, y: 1/2} as Coordinate;
+    meeplePositionMap[2] = {x: 1/2, y: 1/2} as Coordinate;
 
     return(
         <>
@@ -565,13 +574,13 @@ function Tile_19 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_20 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_20 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 1/2} as Position;
-    meeplePositionMap[2] = {x: 4/5, y: 0} as Position;
-    meeplePositionMap[3] = {x: 1/5, y: 0} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 1/2} as Coordinate;
+    meeplePositionMap[2] = {x: 4/5, y: 0} as Coordinate;
+    meeplePositionMap[3] = {x: 1/5, y: 0} as Coordinate;
 
     return(
         <>
@@ -591,13 +600,13 @@ function Tile_20 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_21 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_21 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 1/2} as Position;
-    meeplePositionMap[2] = {x: 4/5, y: 0} as Position;
-    meeplePositionMap[3] = {x: 1/5, y: 0} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 1/2} as Coordinate;
+    meeplePositionMap[2] = {x: 4/5, y: 0} as Coordinate;
+    meeplePositionMap[3] = {x: 1/5, y: 0} as Coordinate;
 
     return(
         <>
@@ -610,7 +619,7 @@ function Tile_21 ({pointOfCompass, meeple, legalParts } : TileProps) {
                 </g>
                 <g className={"city" + clickable(legalParts,1)}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + (size*2) + " " + (size*2) + " L -" + size + " " + (size*2) + " z"} />
-                    <Shield position={{x: 1/6, y: 5/6} as Position}/>
+                    <Shield position={{x: 1/6, y: 5/6} as Coordinate}/>
                 </g>
             </svg>
             {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
@@ -618,12 +627,12 @@ function Tile_21 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_22 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_22 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[2] = {x: 1/2, y: 1} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[2] = {x: 1/2, y: 1} as Coordinate;
 
     return(
         <>
@@ -639,12 +648,12 @@ function Tile_22 ({pointOfCompass, meeple, legalParts } : TileProps) {
     );
 }
 
-function Tile_23 ({pointOfCompass, meeple, legalParts } : TileProps) {
+function Tile_23 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
-    const meeplePositionMap = [] as Position[];
-    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Position;
-    meeplePositionMap[1] = {x: 1/2, y: 0} as Position;
-    meeplePositionMap[2] = {x: 1/2, y: 1} as Position;
+    const meeplePositionMap = [] as Coordinate[];
+    meeplePositionMap[0] = {x: 1/2, y: 1/2} as Coordinate;
+    meeplePositionMap[1] = {x: 1/2, y: 0} as Coordinate;
+    meeplePositionMap[2] = {x: 1/2, y: 1} as Coordinate;
 
     return(
         <>
@@ -653,7 +662,7 @@ function Tile_23 ({pointOfCompass, meeple, legalParts } : TileProps) {
                 <rect className={"field" + clickable(legalParts,2)} x={0} y={size/2} width={size} height={size/2}/>
                 <g className={"city" + clickable(legalParts,0)}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + size*2 + " " + size + " L " + size + " " + size + " C " + (size*70/100) + " " + (size*70/100) + " " + (size*30/100) + " " + (size*70/100) + " 0 " + size} />
-                    <Shield position={{x: 1/6, y: 4/6} as Position}/>
+                    <Shield position={{x: 1/6, y: 4/6} as Coordinate}/>
                 </g>
             </svg>
             {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}

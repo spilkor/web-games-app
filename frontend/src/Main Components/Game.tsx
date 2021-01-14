@@ -6,21 +6,26 @@ import API from "../util/API";
 
 import {ReactComponent as QuitLogo} from '../svg/quit.svg';
 import {Chess} from "../chess/Chess";
+import {Carcassonne} from "../carcassonne/Carcassonne";
 
 export enum GameType  {
     AMOBA = "AMOBA",
-    CHESS = "CHESS"
+    CHESS = "CHESS",
+    CARCASSONNE = "CARCASSONNE"
 }
 
 export function Game () {
 
     const { gameData, gameTypes } = useContext(AppContext);
 
-    if (!gameData){
+    if (gameData === undefined){
+        return null;
+    }
+
+    if (gameData === null){
         return(
             <LocalLobby/>
         );
-
     }
 
     switch (gameData.gameType) {
@@ -31,6 +36,10 @@ export function Game () {
         case GameType.CHESS:
             return(
                 <Chess/>
+            );
+        case GameType.CARCASSONNE:
+            return(
+                <Carcassonne/>
             );
     }
 

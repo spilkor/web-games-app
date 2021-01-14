@@ -1,9 +1,9 @@
 
-import {Position, User} from "../util/types";
+import {Coordinate, User} from "../util/types";
 
 
 export type SquireProps = {
-    position: Position
+    position: Coordinate
 }
 
 export enum OwnerAs {
@@ -24,8 +24,8 @@ export type ChessGameDTO = {
 }
 
 export type ChessMoveDTO = {
-    fromPosition: Position,
-    toPosition: Position
+    fromPosition: Coordinate,
+    toPosition: Coordinate
 }
 
 export type ChessPiece = {

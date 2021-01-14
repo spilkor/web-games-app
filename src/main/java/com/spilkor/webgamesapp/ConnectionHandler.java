@@ -72,10 +72,6 @@ public abstract class ConnectionHandler {
         WebSocketMessageSender.sendMessage(user.getId(), webSocketMessage);
     }
 
-    public static void removeUserToken(UserTokenDTO userToken) {
-        userTokens.remove(userToken);
-    }
-
     public static void removeAndCloseConnections(Long userId) {
         List<Session> connectionsOfUser = userConnections.get(userId);
         if (connectionsOfUser != null){
@@ -137,15 +133,6 @@ public abstract class ConnectionHandler {
         userTokens.add(userToken);
     }
 
-    public static void authenticate(UserTokenDTO userTokenDTO, Session session) {
-        UserTokenDTO found = ConnectionHandler.getUserTokens().stream().filter(ut -> ut.equals(userTokenDTO)).findFirst().orElse(null);
-        if (found != null){
-            ConnectionHandler.removeUserToken(found);
-            ConnectionHandler.addConnection(found.getUserId(), session);
-        }
-    }
-
-
     public static void startUserTokenRemover(){
         if (userTokenRemover == null){
             userTokenRemover = new UserTokenRemover();
@@ -177,20 +164,26 @@ public abstract class ConnectionHandler {
 
     private static class UserTokenRemover extends Thread {
 
+        private boolean running = false;
         private List<UserTokenDTO> toRemove = new ArrayList<>();
 
         @Override
         public void run() {
+            running = true;
             try {
-                while (true){
+                while (running){
                     Thread.sleep(10000);
-                    ConnectionHandler.getUserTokens().remove(toRemove);
+                    userTokens.remove(toRemove);
                     toRemove.clear();
                     toRemove.addAll(ConnectionHandler.getUserTokens());
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+
+        public void _stop() {
+            running = false;
         }
     }
 

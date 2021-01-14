@@ -18,7 +18,8 @@ public abstract class Game {
 
     public enum GameType {
         AMOBA,
-        CHESS
+        CHESS,
+        CARCASSONNE
     }
 
     protected UserDTO owner;
@@ -59,6 +60,8 @@ public abstract class Game {
     public abstract boolean legal(UserDTO userDTO, String moveJSON);
     public abstract void move(UserDTO userDTO, String moveJSON);
 
+
+    public void playerJoined(UserDTO player){ };
 
     public UserDTO getSecondPlayer(){
         return players.stream().filter(player -> !player.equals(owner)).findFirst().orElse(null);

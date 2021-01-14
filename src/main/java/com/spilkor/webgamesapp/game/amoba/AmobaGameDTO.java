@@ -1,6 +1,6 @@
 package com.spilkor.webgamesapp.game.amoba;
 
-import com.spilkor.webgamesapp.model.dto.Point;
+import com.spilkor.webgamesapp.model.dto.Coordinate;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 
 import java.io.Serializable;
@@ -15,7 +15,7 @@ public class AmobaGameDTO implements Serializable {
     private Boolean nextSign;
     private Boolean[][] table;
     private List<Square> squares;
-    private Point lastPosition;
+    private Coordinate lastPosition;
 
 
     public UserDTO getNextPlayer() {
@@ -74,11 +74,11 @@ public class AmobaGameDTO implements Serializable {
         this.squares = squares;
     }
 
-    public Point getLastPosition() {
+    public Coordinate getLastPosition() {
         return lastPosition;
     }
 
-    public void setLastPosition(Point lastPosition) {
+    public void setLastPosition(Coordinate lastPosition) {
         this.lastPosition = lastPosition;
     }
 }
