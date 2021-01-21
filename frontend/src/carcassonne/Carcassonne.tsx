@@ -1,13 +1,14 @@
 import React, {useContext, useState} from 'react';
 
 
-import {CarcassonneGameDTO, TileID, TileDTO} from "./carcassonneTypes";
-import {GameState, PointOfCompass, Coordinate} from "../util/types";
+import {CarcassonneGameDTO, CarcassonneMoveDTO, MoveType, TileDTO} from "./carcassonneTypes";
+import {Coordinate, GameState, PointOfCompass} from "../util/types";
 import Tile, {size} from "./Tile";
 import './carcassonne.scss';
 import {AppContext} from "../App";
-import {AmobaGameDTO} from "../amoba/amobaTypes";
 import {StartGameButton} from "../Main Components/Game";
+import {ReactComponent as RotateSVG} from '../svg/rotate-left.svg';
+import API from "../util/API";
 
 export function Carcassonne () {
 
@@ -15,7 +16,9 @@ export function Carcassonne () {
 
     const carcassonneGameDTO = JSON.parse(gameData!.gameJSON) as CarcassonneGameDTO;
 
-    // console.log("carcassonneGameDTO: ", carcassonneGameDTO);
+    const [pointOfCompass, setPointOfCompass] = useState<PointOfCompass>(PointOfCompass.NORTH);
+
+    console.log("carcassonneGameDTO: ", carcassonneGameDTO);
 
     const [offset_X, setOffset_X] = useState<number>(0);
     const [offset_Y, setOffset_Y] = useState<number>(0);
@@ -61,7 +64,8 @@ export function Carcassonne () {
 
     function Board () {
 
-        const tiles = carcassonneGameDTO.tiles;
+        const { tiles, nextMoveType, tile, legalParts } = carcassonneGameDTO;
+
 
         // const tiles = [
         //     {
@@ -99,10 +103,11 @@ export function Carcassonne () {
             const columns = [];
             for (let x = min_x-1; x <= max_x+1; x++) {
                 const tile = getTile(x, y);
+                const clickable = isPositionClickable({x,y} as Coordinate);
                 columns.push(
                     <td key={x}>
-                        <div className={"tile-wrapper"} style={{height: size, width: size}}>
-                            {tile && <Tile {...tile}/>}
+                        <div className={"tile-wrapper" + (clickable ? " clickable" : "")} onClick={()=>{clickable && move({x, y} as Coordinate)}} style={{height: size, width: size}}>
+                            {tile && <Tile legalParts={getLegalPartsForTile({x, y} as Coordinate)} {...tile}/>}
                         </div>
                     </td>
                 );
@@ -112,6 +117,31 @@ export function Carcassonne () {
                     {columns}
                 </tr>
             )
+        }
+
+        function getLegalPartsForTile(coordinate: Coordinate): number[] | null {
+            if (nextMoveType === MoveType.MEEPLE && tile!.coordinate.x === coordinate.x && tile!.coordinate.y === coordinate.y){
+                return legalParts;
+            } else {
+                return null;
+            }
+        }
+
+        function move(coordinate: Coordinate) {
+            let carcassonneMoveDTO = {
+                coordinate,
+                pointOfCompass
+            } as CarcassonneMoveDTO;
+            API.move(JSON.stringify(carcassonneMoveDTO));
+        }
+
+        function isPositionClickable(coordinate: Coordinate){
+            const { playableTilePositions } = carcassonneGameDTO;
+            return playableTilePositions && playableTilePositions.some((playableTilePosition) => {
+                return playableTilePosition.coordinate.x === coordinate.x
+                    && playableTilePosition.coordinate.y === coordinate.y
+                    && playableTilePosition.pointOfCompass === pointOfCompass
+            });
         }
 
         function getTile(x: number, y: number): TileDTO | undefined{
@@ -131,11 +161,59 @@ export function Carcassonne () {
         );
     }
 
+    function NextTile () {
+
+
+        const [rotating, setRotating] = useState<boolean>(false);
+
+        if (!carcassonneGameDTO.tile || carcassonneGameDTO.nextMoveType !== MoveType.TILE){
+            return null;
+        }
+
+        return (
+            <div className={"next-tile"}>
+                <div className={"tile-wrapper " + pointOfCompass.toLowerCase()} style={{height: size, width: size}}>
+                    <Tile {...carcassonneGameDTO.tile!}/>
+                </div>
+
+                <div className={"rotate-icon" + (rotating ? " rotating" : "")} onClick={()=>rotateLeft()} >
+                    <RotateSVG/>
+                </div>
+            </div>
+        );
+
+        function rotateLeft() {
+            if (rotating){
+                return;
+            }
+            setRotating(true);
+            setTimeout(()=>{
+                setRotating(false);
+            }, 350);
+
+            switch (pointOfCompass) {
+                case PointOfCompass.NORTH:
+                    setPointOfCompass(PointOfCompass.WEST);
+                    return;
+                case PointOfCompass.EAST:
+                    setPointOfCompass(PointOfCompass.NORTH);
+                    return;
+                case PointOfCompass.SOUTH:
+                    setPointOfCompass(PointOfCompass.EAST);
+                    return;
+                case PointOfCompass.WEST:
+                    setPointOfCompass(PointOfCompass.SOUTH);
+                    return;
+            }
+        }
+    }
+
     function Game () {
         return(
-            <>
+            <div className={"game"}>
                 <Board/>
-            </>
+                <NextTile/>
+            </div>
         );
     }
 

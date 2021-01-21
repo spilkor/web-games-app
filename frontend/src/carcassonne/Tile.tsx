@@ -8,24 +8,25 @@ import {
     ShieldProps,
     TileID,
     TileDTO,
-    MeepleType, Color
+    MeepleType, Color, CarcassonneMoveDTO
 } from "./carcassonneTypes";
+import API from "../util/API";
 
 export const size = 100;
 
 export default function Tile (tileProps: TileDTO) {
 
     switch (tileProps.id) {
-        case TileID.TILE_0: return( <Tile_0 {...tileProps} />);
-        case TileID.TILE_1: return( <Tile_1 {...tileProps}/>);
-        case TileID.TILE_2: return( <Tile_2 {...tileProps}/>);
-        case TileID.TILE_3: return( <Tile_3 {...tileProps}/>);
-        case TileID.TILE_4: return( <Tile_4 {...tileProps}/>);
-        case TileID.TILE_5: return( <Tile_5 {...tileProps}/>);
-        case TileID.TILE_6: return( <Tile_6 {...tileProps}/>);
-        case TileID.TILE_7: return( <Tile_7 {...tileProps}/>);
-        case TileID.TILE_8: return( <Tile_8 {...tileProps}/>);
-        case TileID.TILE_9: return( <Tile_9 {...tileProps}/>);
+        case TileID.TILE_0: return(<Tile_0 {...tileProps} />);
+        case TileID.TILE_1: return(<Tile_1 {...tileProps}/>);
+        case TileID.TILE_2: return(<Tile_2 {...tileProps}/>);
+        case TileID.TILE_3: return(<Tile_3 {...tileProps}/>);
+        case TileID.TILE_4: return(<Tile_4 {...tileProps}/>);
+        case TileID.TILE_5: return(<Tile_5 {...tileProps}/>);
+        case TileID.TILE_6: return(<Tile_6 {...tileProps}/>);
+        case TileID.TILE_7: return(<Tile_7 {...tileProps}/>);
+        case TileID.TILE_8: return(<Tile_8 {...tileProps}/>);
+        case TileID.TILE_9: return(<Tile_9 {...tileProps}/>);
         case TileID.TILE_10: return(<Tile_10 {...tileProps}/>);
         case TileID.TILE_11: return(<Tile_11 {...tileProps}/>);
         case TileID.TILE_12: return(<Tile_12 {...tileProps}/>);
@@ -82,7 +83,14 @@ function clickable(legalParts: number[] | null, n: number) {
     return legalParts && legalParts.some((legalPart) => legalPart === n) ? " clickable" : "";
 }
 
-function Tile_0 ({pointOfCompass, meeple, legalParts } : TileDTO) {
+function move(index: number) {
+    let carcassonneMoveDTO = {
+        coordinate: {x: index}
+    } as CarcassonneMoveDTO;
+    API.move(JSON.stringify(carcassonneMoveDTO));
+}
+
+function Tile_0 ({pointOfCompass, meeple, legalParts, id, coordinate } : TileDTO) {
 
     const meeplePositionMap = [] as Coordinate[];
     meeplePositionMap[0] = {x: 1/2, y: 1/2} as Coordinate;
@@ -98,7 +106,7 @@ function Tile_0 ({pointOfCompass, meeple, legalParts } : TileDTO) {
                 <g className={"city" + clickable(legalParts,1)}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0"} />
                 </g>
-                <g className={"road" + clickable(legalParts,0)}>
+                <g className={"road" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <line className={"border"} x1={0} y1={size/2} x2={size} y2={size/2} />
                     <line className={"inside"} x1={0} y1={size/2} x2={size} y2={size/2} />
                 </g>

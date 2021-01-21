@@ -44,4 +44,13 @@ public class Coordinate implements Serializable {
         Coordinate other = (Coordinate) o;
         return Objects.equals(x, other.x) && Objects.equals(y, other.y);
     }
+
+    @Override
+    public int hashCode() {
+        int result = 0;
+        result += (x != null ? x.hashCode() : 0);
+        result += (y != null ? y.hashCode() : 0);
+        return result;
+    }
+
 }

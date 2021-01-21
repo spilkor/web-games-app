@@ -34,23 +34,6 @@ public class Tile {
         roads.forEach(road -> road.setTile(this));
     }
 
-    private Object getUpperSide() {
-        return null;
-    }
-
-    private Object getRightSide() {
-        return null;
-    }
-
-    private Object getLowerSide() {
-        return null;
-    }
-
-    private Object getLeftSide() {
-        return null;
-    }
-
-
     public TileID getId() {
         return id;
     }
@@ -168,4 +151,69 @@ public class Tile {
                 default:return null;
         }
     }
+
+    public City getCity(PointOfCompass side) {
+        switch (pointOfCompass){
+            case NORTH:
+                switch (side){
+                    case NORTH:
+                        return cities.stream().filter(city -> city.getSides().contains(NORTH)).findFirst().orElse(null);
+                    case EAST:
+                        return cities.stream().filter(city -> city.getSides().contains(EAST)).findFirst().orElse(null);
+                    case SOUTH:
+                        return cities.stream().filter(city -> city.getSides().contains(SOUTH)).findFirst().orElse(null);
+                    case WEST:
+                        return cities.stream().filter(city -> city.getSides().contains(WEST)).findFirst().orElse(null);
+                }
+
+            case EAST:
+                switch (side){
+                    case NORTH:
+                        return cities.stream().filter(city -> city.getSides().contains(WEST)).findFirst().orElse(null);
+                    case EAST:
+                        return cities.stream().filter(city -> city.getSides().contains(NORTH)).findFirst().orElse(null);
+                    case SOUTH:
+                        return cities.stream().filter(city -> city.getSides().contains(EAST)).findFirst().orElse(null);
+                    case WEST:
+                        return cities.stream().filter(city -> city.getSides().contains(SOUTH)).findFirst().orElse(null);
+                }
+
+            case SOUTH:
+                switch (side){
+                    case NORTH:
+                        return cities.stream().filter(city -> city.getSides().contains(SOUTH)).findFirst().orElse(null);
+                    case EAST:
+                        return cities.stream().filter(city -> city.getSides().contains(WEST)).findFirst().orElse(null);
+                    case SOUTH:
+                        return cities.stream().filter(city -> city.getSides().contains(NORTH)).findFirst().orElse(null);
+                    case WEST:
+                        return cities.stream().filter(city -> city.getSides().contains(EAST)).findFirst().orElse(null);
+                }
+
+            case WEST:
+                switch (side){
+                    case NORTH:
+                        return cities.stream().filter(city -> city.getSides().contains(EAST)).findFirst().orElse(null);
+                    case EAST:
+                        return cities.stream().filter(city -> city.getSides().contains(SOUTH)).findFirst().orElse(null);
+                    case SOUTH:
+                        return cities.stream().filter(city -> city.getSides().contains(WEST)).findFirst().orElse(null);
+                    case WEST:
+                        return cities.stream().filter(city -> city.getSides().contains(NORTH)).findFirst().orElse(null);
+                }
+
+            default:return null;
+        }
+    }
+
+    public TileSide getTileSide(PointOfCompass pointOfCompass) {
+        if (getRoad(pointOfCompass) != null){
+            return TileSide.ROAD;
+        } else if(getCity(pointOfCompass) != null){
+            return TileSide.CITY;
+        } else {
+            return TileSide.FIELD;
+        }
+    }
+
 }

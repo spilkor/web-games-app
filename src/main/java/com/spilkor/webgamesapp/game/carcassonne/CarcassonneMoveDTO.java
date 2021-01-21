@@ -6,17 +6,8 @@ import java.io.Serializable;
 
 public class CarcassonneMoveDTO implements Serializable {
 
-    private MoveType moveType;
     private Coordinate coordinate;
     private PointOfCompass pointOfCompass;
-
-    public MoveType getMoveType() {
-        return moveType;
-    }
-
-    public void setMoveType(MoveType moveType) {
-        this.moveType = moveType;
-    }
 
     public Coordinate getCoordinate() {
         return coordinate;

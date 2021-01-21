@@ -2,8 +2,6 @@ package com.spilkor.webgamesapp.game.carcassonne;
 
 
 
-import com.spilkor.webgamesapp.model.dto.UserDTO;
-
 import java.io.Serializable;
 import java.util.Set;
 
@@ -15,6 +13,9 @@ public class CarcassonneGameDTO implements Serializable {
     private Set<TileDTO> tiles;
     private TileDTO tile;
     private MoveType nextMoveType;
+    private Set<TilePosition> playableTilePositions;
+    private Set<Integer> legalParts;
+
 
     public Player getNextPlayer() {
         return nextPlayer;
@@ -62,5 +63,21 @@ public class CarcassonneGameDTO implements Serializable {
 
     public void setNextMoveType(MoveType nextMoveType) {
         this.nextMoveType = nextMoveType;
+    }
+
+    public Set<TilePosition> getPlayableTilePositions() {
+        return playableTilePositions;
+    }
+
+    public void setPlayableTilePositions(Set<TilePosition> playableTilePositions) {
+        this.playableTilePositions = playableTilePositions;
+    }
+
+    public Set<Integer> getLegalParts() {
+        return legalParts;
+    }
+
+    public void setLegalParts(Set<Integer> legalParts) {
+        this.legalParts = legalParts;
     }
 }

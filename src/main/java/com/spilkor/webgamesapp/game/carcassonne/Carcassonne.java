@@ -12,10 +12,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.spilkor.webgamesapp.game.carcassonne.MoveType.MEEPLE;
 import static com.spilkor.webgamesapp.game.carcassonne.MoveType.TILE;
-import static com.spilkor.webgamesapp.game.carcassonne.PointOfCompass.SOUTH;
+import static com.spilkor.webgamesapp.game.carcassonne.PointOfCompass.*;
 import static com.spilkor.webgamesapp.game.carcassonne.TileID.TILE_0;
 
+//    -1|-1  0|-1  1|-1
+//    -1|0   0|0   1|0
+//    -1|1   0|1   1|1
 
 public class Carcassonne extends Game {
 
@@ -25,8 +29,10 @@ public class Carcassonne extends Game {
     private Set<Tile> tiles;
     private Tile tile;
     private MoveType nextMoveType;
-    private Set<Coordinate> placeableCoordinates = null;
+    private Set<Coordinate> playableCoordinates = null;
     private Deck deck;
+    private Set<TilePosition> playableTilePositions = null;
+    private Set<Integer> legalParts = null;
 
     public Carcassonne(UserDTO owner, GameType gameType){
         super(owner, gameType);
@@ -50,24 +56,28 @@ public class Carcassonne extends Game {
 
     @Override
     public void start() {
-        nextPlayer = MathUtil.selectRandom(players);
+//        nextPlayer = MathUtil.selectRandom(players);
+//        FIXME
+        nextPlayer = players.stream().filter(p->p.getUser().equals(owner)).findFirst().get();
 
         tiles = new HashSet<>();
         Tile startingTile = TileFactory.createTile(TILE_0, this);
         startingTile.setCoordinate(new Coordinate(0, 0));
+
         tiles.add(startingTile);
 
-        placeableCoordinates = new HashSet<>();
-        placeableCoordinates.add(new Coordinate(0, 1));
-        placeableCoordinates.add(new Coordinate(0, -1));
-        placeableCoordinates.add(new Coordinate(1, 0));
-        placeableCoordinates.add(new Coordinate(-1, 0));
+        playableCoordinates = new HashSet<>();
+        playableCoordinates.add(new Coordinate(0, 1));
+        playableCoordinates.add(new Coordinate(0, -1));
+        playableCoordinates.add(new Coordinate(1, 0));
+        playableCoordinates.add(new Coordinate(-1, 0));
 
         nextMoveType = TILE;
 
         createDeck();
 
         tile = TileFactory.createTile(deck.draw(),this);
+        playableTilePositions = getPlayableTilePositions();
     }
 
     @Override
@@ -75,7 +85,9 @@ public class Carcassonne extends Game {
         tiles = null;
         nextPlayer = null;
         tile = null;
-        placeableCoordinates = null;
+        playableCoordinates = null;
+        legalParts = null;
+        playableTilePositions = null;
     }
 
     @Override
@@ -86,9 +98,18 @@ public class Carcassonne extends Game {
 
         if (GameState.IN_GAME.equals(gameState)){
             carcassonneGameDTO.setNextPlayer(nextPlayer);
-            carcassonneGameDTO.setTiles(tiles.stream().map((Tile t) -> convertTile(t, user)).collect(Collectors.toSet()));
-            carcassonneGameDTO.setTile(convertTile(tile, user));
+            carcassonneGameDTO.setTiles(tiles.stream().map(TileDTO::new).collect(Collectors.toSet()));
             carcassonneGameDTO.setNextMoveType(nextMoveType);
+            carcassonneGameDTO.setTile(new TileDTO(tile));
+            if (MoveType.TILE.equals(nextMoveType)){
+                if (nextPlayer.getUser().equals(user)){
+                    carcassonneGameDTO.setPlayableTilePositions(playableTilePositions);
+                }
+            } else if (MoveType.MEEPLE.equals(nextMoveType)){
+                if (nextPlayer.getUser().equals(user)){
+                    carcassonneGameDTO.setLegalParts(legalParts);
+                }
+            }
         } else if (GameState.ENDED.equals(gameState)){
             carcassonneGameDTO.setWinner(winner);
         }
@@ -100,6 +121,95 @@ public class Carcassonne extends Game {
         }
         return null;
 
+    }
+
+    private Set<TilePosition> getPlayableTilePositions() {
+        Set<TilePosition> playableTilePositions = new HashSet<>();
+        for (Coordinate coordinate: playableCoordinates){
+            if(isTilePlayable(coordinate, NORTH)){
+                playableTilePositions.add(new TilePosition(coordinate, NORTH));
+            }
+            if(isTilePlayable(coordinate, EAST)){
+                playableTilePositions.add(new TilePosition(coordinate, EAST));
+            }
+            if(isTilePlayable(coordinate, SOUTH)){
+                playableTilePositions.add(new TilePosition(coordinate, SOUTH));
+            }
+            if(isTilePlayable(coordinate, WEST)){
+                playableTilePositions.add(new TilePosition(coordinate, WEST));
+            }
+        }
+        return playableTilePositions;
+    }
+
+    private boolean isTilePlayable(Coordinate coordinate, PointOfCompass pointOfCompass) {
+        if (tile == null || !TILE.equals(nextMoveType)){
+            return false;
+        }
+
+        Tile tileToNorth = getTile(coordinate.getX(), coordinate.getY() - 1);
+        if (tileToNorth != null && !tileToNorth.getTileSide(SOUTH).equals(tile.getTileSide(pointOfCompass))){
+            return false;
+        }
+        Tile tileToEast = getTile(coordinate.getX() + 1, coordinate.getY());
+        if (tileToEast != null && !tileToEast.getTileSide(WEST).equals(tile.getTileSide(rotate_90(pointOfCompass)))){
+            return false;
+        }
+        Tile tileToSouth = getTile(coordinate.getX(), coordinate.getY() + 1);
+        if (tileToSouth != null && !tileToSouth.getTileSide(NORTH).equals(tile.getTileSide(rotate_180(pointOfCompass)))){
+            return false;
+        }
+        Tile tileToWest = getTile(coordinate.getX() - 1, coordinate.getY());
+        if (tileToWest != null && !tileToWest.getTileSide(EAST).equals(tile.getTileSide(rotate_270(pointOfCompass)))){
+            return false;
+        }
+
+        return true;
+    }
+
+    private PointOfCompass rotate_90(PointOfCompass pointOfCompass){
+        switch (pointOfCompass){
+            case NORTH:
+                return EAST;
+            case EAST:
+                return SOUTH;
+            case SOUTH:
+                return WEST;
+            case WEST:
+                return NORTH;
+
+                default: return null;
+        }
+    }
+
+    private PointOfCompass rotate_180(PointOfCompass pointOfCompass){
+        switch (pointOfCompass){
+            case NORTH:
+                return SOUTH;
+            case EAST:
+                return WEST;
+            case SOUTH:
+                return NORTH;
+            case WEST:
+                return EAST;
+
+            default: return null;
+        }
+    }
+
+    private PointOfCompass rotate_270(PointOfCompass pointOfCompass){
+        switch (pointOfCompass){
+            case NORTH:
+                return WEST;
+            case EAST:
+                return NORTH;
+            case SOUTH:
+                return EAST;
+            case WEST:
+                return SOUTH;
+
+            default: return null;
+        }
     }
 
     @Override
@@ -167,7 +277,63 @@ public class Carcassonne extends Game {
 
     @Override
     public void move(UserDTO userDTO, String moveJSON) {
-        //TODO
+        try {
+            CarcassonneMoveDTO carcassonneMoveDTO = Mapper.readValue(moveJSON, CarcassonneMoveDTO.class);
+
+            if (TILE.equals(nextMoveType)){
+                Coordinate coordinate = carcassonneMoveDTO.getCoordinate();
+                tile.setCoordinate(coordinate);
+                tile.setPointOfCompass(carcassonneMoveDTO.getPointOfCompass());
+                tiles.add(tile);
+
+                playableCoordinates.remove(coordinate);
+
+                Tile tileToTheNorth = getTile(coordinate.getX(), coordinate.getY() - 1);
+                if (tileToTheNorth == null){
+                    playableCoordinates.add(new Coordinate(coordinate.getX(), coordinate.getY() -1 ));
+                }
+
+                Tile tileToTheEast = getTile(coordinate.getX() + 1, coordinate.getY());
+                if (tileToTheEast == null){
+                    playableCoordinates.add(new Coordinate(coordinate.getX() + 1, coordinate.getY()));
+                }
+
+                Tile tileToTheSouth = getTile(coordinate.getX(), coordinate.getY() + 1);
+                if (tileToTheSouth == null){
+                    playableCoordinates.add(new Coordinate(coordinate.getX(), coordinate.getY() + 1));
+                }
+
+                Tile tileToTheWest = getTile(coordinate.getX() - 1, coordinate.getY());
+                if (tileToTheWest == null){
+                    playableCoordinates.add(new Coordinate(coordinate.getX() - 1, coordinate.getY()));
+                }
+
+                playableTilePositions = null;
+
+                legalParts = getLegalParts();
+
+                nextMoveType = MoveType.MEEPLE;
+            } else if (MEEPLE.equals(nextMoveType)){
+//                MEEPLE
+                Meeple meeple = new Meeple();
+                meeple.setPosition(carcassonneMoveDTO.getCoordinate().getX());
+                meeple.setColor(nextPlayer.getColor());
+                tile.setMeeple(meeple);
+
+                nextMoveType = TILE;
+
+                //FIXME next player
+                nextPlayer = players.stream().filter(p-> !p.getUser().equals(nextPlayer.getUser())).findFirst().get();
+
+                legalParts = null;
+
+                tile = TileFactory.createTile(deck.draw(),this);
+                playableTilePositions = getPlayableTilePositions();
+            }
+
+        } catch (JsonProcessingException e) {
+            System.out.println(e);
+        }
     }
 
     private void createDeck() {
@@ -191,7 +357,6 @@ public class Carcassonne extends Game {
                 return Color.GREEN;
         }
     }
-
 
     private boolean roadHasMeeple(Road road) {
         if (road.getTile().getMeeple() != null && road.getTile().getMeeple().getPosition() == road.getPosition()){
@@ -234,7 +399,9 @@ public class Carcassonne extends Game {
                                     neighborRoads.add(neighborRoad);
                                 }
                             }
+                            //TODO
                     }
+                    //TODO
             }
         }
 
@@ -242,18 +409,7 @@ public class Carcassonne extends Game {
         return neighborRoads;
     }
 
-
-
-    private TileDTO convertTile(Tile tile, UserDTO user){
-        TileDTO tileDTO = new TileDTO(tile);
-        tileDTO.setLegalParts(getLegalParts(tile, user));
-        return tileDTO;
-    }
-
-    public Set<Integer> getLegalParts(Tile tile, UserDTO user) {
-        if (!nextPlayer.getUser().equals(user) || !MoveType.MEEPLE.equals(nextMoveType) || this.tile != tile){
-            return null;
-        }
+    public Set<Integer> getLegalParts() {
 
         Set<Integer> result = new HashSet<>();
         tile.getRoads().forEach(road-> {
@@ -261,6 +417,8 @@ public class Carcassonne extends Game {
                 result.add(road.getPosition());
             }
         });
+
+//        TODO
 //        tile.getCities().forEach(city-> {
 //            if (city.legal()){
 //                result.add(city.getPosition());
@@ -280,7 +438,7 @@ public class Carcassonne extends Game {
 
 
     private Tile getTile(int x, int y){
-        return tiles.stream().filter(t -> t.getCoordinate().getX().equals(x) && t.getCoordinate().getX().equals(x)).findFirst().orElse(null);
+        return tiles.stream().filter(t -> t.getCoordinate().getX().equals(x) && t.getCoordinate().getY().equals(y)).findFirst().orElse(null);
     }
 
 

@@ -8,21 +8,83 @@
   width: 100%;
   height: 100%;
 
-  .board{
-    //min-width: 100%;
-    //min-height: 100%;
+  .game{
+    width: 100%;
+    height: 100%;
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    position: relative;
 
-    table{
-      border-collapse: collapse;
+    .next-tile{
+      position: absolute;
+      top: 50px;
+      right: 50px;
+      background: #86c3e9;
+      padding: 15px;
+
+      .tile-wrapper{
+        transition: transform .3s ease;
+      }
+
+      .tile-wrapper.north{
+        transform: rotate(0deg);
+      }
+      .tile-wrapper.east{
+        transform: rotate(90deg);
+      }
+      .tile-wrapper.south{
+        transform: rotate(180deg);
+      }
+      .tile-wrapper.west{
+        animation: north-to-west .3s ease;
+        transition-delay: .3s;
+        transform: rotate(270deg);
+        transition: 0s ease;
+      }
+
+      @keyframes north-to-west {
+        0% {transform: rotate(0);}
+        100% {transform: rotate(-90deg);}
+      }
+
+      .rotate-icon{
+        cursor: pointer;
+        transition: .15s;
+        transform-origin: center;
+        margin: 20px auto auto;
+        width: min-content;
+        svg{
+          width: 40px !important;
+          height: 40px !important;
+        }
+      }
+
+      .rotate-icon:not(.rotating):hover{
+        transform: scale(1.15);
+      }
+
     }
 
-    table td{
-      padding: 0;
+    .board{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+
+
+      table{
+        border-collapse: collapse;
+      }
+
+      table td{
+        padding: 0;
+      }
+
+
+
     }
 
     .tile-wrapper{
@@ -31,71 +93,77 @@
       margin: 1px;
     }
 
-    svg path, svg line, svg polygon, svg rect, svg g{
+    .tile-wrapper.clickable:hover{
+      box-shadow: 0 0 0 1px #86c3e9 inset;
+      cursor: pointer;
+    }
+
+
+    svg.tile path, svg.tile line, svg.tile polygon, svg.tile rect, svg.tile g{
       transition: .2s;
     }
 
     /*CITY*/
-    svg .city{
+    svg.tile .city{
       fill: chocolate;
     }
-    svg .city{
+    svg.tile .city{
       stroke: black;
       stroke-width: 3px;
     }
-    svg .city.clickable:hover{
+    svg.tile .city.clickable:hover{
       fill: #86C3E9;
       cursor: pointer;
     }
 
     /*FIELD*/
-    svg .field{
+    svg.tile .field{
       fill: lightgreen;
     }
-    svg .field.clickable:hover{
+    svg.tile .field.clickable:hover{
       fill: lime;
       cursor: pointer;
       fill: #86C3E9;
     }
 
     /*ROAD*/
-    svg .road{
+    svg.tile .road{
       stroke: white;
       stroke-width: 8px;
       stroke-linecap: butt;
     }
-    svg .road.clickable:hover{
+    svg.tile .road.clickable:hover{
       cursor: pointer;
     }
-    svg .road .inside{
+    svg.tile .road .inside{
       stroke-width: 11px;
       stroke: white;
     }
-    svg .road .border{
+    svg.tile .road .border{
       stroke-width: 15px;
       stroke: black;
     }
-    svg .road.clickable:hover .inside{
+    svg.tile .road.clickable:hover .inside{
       stroke-width: 15px;
       stroke: #86C3E9;
     }
-    svg .road.clickable:hover .border{
+    svg.tile .road.clickable:hover .border{
       stroke-width: 19px;
     }
 
     /*HOUSE*/
-    svg .house{
+    svg.tile .house{
       fill: black;
     }
 
     /*MONASTERY*/
-    svg .monastery{
+    svg.tile .monastery{
       fill: yellow;
       stroke: black;
       stroke-width: 2px;
       transform-origin: center;
     }
-    svg .monastery.clickable:hover{
+    svg.tile .monastery.clickable:hover{
       cursor: pointer;
       transform: scale(1.1);
       fill: #86C3E9;
@@ -122,12 +190,11 @@
     }
 
     /*SHIELD*/
-    svg .shield{
+    svg.tile .shield{
       fill: dodgerblue;
       stroke: black;
       stroke-width: 2px;
     }
-
 
   }
 

@@ -11,10 +11,10 @@ export enum Color {
 
 export type TileDTO = {
     id: TileID,
-    legalParts: number[] | null
     meeple?: MeepleType
     pointOfCompass: PointOfCompass
     coordinate: Coordinate
+    legalParts: number[] | null
 }
 
 export type MeepleType = {
@@ -27,6 +27,10 @@ export type Player = {
     color: Color
 }
 
+export type CarcassonneMoveDTO = {
+    coordinate: Coordinate,
+    pointOfCompass: PointOfCompass
+}
 
 export type CarcassonneGameDTO = {
 
@@ -40,9 +44,15 @@ export type CarcassonneGameDTO = {
 
     lastTileCoordinate: Coordinate
     nextMoveType: MoveType
+
+    legalParts: number[] | null
+    playableTilePositions: TilePosition[]
 }
 
 export enum MoveType {
+
+    TILE = "TILE",
+    MEEPLE = "MEEPLE"
 
 }
 
@@ -80,8 +90,8 @@ export type ShieldProps= {
 }
 
 export type MonasteryProps = {
-    legalParts: number[] | null,
     partIndex: number
+    legalParts: number[] | null
 }
 
 export type MeepleProps = {
@@ -96,3 +106,8 @@ export const pointOfCompassMap : {[x: string]:number}= {
     "SOUTH": 180,
     "WEST": 270
 };
+
+export type TilePosition = {
+    coordinate: Coordinate,
+    pointOfCompass: PointOfCompass
+}
