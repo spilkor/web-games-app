@@ -75,28 +75,28 @@ public class TileFactory {
         Set<City> cities = new HashSet<>();
         Set<PointOfCompass> cityPointOfCompasses = new HashSet<>();
         cityPointOfCompasses.add(NORTH);
-        City city = new City(cityPointOfCompasses);
+        City city = new City(cityPointOfCompasses, 1);
         cities.add(city);
 
         Set<Road> roads = new HashSet<>();
         Set<PointOfCompass> roadPointOfCompasses = new HashSet<>();
         roadPointOfCompasses.add(EAST);
         roadPointOfCompasses.add(WEST);
-        Road road = new Road(roadPointOfCompasses);
+        Road road = new Road(roadPointOfCompasses, 0);
         roads.add(road);
 
         Set<Field> fields = new HashSet<>();
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(EAST_NORTH);
         halfSides_1.add(WEST_NORTH);
-        Field field_1 = new Field(halfSides_1);
+        Field field_1 = new Field(halfSides_1, 2);
         fields.add(field_1);
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(EAST_SOUTH);
         halfSides_2.add(SOUTH_EAST);
         halfSides_2.add(SOUTH_WEST);
         halfSides_2.add(WEST_SOUTH);
-        Field field_2 = new Field(halfSides_2);
+        Field field_2 = new Field(halfSides_2, 3);
         fields.add(field_2);
 
         return new Tile(carcassonne, TILE_0, null, roads, cities, fields, null, NORTH, null);

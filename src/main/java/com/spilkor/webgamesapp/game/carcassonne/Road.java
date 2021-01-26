@@ -1,18 +1,16 @@
 package com.spilkor.webgamesapp.game.carcassonne;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class Road {
-
-
 
     private Set<PointOfCompass> sides;
     private int position;
     private Tile tile;
 
-    public Road(Set<PointOfCompass> sides) {
+    public Road(Set<PointOfCompass> sides, int position) {
         this.sides = sides;
+        this.position = position;
     }
 
     public Set<PointOfCompass> getSides() {

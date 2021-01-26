@@ -101,9 +101,9 @@ function Tile_0 ({pointOfCompass, meeple, legalParts, id, coordinate } : TileDTO
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size/2}/>
-                <rect className={"field" + clickable(legalParts,3)} x={0} y={size/2} width={size} height={size/2}/>
-                <g className={"city" + clickable(legalParts,1)}>
+                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size/2} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <rect className={"field" + clickable(legalParts,3)} x={0} y={size/2} width={size} height={size/2} onClick={()=>{clickable(legalParts,3) && move(3)}}/>
+                <g className={"city" + clickable(legalParts,1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0"} />
                 </g>
                 <g className={"road" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>

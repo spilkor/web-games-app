@@ -1,11 +1,10 @@
 package com.spilkor.webgamesapp.game.carcassonne;
 
 import com.spilkor.webgamesapp.model.dto.Coordinate;
-import com.spilkor.webgamesapp.model.dto.UserDTO;
 
-import java.util.HashSet;
 import java.util.Set;
 
+import static com.spilkor.webgamesapp.game.carcassonne.HalfSide.*;
 import static com.spilkor.webgamesapp.game.carcassonne.PointOfCompass.*;
 
 public class Tile {
@@ -32,6 +31,8 @@ public class Tile {
         this.meeple = meeple;
 
         roads.forEach(road -> road.setTile(this));
+        cities.forEach(city -> city.setTile(this));
+        fields.forEach(field -> field.setTile(this));
     }
 
     public TileID getId() {
@@ -202,6 +203,88 @@ public class Tile {
                         return cities.stream().filter(city -> city.getSides().contains(NORTH)).findFirst().orElse(null);
                 }
 
+            default:return null;
+        }
+    }
+
+    public Field getField(HalfSide halfSide) {
+        switch (pointOfCompass){
+            case NORTH:
+                switch (halfSide){
+                    case NORTH_EAST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_EAST)).findFirst().orElse(null);
+                    case EAST_NORTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_NORTH)).findFirst().orElse(null);
+                    case EAST_SOUTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_SOUTH)).findFirst().orElse(null);
+                    case SOUTH_EAST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_EAST)).findFirst().orElse(null);
+                    case SOUTH_WEST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_WEST)).findFirst().orElse(null);
+                    case WEST_SOUTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_SOUTH)).findFirst().orElse(null);
+                    case WEST_NORTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_NORTH)).findFirst().orElse(null);
+                    case NORTH_WEST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_WEST)).findFirst().orElse(null);
+                }
+            case EAST:
+                switch (halfSide){
+                    case NORTH_EAST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_SOUTH)).findFirst().orElse(null);
+                    case EAST_NORTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_EAST)).findFirst().orElse(null);
+                    case EAST_SOUTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_WEST)).findFirst().orElse(null);
+                    case SOUTH_EAST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_SOUTH)).findFirst().orElse(null);
+                    case SOUTH_WEST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_NORTH)).findFirst().orElse(null);
+                    case WEST_SOUTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_WEST)).findFirst().orElse(null);
+                    case WEST_NORTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_EAST)).findFirst().orElse(null);
+                    case NORTH_WEST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_NORTH)).findFirst().orElse(null);
+                }
+            case SOUTH:
+                switch (halfSide){
+                    case NORTH_EAST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_WEST)).findFirst().orElse(null);
+                    case EAST_NORTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_SOUTH)).findFirst().orElse(null);
+                    case EAST_SOUTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_NORTH)).findFirst().orElse(null);
+                    case SOUTH_EAST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_WEST)).findFirst().orElse(null);
+                    case SOUTH_WEST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_EAST)).findFirst().orElse(null);
+                    case WEST_SOUTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_NORTH)).findFirst().orElse(null);
+                    case WEST_NORTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_SOUTH)).findFirst().orElse(null);
+                    case NORTH_WEST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_EAST)).findFirst().orElse(null);
+                }
+            case WEST:
+                switch (halfSide){
+                    case NORTH_EAST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_NORTH)).findFirst().orElse(null);
+                    case EAST_NORTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_WEST)).findFirst().orElse(null);
+                    case EAST_SOUTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_EAST)).findFirst().orElse(null);
+                    case SOUTH_EAST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_NORTH)).findFirst().orElse(null);
+                    case SOUTH_WEST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_SOUTH)).findFirst().orElse(null);
+                    case WEST_SOUTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_EAST)).findFirst().orElse(null);
+                    case WEST_NORTH:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_WEST)).findFirst().orElse(null);
+                    case NORTH_WEST:
+                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_SOUTH)).findFirst().orElse(null);
+                }
             default:return null;
         }
     }

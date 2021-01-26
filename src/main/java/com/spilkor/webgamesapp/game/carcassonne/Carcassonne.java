@@ -6,12 +6,14 @@ import com.spilkor.webgamesapp.game.Game;
 import com.spilkor.webgamesapp.model.dto.Coordinate;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
-import com.spilkor.webgamesapp.util.MathUtil;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.spilkor.webgamesapp.game.carcassonne.HalfSide.*;
 import static com.spilkor.webgamesapp.game.carcassonne.MoveType.MEEPLE;
 import static com.spilkor.webgamesapp.game.carcassonne.MoveType.TILE;
 import static com.spilkor.webgamesapp.game.carcassonne.PointOfCompass.*;
@@ -96,7 +98,9 @@ public class Carcassonne extends Game {
 
         carcassonneGameDTO.setPlayers(players);
 
-        if (GameState.IN_GAME.equals(gameState)){
+        if (GameState.IN_LOBBY.equals(gameState)){
+            //TODO
+        } else if (GameState.IN_GAME.equals(gameState)){
             carcassonneGameDTO.setNextPlayer(nextPlayer);
             carcassonneGameDTO.setTiles(tiles.stream().map(TileDTO::new).collect(Collectors.toSet()));
             carcassonneGameDTO.setNextMoveType(nextMoveType);
@@ -111,6 +115,7 @@ public class Carcassonne extends Game {
                 }
             }
         } else if (GameState.ENDED.equals(gameState)){
+            //TODO
             carcassonneGameDTO.setWinner(winner);
         }
 
@@ -327,17 +332,71 @@ public class Carcassonne extends Game {
 
                 legalParts = null;
 
-                tile = TileFactory.createTile(deck.draw(),this);
+                TileID tileID = drawIfPossible();
+
+                if (tileID == null){
+                    endGame();
+                    return;
+                }
+
+                tile = TileFactory.createTile(tileID,this);
                 playableTilePositions = getPlayableTilePositions();
             }
 
         } catch (JsonProcessingException e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
+    }
+
+    private void endGame() {
+        gameState = GameState.ENDED;
+    }
+
+    private TileID drawIfPossible(){
+        List<TileID> drawn = new ArrayList<>();
+        TileID tileID;
+
+        do {
+            tileID = deck.draw();
+
+            if (tileID == null){
+                break;
+            }
+
+            if (drawn.contains(tileID)){
+                drawn.add(tileID);
+                continue;
+            }
+
+            drawn.add(tileID);
+
+            if (!possibleToPlace(tileID)){
+                continue;
+            }
+
+            break;
+        } while (true);
+
+        TileID finalTileID = tileID;
+        drawn.stream().filter(t-> !t.equals(finalTileID)).forEach(t-> deck.put(t));
+
+        return finalTileID;
+    }
+
+    private boolean possibleToPlace(TileID tileID) {
+//        FIXME
+        return true;
     }
 
     private void createDeck() {
         deck = new Deck();
+        deck.put(TILE_0);
+        deck.put(TILE_0);
+        deck.put(TILE_0);
+        deck.put(TILE_0);
+        deck.put(TILE_0);
+        deck.put(TILE_0);
+        deck.put(TILE_0);
         deck.put(TILE_0);
         deck.put(TILE_0);
         deck.put(TILE_0);
@@ -358,6 +417,46 @@ public class Carcassonne extends Game {
         }
     }
 
+    private boolean cityHasMeeple(City city) {
+        if (city.getTile().getMeeple() != null && city.getTile().getMeeple().getPosition() == city.getPosition()){
+            return true;
+        }
+
+        Set<City> checked = new HashSet<>();
+        checked.add(city);
+
+        return cityHasMeepleRecursive(city, checked);
+    }
+
+    private boolean fieldHasMeeple(Field field) {
+        if (field.getTile().getMeeple() != null && field.getTile().getMeeple().getPosition() == field.getPosition()){
+            return true;
+        }
+
+        Set<Field> checked = new HashSet<>();
+        checked.add(field);
+
+        return fieldHasMeepleRecursive(field, checked);
+    }
+
+    private boolean fieldHasMeepleRecursive(Field field, Set<Field> checked) {
+        for(Field neighborField: getNeighborFields(field)){
+            if (!checked.contains(neighborField)){
+                Meeple meeple = neighborField.getTile().getMeeple();
+                if (meeple != null && meeple.getPosition() == neighborField.getPosition()){
+                    return true;
+                } else {
+                    checked.add(neighborField);
+                    if (fieldHasMeepleRecursive(neighborField, checked)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
     private boolean roadHasMeeple(Road road) {
         if (road.getTile().getMeeple() != null && road.getTile().getMeeple().getPosition() == road.getPosition()){
             return true;
@@ -369,6 +468,23 @@ public class Carcassonne extends Game {
         return roadHasMeepleRecursive(road, checked);
     }
 
+    private boolean cityHasMeepleRecursive(City city, Set<City> checked) {
+        for(City neighborCity: getNeighborCities(city)){
+            if (!checked.contains(neighborCity)){
+                Meeple meeple = neighborCity.getTile().getMeeple();
+                if (meeple != null && meeple.getPosition() == neighborCity.getPosition()){
+                    return true;
+                } else {
+                    checked.add(neighborCity);
+                    if (cityHasMeepleRecursive(neighborCity, checked)){
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private boolean roadHasMeepleRecursive(Road road, Set<Road> checked) {
         for(Road neighborRoad: getNeighborRoads(road)){
             if (!checked.contains(neighborRoad)){
@@ -377,31 +493,732 @@ public class Carcassonne extends Game {
                     return true;
                 } else {
                     checked.add(neighborRoad);
-                    roadHasMeepleRecursive(neighborRoad, checked);
+                    if (roadHasMeepleRecursive(neighborRoad, checked)){
+                        return true;
+                    }
                 }
             }
         }
         return false;
     }
 
+
+    private Set<Field> getNeighborFields(Field field){
+        Set<Field> neighborFields = new HashSet<>();
+
+        for (HalfSide fieldHalfSide: field.getHalfSides()){
+            switch (field.getTile().getPointOfCompass()){
+                case NORTH:
+                    switch (fieldHalfSide){
+                        case NORTH_EAST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(SOUTH_EAST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST_NORTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() + 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(WEST_NORTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST_SOUTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() + 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(WEST_SOUTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH_EAST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(NORTH_EAST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH_WEST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(NORTH_WEST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST_SOUTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() - 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(EAST_SOUTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST_NORTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() - 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(EAST_NORTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case NORTH_WEST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(SOUTH_WEST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case EAST:
+                    switch (fieldHalfSide){
+                        case NORTH_EAST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() + 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(WEST_NORTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST_NORTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(NORTH_EAST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST_SOUTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(NORTH_WEST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH_EAST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() - 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(EAST_SOUTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH_WEST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() - 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(EAST_NORTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST_SOUTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(SOUTH_WEST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST_NORTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(SOUTH_EAST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case NORTH_WEST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() + 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(WEST_NORTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case SOUTH:
+                    switch (fieldHalfSide){
+                        case NORTH_EAST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(NORTH_WEST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST_NORTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() - 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(EAST_SOUTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST_SOUTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() - 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(EAST_NORTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH_EAST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(SOUTH_WEST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH_WEST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(SOUTH_EAST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST_SOUTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() + 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(WEST_NORTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST_NORTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() + 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(WEST_SOUTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case NORTH_WEST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(NORTH_EAST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case WEST:
+                    switch (fieldHalfSide){
+                        case NORTH_EAST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() - 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(EAST_NORTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST_NORTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(SOUTH_WEST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST_SOUTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(SOUTH_EAST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH_EAST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() + 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(WEST_NORTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH_WEST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() + 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(WEST_SOUTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST_SOUTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(NORTH_EAST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST_NORTH: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX(), field.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(NORTH_WEST);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                        case NORTH_WEST: {
+                            Tile neighborTile = getTile(field.getTile().getCoordinate().getX() - 1, field.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Field neighborField = neighborTile.getField(EAST_SOUTH);
+                                if (neighborField != null){
+                                    neighborFields.add(neighborField);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        return neighborFields;
+    }
+
+    private Set<City> getNeighborCities(City city){
+        Set<City> neighborCities = new HashSet<>();
+
+        for (PointOfCompass citySide: city.getSides()){
+            switch (city.getTile().getPointOfCompass()){
+                case NORTH:
+                    switch (citySide){
+                        case NORTH: {
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(SOUTH);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX() + 1, city.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(WEST);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(NORTH);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX() - 1, city.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(EAST);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case EAST:
+                    switch (citySide){
+                        case NORTH: {
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX() + 1, city.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(WEST);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(NORTH);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX() - 1, city.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(EAST);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(SOUTH);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case SOUTH:
+                    switch (citySide){
+                        case NORTH: {
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(NORTH);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX() - 1, city.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(EAST);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(SOUTH);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX() + 1, city.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(WEST);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case WEST:
+                    switch (citySide){
+                        case NORTH: {
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX() - 1, city.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(EAST);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(SOUTH);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX() + 1, city.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(WEST);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST:{
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                City neighborCity = neighborTile.getCity(NORTH);
+                                if (neighborCity != null){
+                                    neighborCities.add(neighborCity);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+
+
+        return neighborCities;
+    }
+
     private Set<Road> getNeighborRoads(Road road){
         Set<Road> neighborRoads = new HashSet<>();
 
-        for (PointOfCompass pointOfCompassSide: road.getSides()){
+        for (PointOfCompass roadSide: road.getSides()){
             switch (road.getTile().getPointOfCompass()){
                 case NORTH:
-                    switch (pointOfCompassSide){
-                        case NORTH:
-                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getX() - 1);
+                    switch (roadSide){
+                        case NORTH: {
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() - 1);
                             if (neighborTile != null){
                                 Road neighborRoad = neighborTile.getRoad(SOUTH);
                                 if (neighborRoad != null){
                                     neighborRoads.add(neighborRoad);
                                 }
                             }
-                            //TODO
+                            break;
+                        }
+                        case EAST:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX() + 1, road.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(WEST);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(NORTH);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX() - 1, road.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(EAST);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
                     }
-                    //TODO
+                    break;
+                case EAST:
+                    switch (roadSide){
+                        case NORTH: {
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX() + 1, road.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(WEST);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(NORTH);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX() - 1, road.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(EAST);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(SOUTH);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case SOUTH:
+                    switch (roadSide){
+                        case NORTH: {
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(NORTH);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX() - 1, road.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(EAST);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(SOUTH);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX() + 1, road.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(WEST);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case WEST:
+                    switch (roadSide){
+                        case NORTH: {
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX() - 1, road.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(EAST);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case EAST:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() + 1);
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(SOUTH);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case SOUTH:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX() + 1, road.getTile().getCoordinate().getY());
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(WEST);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                        case WEST:{
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() - 1);
+                            if (neighborTile != null){
+                                Road neighborRoad = neighborTile.getRoad(NORTH);
+                                if (neighborRoad != null){
+                                    neighborRoads.add(neighborRoad);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -410,25 +1227,26 @@ public class Carcassonne extends Game {
     }
 
     public Set<Integer> getLegalParts() {
-
         Set<Integer> result = new HashSet<>();
+
         tile.getRoads().forEach(road-> {
             if (!roadHasMeeple(road)){
                 result.add(road.getPosition());
             }
         });
 
-//        TODO
-//        tile.getCities().forEach(city-> {
-//            if (city.legal()){
-//                result.add(city.getPosition());
-//            }
-//        });
-//        tile.getFields().forEach(field-> {
-//            if (field.legal()){
-//                result.add(field.getPosition());
-//            }
-//        });
+        tile.getCities().forEach(city-> {
+            if (!cityHasMeeple(city)){
+                result.add(city.getPosition());
+            }
+        });
+
+        tile.getFields().forEach(field-> {
+            if (!fieldHasMeeple(field)){
+                result.add(field.getPosition());
+            }
+        });
+
         if (tile.getMonasteryPosition() != null){
             result.add(tile.getMonasteryPosition());
         }
