@@ -2,10 +2,8 @@ package com.spilkor.webgamesapp.game.carcassonne;
 
 import com.spilkor.webgamesapp.model.dto.Coordinate;
 
+import java.util.HashSet;
 import java.util.Set;
-
-import static com.spilkor.webgamesapp.game.carcassonne.HalfSide.*;
-import static com.spilkor.webgamesapp.game.carcassonne.PointOfCompass.*;
 
 public class Tile {
 
@@ -23,16 +21,16 @@ public class Tile {
         this.carcassonne = carcassonne;
         this.id = id;
         this.coordinate = coordinate;
-        this.roads = roads;
-        this.cities = cities;
-        this.fields = fields;
+        this.roads = roads == null ? new HashSet<>() : roads;
+        this.cities = cities == null ? new HashSet<>() : cities;
+        this.fields = fields == null ? new HashSet<>() : fields;
         this.monasteryPosition = monasteryPosition;
         this.pointOfCompass = pointOfCompass;
         this.meeple = meeple;
 
-        roads.forEach(road -> road.setTile(this));
-        cities.forEach(city -> city.setTile(this));
-        fields.forEach(field -> field.setTile(this));
+        this.roads.forEach(road -> road.setTile(this));
+        this.cities.forEach(city -> city.setTile(this));
+        this.fields.forEach(field -> field.setTile(this));
     }
 
     public TileID getId() {
@@ -99,194 +97,19 @@ public class Tile {
         this.meeple = meeple;
     }
 
-    public Road getRoad(PointOfCompass side) {
-        switch (pointOfCompass){
-            case NORTH:
-                switch (side){
-                    case NORTH:
-                        return roads.stream().filter(road -> road.getSides().contains(NORTH)).findFirst().orElse(null);
-                    case EAST:
-                        return roads.stream().filter(road -> road.getSides().contains(EAST)).findFirst().orElse(null);
-                    case SOUTH:
-                        return roads.stream().filter(road -> road.getSides().contains(SOUTH)).findFirst().orElse(null);
-                    case WEST:
-                        return roads.stream().filter(road -> road.getSides().contains(WEST)).findFirst().orElse(null);
-                }
-
-            case EAST:
-                switch (side){
-                    case NORTH:
-                        return roads.stream().filter(road -> road.getSides().contains(WEST)).findFirst().orElse(null);
-                    case EAST:
-                        return roads.stream().filter(road -> road.getSides().contains(NORTH)).findFirst().orElse(null);
-                    case SOUTH:
-                        return roads.stream().filter(road -> road.getSides().contains(EAST)).findFirst().orElse(null);
-                    case WEST:
-                        return roads.stream().filter(road -> road.getSides().contains(SOUTH)).findFirst().orElse(null);
-                }
-
-            case SOUTH:
-                switch (side){
-                    case NORTH:
-                        return roads.stream().filter(road -> road.getSides().contains(SOUTH)).findFirst().orElse(null);
-                    case EAST:
-                        return roads.stream().filter(road -> road.getSides().contains(WEST)).findFirst().orElse(null);
-                    case SOUTH:
-                        return roads.stream().filter(road -> road.getSides().contains(NORTH)).findFirst().orElse(null);
-                    case WEST:
-                        return roads.stream().filter(road -> road.getSides().contains(EAST)).findFirst().orElse(null);
-                }
-
-            case WEST:
-                switch (side){
-                    case NORTH:
-                        return roads.stream().filter(road -> road.getSides().contains(EAST)).findFirst().orElse(null);
-                    case EAST:
-                        return roads.stream().filter(road -> road.getSides().contains(SOUTH)).findFirst().orElse(null);
-                    case SOUTH:
-                        return roads.stream().filter(road -> road.getSides().contains(WEST)).findFirst().orElse(null);
-                    case WEST:
-                        return roads.stream().filter(road -> road.getSides().contains(NORTH)).findFirst().orElse(null);
-                }
-
-                default:return null;
-        }
+    public Road getRoad(PointOfCompass pointOfCompass) {
+        PointOfCompass actualSide = pointOfCompass.subtract(this.pointOfCompass);
+        return roads.stream().filter(road -> road.getSides().contains(actualSide)).findFirst().orElse(null);
     }
 
-    public City getCity(PointOfCompass side) {
-        switch (pointOfCompass){
-            case NORTH:
-                switch (side){
-                    case NORTH:
-                        return cities.stream().filter(city -> city.getSides().contains(NORTH)).findFirst().orElse(null);
-                    case EAST:
-                        return cities.stream().filter(city -> city.getSides().contains(EAST)).findFirst().orElse(null);
-                    case SOUTH:
-                        return cities.stream().filter(city -> city.getSides().contains(SOUTH)).findFirst().orElse(null);
-                    case WEST:
-                        return cities.stream().filter(city -> city.getSides().contains(WEST)).findFirst().orElse(null);
-                }
-
-            case EAST:
-                switch (side){
-                    case NORTH:
-                        return cities.stream().filter(city -> city.getSides().contains(WEST)).findFirst().orElse(null);
-                    case EAST:
-                        return cities.stream().filter(city -> city.getSides().contains(NORTH)).findFirst().orElse(null);
-                    case SOUTH:
-                        return cities.stream().filter(city -> city.getSides().contains(EAST)).findFirst().orElse(null);
-                    case WEST:
-                        return cities.stream().filter(city -> city.getSides().contains(SOUTH)).findFirst().orElse(null);
-                }
-
-            case SOUTH:
-                switch (side){
-                    case NORTH:
-                        return cities.stream().filter(city -> city.getSides().contains(SOUTH)).findFirst().orElse(null);
-                    case EAST:
-                        return cities.stream().filter(city -> city.getSides().contains(WEST)).findFirst().orElse(null);
-                    case SOUTH:
-                        return cities.stream().filter(city -> city.getSides().contains(NORTH)).findFirst().orElse(null);
-                    case WEST:
-                        return cities.stream().filter(city -> city.getSides().contains(EAST)).findFirst().orElse(null);
-                }
-
-            case WEST:
-                switch (side){
-                    case NORTH:
-                        return cities.stream().filter(city -> city.getSides().contains(EAST)).findFirst().orElse(null);
-                    case EAST:
-                        return cities.stream().filter(city -> city.getSides().contains(SOUTH)).findFirst().orElse(null);
-                    case SOUTH:
-                        return cities.stream().filter(city -> city.getSides().contains(WEST)).findFirst().orElse(null);
-                    case WEST:
-                        return cities.stream().filter(city -> city.getSides().contains(NORTH)).findFirst().orElse(null);
-                }
-
-            default:return null;
-        }
+    public City getCity(PointOfCompass pointOfCompass) {
+        PointOfCompass actualSide = pointOfCompass.subtract(this.pointOfCompass);
+        return cities.stream().filter(city -> city.getSides().contains(actualSide)).findFirst().orElse(null);
     }
 
     public Field getField(HalfSide halfSide) {
-        switch (pointOfCompass){
-            case NORTH:
-                switch (halfSide){
-                    case NORTH_EAST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_EAST)).findFirst().orElse(null);
-                    case EAST_NORTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_NORTH)).findFirst().orElse(null);
-                    case EAST_SOUTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_SOUTH)).findFirst().orElse(null);
-                    case SOUTH_EAST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_EAST)).findFirst().orElse(null);
-                    case SOUTH_WEST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_WEST)).findFirst().orElse(null);
-                    case WEST_SOUTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_SOUTH)).findFirst().orElse(null);
-                    case WEST_NORTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_NORTH)).findFirst().orElse(null);
-                    case NORTH_WEST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_WEST)).findFirst().orElse(null);
-                }
-            case EAST:
-                switch (halfSide){
-                    case NORTH_EAST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_SOUTH)).findFirst().orElse(null);
-                    case EAST_NORTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_EAST)).findFirst().orElse(null);
-                    case EAST_SOUTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_WEST)).findFirst().orElse(null);
-                    case SOUTH_EAST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_SOUTH)).findFirst().orElse(null);
-                    case SOUTH_WEST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_NORTH)).findFirst().orElse(null);
-                    case WEST_SOUTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_WEST)).findFirst().orElse(null);
-                    case WEST_NORTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_EAST)).findFirst().orElse(null);
-                    case NORTH_WEST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_NORTH)).findFirst().orElse(null);
-                }
-            case SOUTH:
-                switch (halfSide){
-                    case NORTH_EAST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_WEST)).findFirst().orElse(null);
-                    case EAST_NORTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_SOUTH)).findFirst().orElse(null);
-                    case EAST_SOUTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_NORTH)).findFirst().orElse(null);
-                    case SOUTH_EAST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_WEST)).findFirst().orElse(null);
-                    case SOUTH_WEST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_EAST)).findFirst().orElse(null);
-                    case WEST_SOUTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_NORTH)).findFirst().orElse(null);
-                    case WEST_NORTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_SOUTH)).findFirst().orElse(null);
-                    case NORTH_WEST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_EAST)).findFirst().orElse(null);
-                }
-            case WEST:
-                switch (halfSide){
-                    case NORTH_EAST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_NORTH)).findFirst().orElse(null);
-                    case EAST_NORTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_WEST)).findFirst().orElse(null);
-                    case EAST_SOUTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(NORTH_EAST)).findFirst().orElse(null);
-                    case SOUTH_EAST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_NORTH)).findFirst().orElse(null);
-                    case SOUTH_WEST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(EAST_SOUTH)).findFirst().orElse(null);
-                    case WEST_SOUTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_EAST)).findFirst().orElse(null);
-                    case WEST_NORTH:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(SOUTH_WEST)).findFirst().orElse(null);
-                    case NORTH_WEST:
-                        return fields.stream().filter(field -> field.getHalfSides().contains(WEST_SOUTH)).findFirst().orElse(null);
-                }
-            default:return null;
-        }
+        HalfSide actualHalfSide = halfSide.subtract(this.pointOfCompass);
+        return fields.stream().filter(field -> field.getHalfSides().contains(actualHalfSide)).findFirst().orElse(null);
     }
 
     public TileSide getTileSide(PointOfCompass pointOfCompass) {

@@ -17,7 +17,7 @@ import static com.spilkor.webgamesapp.game.carcassonne.HalfSide.*;
 import static com.spilkor.webgamesapp.game.carcassonne.MoveType.MEEPLE;
 import static com.spilkor.webgamesapp.game.carcassonne.MoveType.TILE;
 import static com.spilkor.webgamesapp.game.carcassonne.PointOfCompass.*;
-import static com.spilkor.webgamesapp.game.carcassonne.TileID.TILE_0;
+import static com.spilkor.webgamesapp.game.carcassonne.TileID.*;
 
 //    -1|-1  0|-1  1|-1
 //    -1|0   0|0   1|0
@@ -76,7 +76,7 @@ public class Carcassonne extends Game {
 
         nextMoveType = TILE;
 
-        createDeck();
+        deck = new Deck();
 
         tile = TileFactory.createTile(deck.draw(),this);
         playableTilePositions = getPlayableTilePositions();
@@ -107,10 +107,12 @@ public class Carcassonne extends Game {
             carcassonneGameDTO.setTile(new TileDTO(tile));
             if (MoveType.TILE.equals(nextMoveType)){
                 if (nextPlayer.getUser().equals(user)){
+                    getPlayableTilePositions(); //FIXME nem kell
                     carcassonneGameDTO.setPlayableTilePositions(playableTilePositions);
                 }
             } else if (MoveType.MEEPLE.equals(nextMoveType)){
                 if (nextPlayer.getUser().equals(user)){
+                    getLegalParts(); //FIXME nem kell
                     carcassonneGameDTO.setLegalParts(legalParts);
                 }
             }
@@ -153,68 +155,23 @@ public class Carcassonne extends Game {
         }
 
         Tile tileToNorth = getTile(coordinate.getX(), coordinate.getY() - 1);
-        if (tileToNorth != null && !tileToNorth.getTileSide(SOUTH).equals(tile.getTileSide(pointOfCompass))){
+        if (tileToNorth != null && !tileToNorth.getTileSide(SOUTH).equals(tile.getTileSide(NORTH.subtract(pointOfCompass)))){
             return false;
         }
         Tile tileToEast = getTile(coordinate.getX() + 1, coordinate.getY());
-        if (tileToEast != null && !tileToEast.getTileSide(WEST).equals(tile.getTileSide(rotate_90(pointOfCompass)))){
+        if (tileToEast != null && !tileToEast.getTileSide(WEST).equals(tile.getTileSide(EAST.subtract(pointOfCompass)))){
             return false;
         }
         Tile tileToSouth = getTile(coordinate.getX(), coordinate.getY() + 1);
-        if (tileToSouth != null && !tileToSouth.getTileSide(NORTH).equals(tile.getTileSide(rotate_180(pointOfCompass)))){
+        if (tileToSouth != null && !tileToSouth.getTileSide(NORTH).equals(tile.getTileSide(SOUTH.subtract(pointOfCompass)))){
             return false;
         }
         Tile tileToWest = getTile(coordinate.getX() - 1, coordinate.getY());
-        if (tileToWest != null && !tileToWest.getTileSide(EAST).equals(tile.getTileSide(rotate_270(pointOfCompass)))){
+        if (tileToWest != null && !tileToWest.getTileSide(EAST).equals(tile.getTileSide(WEST.subtract(pointOfCompass)))){
             return false;
         }
 
         return true;
-    }
-
-    private PointOfCompass rotate_90(PointOfCompass pointOfCompass){
-        switch (pointOfCompass){
-            case NORTH:
-                return EAST;
-            case EAST:
-                return SOUTH;
-            case SOUTH:
-                return WEST;
-            case WEST:
-                return NORTH;
-
-                default: return null;
-        }
-    }
-
-    private PointOfCompass rotate_180(PointOfCompass pointOfCompass){
-        switch (pointOfCompass){
-            case NORTH:
-                return SOUTH;
-            case EAST:
-                return WEST;
-            case SOUTH:
-                return NORTH;
-            case WEST:
-                return EAST;
-
-            default: return null;
-        }
-    }
-
-    private PointOfCompass rotate_270(PointOfCompass pointOfCompass){
-        switch (pointOfCompass){
-            case NORTH:
-                return WEST;
-            case EAST:
-                return NORTH;
-            case SOUTH:
-                return EAST;
-            case WEST:
-                return SOUTH;
-
-            default: return null;
-        }
     }
 
     @Override
@@ -386,21 +343,6 @@ public class Carcassonne extends Game {
     private boolean possibleToPlace(TileID tileID) {
 //        FIXME
         return true;
-    }
-
-    private void createDeck() {
-        deck = new Deck();
-        deck.put(TILE_0);
-        deck.put(TILE_0);
-        deck.put(TILE_0);
-        deck.put(TILE_0);
-        deck.put(TILE_0);
-        deck.put(TILE_0);
-        deck.put(TILE_0);
-        deck.put(TILE_0);
-        deck.put(TILE_0);
-        deck.put(TILE_0);
-        //TODO
     }
 
     private Color geColor(int numberOfPlayers){
