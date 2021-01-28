@@ -258,14 +258,14 @@ function Tile_6 ({pointOfCompass, meeple, legalParts } : TileDTO) {
 
     const meeplePositionMap = [] as Coordinate[];
     meeplePositionMap[0] = {x: 1/2, y: 4/5} as Coordinate;
-    meeplePositionMap[1] = {x: 1/2, y: 1/2} as Coordinate;
-    meeplePositionMap[2] = {x: 1/6, y: 1/6} as Coordinate;
+    meeplePositionMap[1] = {x: 1/6, y: 1/6} as Coordinate;
+    meeplePositionMap[2] = {x: 1/2, y: 1/2} as Coordinate;
 
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size}/>
-                <g className={"road" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,1) && move(1)}}/>
+                <g className={"road" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <line className={"border"} x1={size/2} y1={size} x2={size/2} y2={size/2}/>
                     <line className={"inside"} x1={size/2} y1={size} x2={size/2} y2={size/2}/>
                 </g>
@@ -285,8 +285,8 @@ function Tile_7 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size}/>
-                <g className={"city" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,1) && move(1)}}/>
+                <g className={"city" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + (size*2) + " " + (size*2) + " L -" + size + " " + (size*2) + " z"} />
                 </g>
             </svg>
@@ -304,8 +304,8 @@ function Tile_8 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size}/>
-                <g className={"city" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,1) && move(1)}}/>
+                <g className={"city" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + (size*2) + " " + (size*2) + " L -" + size + " " + (size*2) + " z"} />
                     <Shield position={{x: 1/6, y: 5/6} as Coordinate}/>
                 </g>
@@ -323,7 +323,7 @@ function Tile_9 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <g className={"city" + clickable(legalParts,0)}>
+                <g className={"city" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <rect x={0} y={0} width={size} height={size}/>
                     <Shield position={{x: 1/6, y: 5/6} as Coordinate}/>
                 </g>
@@ -342,8 +342,8 @@ function Tile_10 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size}/>
-                <g className={"city" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,1) && move(1)}}/>
+                <g className={"city" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <polygon points={"-5 -5 " + (size + 5) + " -5 -5 " + (size + 5)}/>
                 </g>
             </svg>
@@ -361,8 +361,8 @@ function Tile_11 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size}/>
-                <g className={"city" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,1) && move(1)}}/>
+                <g className={"city" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <polygon points={"-5 -5 " + (size + 5) + " -5 -5 " + (size + 5)}/>
                     <Shield position={{x: 1/6, y: 7/12} as Coordinate}/>
                 </g>
@@ -383,13 +383,13 @@ function Tile_12 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size}/>
-                <path className={"field" + clickable(legalParts,3)} d={"M " + size + " " + size/2 + " A " + size/2 + " " + size/2 + " 0 0 0 " + size/2 + " " + size + " L " + size + " " + size}/>
-                <g className={"road" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <path className={"field" + clickable(legalParts,3)} onClick={()=>{clickable(legalParts,3) && move(3)}} d={"M " + size + " " + size/2 + " A " + size/2 + " " + size/2 + " 0 0 0 " + size/2 + " " + size + " L " + size + " " + size}/>
+                <g className={"road" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path className={"border"} fill="none" d={"M " + size + " " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 0 " + (size/2) + " " + size}/>
                     <path className={"inside"} fill="none" d={"M " + size + " " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 0 " + (size/2) + " " + size}/>
                 </g>
-                <g className={"city" + clickable(legalParts,1)}>
+                <g className={"city" + clickable(legalParts,1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
                     <polygon points={"-5 -5 " + (size+5) + " -5 -5 " + (size+5)}/>
                 </g>
             </svg>
@@ -409,13 +409,13 @@ function Tile_13 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size}/>
-                <path className={"field" + clickable(legalParts,3)} d={"M " + size + " " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 0 " + (size/2) + " " + size + " L " + size + " " + size}/>
-                <g className={"road" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <path className={"field" + clickable(legalParts,3)} onClick={()=>{clickable(legalParts,3) && move(3)}} d={"M " + size + " " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 0 " + (size/2) + " " + size + " L " + size + " " + size}/>
+                <g className={"road" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path className={"border"} fill="none" d={"M " + size + " " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 0 " + (size/2) + " " + size}/>
                     <path className={"inside"} fill="none" d={"M " + size + " " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 0 " + (size/2) + " " + size}/>
                 </g>
-                <g className={"city" + clickable(legalParts, 1)}>
+                <g className={"city" + clickable(legalParts, 1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
                     <polygon points={"-5 -5 " + (size+5) + " -5 -5 " + (size+5)}/>
                     <Shield position={{x: 1/6, y: 7/12} as Coordinate}/>
                 </g>
@@ -435,11 +435,11 @@ function Tile_14 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size}/>
-                <g className={"city" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <g className={"city" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0"} />
                 </g>
-                <g className={"city" + clickable(legalParts,1)}>
+                <g className={"city" + clickable(legalParts,1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + ", " + (size*30/100) + " " + (size*70/100) + " 0 " + size} />
                 </g>
             </svg>
@@ -457,8 +457,8 @@ function Tile_15 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size}/>
-                <g className={"city" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,1) && move(1)}}/>
+                <g className={"city" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0"} />
                 </g>
             </svg>
@@ -481,21 +481,21 @@ function Tile_16 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,4)} x={0} y={0} width={size} height={size/2}/>
-                <rect className={"field" + clickable(legalParts,5)} x={size/2} y={size/2} width={size/2} height={size/2}/>
-                <rect className={"field" + clickable(legalParts,6)} x={0} y={size/2} width={size/2} height={size/2}/>
-                <g className={"city" + clickable(legalParts,3)}>
+                <rect className={"field" + clickable(legalParts,4)} x={0} y={0} width={size} height={size/2} onClick={()=>{clickable(legalParts,4) && move(4)}}/>
+                <rect className={"field" + clickable(legalParts,5)} x={size/2} y={size/2} width={size/2} height={size/2} onClick={()=>{clickable(legalParts,5) && move(5)}}/>
+                <rect className={"field" + clickable(legalParts,6)} x={0} y={size/2} width={size/2} height={size/2} onClick={()=>{clickable(legalParts,6) && move(6)}}/>
+                <g className={"city" + clickable(legalParts,3)} onClick={()=>{clickable(legalParts,3) && move(3)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0"} />
                 </g>
-                <g className={"road" + clickable(legalParts,0)}>
+                <g className={"road" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <line className={"border"} x1={size} y1={size/2} x2={size/2} y2={size/2} />
                     <line className={"inside"} x1={size} y1={size/2} x2={size/2} y2={size/2} />
                 </g>
-                <g className={"road" + clickable(legalParts,1)}>
+                <g className={"road" + clickable(legalParts,1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
                     <line className={"border"} x1={size/2} y1={size} x2={size/2} y2={size/2} />
                     <line className={"inside"} x1={size/2} y1={size} x2={size/2} y2={size/2} />
                 </g>
-                <g className={"road" + clickable(legalParts,2)}>
+                <g className={"road" + clickable(legalParts,2)} onClick={()=>{clickable(legalParts,2) && move(2)}}>
                     <line className={"border"} x1={0} y1={size/2} x2={size/2} y2={size/2} />
                     <line className={"inside"} x1={0} y1={size/2} x2={size/2} y2={size/2} />
                 </g>
@@ -517,12 +517,12 @@ function Tile_17 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size}/>
-                <path className={"field" + clickable(legalParts,3)} d={"M " + size + " " + size/2 + " A " + size/2 + " " + size/2 + " 0 0 0 " + size/2 + " " + size + " L " + size + " " + size}/>
-                <g className={"city" + clickable(legalParts,1)}>
+                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <path className={"field" + clickable(legalParts,3)} onClick={()=>{clickable(legalParts,3) && move(3)}} d={"M " + size + " " + size/2 + " A " + size/2 + " " + size/2 + " 0 0 0 " + size/2 + " " + size + " L " + size + " " + size}/>
+                <g className={"city" + clickable(legalParts,1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0"} />
                 </g>
-                <g className={"road" + clickable(legalParts,0)}>
+                <g className={"road" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path className={"border"} fill="none" d={"M " + size + " " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 0 " + (size/2) + " " + size}/>
                     <path className={"inside"} fill="none" d={"M " + size + " " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 0 " + (size/2) + " " + size}/>
                 </g>
@@ -544,12 +544,12 @@ function Tile_18 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size}/>
-                <path className={"field" + clickable(legalParts,3)} d={"M 0 " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 1 " + (size/2) + " " + size + " L 0 " + size}/>
-                <g className={"city" + clickable(legalParts,1)}>
+                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <path className={"field" + clickable(legalParts,3)} onClick={()=>{clickable(legalParts,3) && move(3)}} d={"M 0 " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 1 " + (size/2) + " " + size + " L 0 " + size}/>
+                <g className={"city" + clickable(legalParts,1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0"} />
                 </g>
-                <g className={"road" + clickable(legalParts,0)}>
+                <g className={"road" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path className={"border"} fill="none" d={"M 0 " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 1 " + (size/2) + " " + size}/>
                     <path className={"inside"} fill="none" d={"M 0 " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 1 " + (size/2) + " " + size}/>
                 </g>
@@ -569,11 +569,11 @@ function Tile_19 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size}/>
-                <g className={"city" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,2)} x={0} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <g className={"city" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0"} />
                 </g>
-                <g className={"city" + clickable(legalParts,1)}>
+                <g className={"city" + clickable(legalParts,1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " 0 " + size} />
                 </g>
             </svg>
@@ -593,13 +593,13 @@ function Tile_20 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,2)} x={size/2} y={0} width={size} height={size}/>
-                <rect className={"field" + clickable(legalParts,3)} x={0} y={0} width={size/2} height={size}/>
-                <g className={"road" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,2)} x={size/2} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <rect className={"field" + clickable(legalParts,3)} x={0} y={0} width={size/2} height={size} onClick={()=>{clickable(legalParts,3) && move(3)}}/>
+                <g className={"road" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <line className={"border"} x1={size/2} y1={0} x2={size/2} y2={size/2} />
                     <line className={"inside"} x1={size/2} y1={0} x2={size/2} y2={size/2} />
                 </g>
-                <g className={"city" + clickable(legalParts,1)}>
+                <g className={"city" + clickable(legalParts,1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + (size*2) + " " + (size*2) + " L -" + size + " " + (size*2) + " z"} />
                 </g>
             </svg>
@@ -619,13 +619,13 @@ function Tile_21 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,2)} x={size/2} y={0} width={size} height={size}/>
-                <rect className={"field" + clickable(legalParts,3)} x={0} y={0} width={size/2} height={size}/>
-                <g className={"road" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,2)} x={size/2} y={0} width={size} height={size} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <rect className={"field" + clickable(legalParts,3)} x={0} y={0} width={size/2} height={size} onClick={()=>{clickable(legalParts,3) && move(3)}}/>
+                <g className={"road" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <line className={"border"} x1={size/2} y1={0} x2={size/2} y2={size/2} />
                     <line className={"inside"} x1={size/2} y1={0} x2={size/2} y2={size/2} />
                 </g>
-                <g className={"city" + clickable(legalParts,1)}>
+                <g className={"city" + clickable(legalParts,1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + (size*2) + " " + (size*2) + " L -" + size + " " + (size*2) + " z"} />
                     <Shield position={{x: 1/6, y: 5/6} as Coordinate}/>
                 </g>
@@ -645,9 +645,9 @@ function Tile_22 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size/2}/>
-                <rect className={"field" + clickable(legalParts,2)} x={0} y={size/2} width={size} height={size/2}/>
-                <g className={"city" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size/2} onClick={()=>{clickable(legalParts,1) && move(1)}}/>
+                <rect className={"field" + clickable(legalParts,2)} x={0} y={size/2} width={size} height={size/2} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <g className={"city" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + size*2 + " " + size + " L " + size + " " + size + " C " + (size*70/100) + " " + (size*70/100) + " " + (size*30/100) + " " + (size*70/100) + " 0 " + size} />
                 </g>
             </svg>
@@ -666,9 +666,9 @@ function Tile_23 ({pointOfCompass, meeple, legalParts } : TileDTO) {
     return(
         <>
             <svg className={"tile"} height={size} width={size} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size/2}/>
-                <rect className={"field" + clickable(legalParts,2)} x={0} y={size/2} width={size} height={size/2}/>
-                <g className={"city" + clickable(legalParts,0)}>
+                <rect className={"field" + clickable(legalParts,1)} x={0} y={0} width={size} height={size/2} onClick={()=>{clickable(legalParts,1) && move(1)}}/>
+                <rect className={"field" + clickable(legalParts,2)} x={0} y={size/2} width={size} height={size/2} onClick={()=>{clickable(legalParts,2) && move(2)}}/>
+                <g className={"city" + clickable(legalParts,0)} onClick={()=>{clickable(legalParts,0) && move(0)}}>
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + size*2 + " " + size + " L " + size + " " + size + " C " + (size*70/100) + " " + (size*70/100) + " " + (size*30/100) + " " + (size*70/100) + " 0 " + size} />
                     <Shield position={{x: 1/6, y: 4/6} as Coordinate}/>
                 </g>

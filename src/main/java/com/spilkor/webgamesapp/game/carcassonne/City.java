@@ -8,10 +8,20 @@ public class City {
 
     private int position;
     private Tile tile;
+    private boolean hasShield;
 
-    public City(Set<PointOfCompass> sides, int position) {
+    public City(Set<PointOfCompass> sides, int position, boolean hasShield) {
         this.sides = sides;
         this.position = position;
+        this.hasShield = hasShield;
+    }
+
+    public boolean isHasShield() {
+        return hasShield;
+    }
+
+    public void setHasShield(boolean hasShield) {
+        this.hasShield = hasShield;
     }
 
     public Set<PointOfCompass> getSides() {

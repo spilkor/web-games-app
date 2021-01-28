@@ -419,7 +419,7 @@ public class Carcassonne extends Game {
                 } else {
                     checked.add(neighborCity);
                     if (cityHasMeepleRecursive(neighborCity, checked)){
-                        return false;
+                        return true;
                     }
                 }
             }
@@ -942,7 +942,7 @@ public class Carcassonne extends Game {
                             break;
                         }
                         case EAST:{
-                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() + 1);
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() - 1);
                             if (neighborTile != null){
                                 City neighborCity = neighborTile.getCity(SOUTH);
                                 if (neighborCity != null){
@@ -962,7 +962,7 @@ public class Carcassonne extends Game {
                             break;
                         }
                         case WEST:{
-                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() - 1);
+                            Tile neighborTile = getTile(city.getTile().getCoordinate().getX(), city.getTile().getCoordinate().getY() + 1);
                             if (neighborTile != null){
                                 City neighborCity = neighborTile.getCity(NORTH);
                                 if (neighborCity != null){
@@ -1130,7 +1130,7 @@ public class Carcassonne extends Game {
                             break;
                         }
                         case EAST:{
-                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() + 1);
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() - 1);
                             if (neighborTile != null){
                                 Road neighborRoad = neighborTile.getRoad(SOUTH);
                                 if (neighborRoad != null){
@@ -1150,7 +1150,7 @@ public class Carcassonne extends Game {
                             break;
                         }
                         case WEST:{
-                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() - 1);
+                            Tile neighborTile = getTile(road.getTile().getCoordinate().getX(), road.getTile().getCoordinate().getY() + 1);
                             if (neighborTile != null){
                                 Road neighborRoad = neighborTile.getRoad(NORTH);
                                 if (neighborRoad != null){
