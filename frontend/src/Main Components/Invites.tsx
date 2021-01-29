@@ -26,7 +26,7 @@ export function InvitesLogo(){
 
     if (hasInvite || invitesOpen && !gameInProgress){
         return(
-            <div className={"invites-logo" + (hasInvite && " yellow") + (invitesOpen ? " open" : "")} onClick={()=> setInvitesOpen!(!invitesOpen)}>
+            <div className={"invites-logo" + (hasInvite && " default_yellow") + (invitesOpen ? " open" : "")} onClick={()=> setInvitesOpen!(!invitesOpen)}>
                 <Logo/>
             </div>
         );

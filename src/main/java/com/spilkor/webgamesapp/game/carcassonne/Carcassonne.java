@@ -7,6 +7,7 @@ import com.spilkor.webgamesapp.game.amoba.AmobaLobbyDTO;
 import com.spilkor.webgamesapp.model.dto.Coordinate;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
+import com.spilkor.webgamesapp.util.MathUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ import static com.spilkor.webgamesapp.game.carcassonne.TileID.*;
 
 public class Carcassonne extends Game {
 
-    private Set<Player> players = new HashSet<>();
+    private List<Player> players = new ArrayList<>();
     private Player nextPlayer;
     private Player winner;
     private Set<Tile> tiles;
@@ -82,9 +83,16 @@ public class Carcassonne extends Game {
 
     @Override
     public void start() {
-//        nextPlayer = MathUtil.selectRandom(players);
-//        FIXME
-        nextPlayer = players.stream().filter(p->p.getUser().equals(owner)).findFirst().get();
+
+        List<Player> randomOrderedPlayers = new ArrayList<>();
+        for(int x = 0; x < players.size() + 1; x ++){
+            Player player = MathUtil.selectRandom(players);
+            randomOrderedPlayers.add(player);
+            players.remove(player);
+        }
+        players = randomOrderedPlayers;
+
+        nextPlayer = players.get(0);
 
         tiles = new HashSet<>();
         Tile startingTile = TileFactory.createTile(TILE_0, this);
@@ -103,7 +111,7 @@ public class Carcassonne extends Game {
         deck = new Deck();
 
         tile = TileFactory.createTile(deck.draw(),this);
-        playableTilePositions = getPlayableTilePositions();
+        playableTilePositions = getPlayableTilePositions(tile);
     }
 
     @Override
@@ -123,7 +131,7 @@ public class Carcassonne extends Game {
         carcassonneGameDTO.setPlayers(players);
 
         if (GameState.IN_LOBBY.equals(gameState)){
-            //TODO
+
         } else if (GameState.IN_GAME.equals(gameState)){
             carcassonneGameDTO.setNextPlayer(nextPlayer);
             carcassonneGameDTO.setTiles(tiles.stream().map(TileDTO::new).collect(Collectors.toSet()));
@@ -131,7 +139,7 @@ public class Carcassonne extends Game {
             carcassonneGameDTO.setTile(new TileDTO(tile));
             if (MoveType.TILE.equals(nextMoveType)){
                 if (nextPlayer.getUser().equals(user)){
-//                 playableTilePositions   getPlayableTilePositions(); //FIXME nem kell
+//                    playableTilePositions  = getPlayableTilePositions(tile); //FIXME nem kell
                     carcassonneGameDTO.setPlayableTilePositions(playableTilePositions);
                 }
             } else if (MoveType.MEEPLE.equals(nextMoveType)){
@@ -154,44 +162,44 @@ public class Carcassonne extends Game {
 
     }
 
-    private Set<TilePosition> getPlayableTilePositions() {
+    private Set<TilePosition> getPlayableTilePositions(Tile tileToPlay) {
         Set<TilePosition> playableTilePositions = new HashSet<>();
         for (Coordinate coordinate: playableCoordinates){
-            if(isTilePlayable(coordinate, NORTH)){
+            if(isTilePlayable(tileToPlay, coordinate, NORTH)){
                 playableTilePositions.add(new TilePosition(coordinate, NORTH));
             }
-            if(isTilePlayable(coordinate, EAST)){
+            if(isTilePlayable(tileToPlay, coordinate, EAST)){
                 playableTilePositions.add(new TilePosition(coordinate, EAST));
             }
-            if(isTilePlayable(coordinate, SOUTH)){
+            if(isTilePlayable(tileToPlay, coordinate, SOUTH)){
                 playableTilePositions.add(new TilePosition(coordinate, SOUTH));
             }
-            if(isTilePlayable(coordinate, WEST)){
+            if(isTilePlayable(tileToPlay, coordinate, WEST)){
                 playableTilePositions.add(new TilePosition(coordinate, WEST));
             }
         }
         return playableTilePositions;
     }
 
-    private boolean isTilePlayable(Coordinate coordinate, PointOfCompass pointOfCompass) {
-        if (tile == null || !TILE.equals(nextMoveType)){
+    private boolean isTilePlayable(Tile tileToPlay, Coordinate coordinate, PointOfCompass pointOfCompass) {
+        if (tileToPlay == null){
             return false;
         }
 
         Tile tileToNorth = getTile(coordinate.getX(), coordinate.getY() - 1);
-        if (tileToNorth != null && !tileToNorth.getTileSide(SOUTH).equals(tile.getTileSide(NORTH.subtract(pointOfCompass)))){
+        if (tileToNorth != null && !tileToNorth.getTileSide(SOUTH).equals(tileToPlay.getTileSide(NORTH.subtract(pointOfCompass)))){
             return false;
         }
         Tile tileToEast = getTile(coordinate.getX() + 1, coordinate.getY());
-        if (tileToEast != null && !tileToEast.getTileSide(WEST).equals(tile.getTileSide(EAST.subtract(pointOfCompass)))){
+        if (tileToEast != null && !tileToEast.getTileSide(WEST).equals(tileToPlay.getTileSide(EAST.subtract(pointOfCompass)))){
             return false;
         }
         Tile tileToSouth = getTile(coordinate.getX(), coordinate.getY() + 1);
-        if (tileToSouth != null && !tileToSouth.getTileSide(NORTH).equals(tile.getTileSide(SOUTH.subtract(pointOfCompass)))){
+        if (tileToSouth != null && !tileToSouth.getTileSide(NORTH).equals(tileToPlay.getTileSide(SOUTH.subtract(pointOfCompass)))){
             return false;
         }
         Tile tileToWest = getTile(coordinate.getX() - 1, coordinate.getY());
-        if (tileToWest != null && !tileToWest.getTileSide(EAST).equals(tile.getTileSide(WEST.subtract(pointOfCompass)))){
+        if (tileToWest != null && !tileToWest.getTileSide(EAST).equals(tileToPlay.getTileSide(WEST.subtract(pointOfCompass)))){
             return false;
         }
 
@@ -321,7 +329,6 @@ public class Carcassonne extends Game {
                 }
 
                 tile = TileFactory.createTile(tileID,this);
-                playableTilePositions = getPlayableTilePositions();
             }
 
         } catch (JsonProcessingException e) {
@@ -335,38 +342,31 @@ public class Carcassonne extends Game {
 
     private TileID drawIfPossible(){
         List<TileID> drawn = new ArrayList<>();
-        TileID tileID;
+        TileID tileID = null;
 
-        do {
+        while (deck.isNotEmpty()){
             tileID = deck.draw();
-
-            if (tileID == null){
-                break;
-            }
 
             if (drawn.contains(tileID)){
                 drawn.add(tileID);
+                tileID = null;
                 continue;
+            }
+
+            Tile tileToPlay = TileFactory.createTile(tileID, this);
+            playableTilePositions = getPlayableTilePositions(tileToPlay);
+            if (!playableTilePositions.isEmpty()){
+                break;
             }
 
             drawn.add(tileID);
-
-            if (!possibleToPlace(tileID)){
-                continue;
-            }
-
-            break;
-        } while (true);
+            tileID = null;
+        }
 
         TileID finalTileID = tileID;
         drawn.stream().filter(t-> !t.equals(finalTileID)).forEach(t-> deck.put(t));
 
         return finalTileID;
-    }
-
-    private boolean possibleToPlace(TileID tileID) {
-//        FIXME
-        return true;
     }
 
     private Color geColor(int numberOfPlayers){

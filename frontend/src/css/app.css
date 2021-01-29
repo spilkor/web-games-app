@@ -392,10 +392,10 @@ input{
     margin-right: 5px !important;
 }
 
-/*.yellow{*/
-    /*color: rgba( 253, 255, 100 , 0.8 ) !important;*/
-    /*background: rgba( 253, 255, 100 , 0.8 ) !important;*/
-/*}*/
+.default_yellow{
+    color: rgba( 253, 255, 100 , 0.8 ) !important;
+    background: rgba( 253, 255, 100 , 0.8 ) !important;
+}
 
 .controls{
     position: absolute;

@@ -3,12 +3,13 @@ package com.spilkor.webgamesapp.game.carcassonne;
 
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 public class CarcassonneGameDTO implements Serializable {
 
     private Player nextPlayer;
-    private Set<Player> players;
+    private List<Player> players;
     private Player winner;
     private Set<TileDTO> tiles;
     private TileDTO tile;
@@ -25,11 +26,11 @@ public class CarcassonneGameDTO implements Serializable {
         this.nextPlayer = nextPlayer;
     }
 
-    public Set<Player> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 
-    public void setPlayers(Set<Player> players) {
+    public void setPlayers(List<Player> players) {
         this.players = players;
     }
 

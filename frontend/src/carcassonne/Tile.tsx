@@ -574,7 +574,7 @@ function Tile_19 ({pointOfCompass, meeple, legalParts } : TileDTO) {
                     <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0"} />
                 </g>
                 <g className={"city" + clickable(legalParts,1)} onClick={()=>{clickable(legalParts,1) && move(1)}}>
-                    <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " 0 " + size} />
+                    <path d={"M 0 " + size + " C " + (size*30/100) + " " + (size*70/100) + " " + (size*70/100) + " " + (size*70/100) + " " + size + " " + size} />
                 </g>
             </svg>
             {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
