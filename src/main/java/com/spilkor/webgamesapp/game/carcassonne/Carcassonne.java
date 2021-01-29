@@ -107,12 +107,12 @@ public class Carcassonne extends Game {
             carcassonneGameDTO.setTile(new TileDTO(tile));
             if (MoveType.TILE.equals(nextMoveType)){
                 if (nextPlayer.getUser().equals(user)){
-                    getPlayableTilePositions(); //FIXME nem kell
+//                 playableTilePositions   getPlayableTilePositions(); //FIXME nem kell
                     carcassonneGameDTO.setPlayableTilePositions(playableTilePositions);
                 }
             } else if (MoveType.MEEPLE.equals(nextMoveType)){
                 if (nextPlayer.getUser().equals(user)){
-                    getLegalParts(); //FIXME nem kell
+//                    legalParts = getLegalParts(); //FIXME nem kell
                     carcassonneGameDTO.setLegalParts(legalParts);
                 }
             }

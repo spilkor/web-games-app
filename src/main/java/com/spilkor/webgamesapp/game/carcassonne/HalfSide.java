@@ -128,7 +128,7 @@ public enum HalfSide {
                     case SOUTH:
                         return SOUTH_WEST;
                     case WEST:
-                        return EAST_NORTH;
+                        return EAST_SOUTH;
                 }
             case EAST_NORTH:
                 switch (pointOfCompass){
