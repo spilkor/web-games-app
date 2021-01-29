@@ -1,7 +1,14 @@
 import React, {useContext, useState} from 'react';
 
 
-import {CarcassonneGameDTO, CarcassonneMoveDTO, MoveType, TileDTO} from "./carcassonneTypes";
+import {
+    CarcassonneGameDTO,
+    CarcassonneLobbyDTO,
+    CarcassonneMoveDTO,
+    Color,
+    MoveType,
+    TileDTO
+} from "./carcassonneTypes";
 import {Coordinate, GameState, PointOfCompass} from "../util/types";
 import Tile, {size} from "./Tile";
 import './carcassonne.scss';
@@ -9,12 +16,16 @@ import {AppContext} from "../App";
 import {StartGameButton} from "../Main Components/Game";
 import {ReactComponent as RotateSVG} from '../svg/rotate-left.svg';
 import API from "../util/API";
+import {AmobaLobbyDTO} from "../amoba/amobaTypes";
 
 export function Carcassonne () {
 
     const { gameData, user } = useContext(AppContext);
 
     const carcassonneGameDTO = JSON.parse(gameData!.gameJSON) as CarcassonneGameDTO;
+
+    const players = carcassonneGameDTO.players;
+
 
     const [pointOfCompass, setPointOfCompass] = useState<PointOfCompass>(PointOfCompass.NORTH);
 
@@ -54,12 +65,82 @@ export function Carcassonne () {
     function Lobby () {
         return (
             <div className={"lobby"}>
-                <div>Carcassonee</div>
+
+                <div className={"caption"}>
+                    Carcassonne lobby
+                </div>
+
+                {/*<div className={"row"}>*/}
+                    {/*<div className={"key"}>*/}
+                        {/*Size:*/}
+                    {/*</div>*/}
+                    {/*<div className={"value"}>*/}
+                        {/*<select disabled={! (user!.id == gameData!.owner.id)} onChange={(e:ChangeEvent<HTMLSelectElement>)=> {}} value={"VALUE"}>*/}
+                            {/*<option value = {AmobaSizes.three.id}>{AmobaSizes.three.name}</option>*/}
+                            {/*<option value = {AmobaSizes.twoHundred.id}>{AmobaSizes.twoHundred.name}</option>*/}
+                        {/*</select>*/}
+                    {/*</div>*/}
+                {/*</div>*/}
+
+                <div className={"row"}>
+                    <div className={"key"}>
+                        Owner:
+                    </div>
+                    <div className={"value"}>
+                        <span>
+                            {gameData!.owner.name}
+                        </span>
+                    </div>
+                </div>
+
+                <div className={"row"}>
+                    <div className={"key"}>
+                        Players:
+                    </div>
+                    <div className={"value"}>
+                        {players.map((player, key)=>
+                            <div key={key} className={"player " + player.color.toLowerCase()}>
+                                <span >
+                                    {player.user.name}
+                                </span>
+                                {gameData!.owner.id === user!.id &&
+                                    <>
+                                        <ColorPick color={Color.RED} userId={player.user.id}/>
+                                        <ColorPick color={Color.BLUE} userId={player.user.id}/>
+                                        <ColorPick color={Color.YELLOW} userId={player.user.id}/>
+                                        <ColorPick color={Color.GREEN} userId={player.user.id}/>
+                                    </>
+                                }
+
+                            </div>
+                        )}
+                    </div>
+                </div>
+
                 {gameData!.owner.id === user!.id &&
                 <StartGameButton text={"START"} enabled={gameData!.startable === true}/>
                 }
+
             </div>
         );
+
+        function ColorPick({userId, color}: {userId: string, color: Color}) {
+            return(
+                <div className={"color " + color.toLowerCase()} onClick={()=>{setColor()}}>
+                </div>
+            );
+
+            function setColor() {
+                const carcassonneLobbyData = {
+                    userId,
+                    color
+                } as CarcassonneLobbyDTO;
+
+                API.sendLobbyData(JSON.stringify(carcassonneLobbyData));
+            }
+
+        }
+
     }
 
     function Board () {

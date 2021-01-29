@@ -3,14 +3,12 @@ package com.spilkor.webgamesapp.game.carcassonne;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spilkor.webgamesapp.game.Game;
+import com.spilkor.webgamesapp.game.amoba.AmobaLobbyDTO;
 import com.spilkor.webgamesapp.model.dto.Coordinate;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.spilkor.webgamesapp.game.carcassonne.HalfSide.*;
@@ -48,12 +46,38 @@ public class Carcassonne extends Game {
 
     @Override
     public boolean updateLobby(String lobbyJSON) {
-        return false;
+        try {
+            CarcassonneLobbyDTO carcassonneLobbyDTO = Mapper.readValue(lobbyJSON, CarcassonneLobbyDTO.class);
+
+            if (carcassonneLobbyDTO.getColor() == null || carcassonneLobbyDTO.getUserId() == null){
+                return false;
+            }
+
+            Player player = players.stream().filter(p-> p.getUser().getId().equals(carcassonneLobbyDTO.getUserId())).findFirst().orElse(null);
+            if (player == null){
+                return false;
+            }
+
+            player.setColor(carcassonneLobbyDTO.getColor());
+
+            return true;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+
     }
 
     @Override
     public boolean isStartable() {
-        return players.size() > 1 && players.size() < 5;
+        return
+                players.size() > 1
+                        &&
+                players.stream().map(Player::getColor).collect(Collectors.toList()).size() ==
+                players.stream().map(Player::getColor).collect(Collectors.toSet()).size()
+                        &&
+                players.stream().noneMatch(player -> player.getColor() == null);
     }
 
     @Override

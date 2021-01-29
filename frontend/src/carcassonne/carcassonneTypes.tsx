@@ -22,6 +22,11 @@ export type MeepleType = {
     position: number
 }
 
+export type CarcassonneLobbyDTO = {
+    userId: string,
+    color: Color
+}
+
 export type Player = {
     user: User
     color: Color
