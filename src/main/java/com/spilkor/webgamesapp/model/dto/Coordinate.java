@@ -48,7 +48,7 @@ public class Coordinate implements Serializable {
     @Override
     public int hashCode() {
         int result = 0;
-        result += (x != null ? x.hashCode() : 0);
+        result += (x != null ? x.hashCode()*1024 : 0);
         result += (y != null ? y.hashCode() : 0);
         return result;
     }

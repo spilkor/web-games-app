@@ -2,14 +2,14 @@ package com.spilkor.webgamesapp.game.carcassonne;
 
 import com.spilkor.webgamesapp.util.MathUtil;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.spilkor.webgamesapp.game.carcassonne.TileID.*;
 
 public class Deck {
 
-    private Set<TileID> tileIDS = new HashSet<>();
+    private List<TileID> tileIDS = new ArrayList<>();
 
     public Deck() {
         put(TILE_0,3);
@@ -63,5 +63,9 @@ public class Deck {
 
     public boolean isNotEmpty(){
         return !isEmpty();
+    }
+
+    public int getSize() {
+        return tileIDS.size();
     }
 }

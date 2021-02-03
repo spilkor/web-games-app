@@ -1,6 +1,5 @@
 package com.spilkor.webgamesapp.game.carcassonne;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class Field {
@@ -8,14 +7,24 @@ public class Field {
     private Set<HalfSide> halfSides;
     private int position;
     private Tile tile;
+    private Set<City> cities;
 
-    public Field(Set<HalfSide> halfSides, int position) {
+    public Field(Set<HalfSide> halfSides, Set<City> cities, int position) {
         this.halfSides = halfSides;
+        this.cities = cities;
         this.position = position;
     }
 
     public Set<HalfSide> getHalfSides() {
         return halfSides;
+    }
+
+    public Set<City> getCities() {
+        return cities;
+    }
+
+    public void setCities(Set<City> cities) {
+        this.cities = cities;
     }
 
     public void setHalfSides(Set<HalfSide> halfSides) {

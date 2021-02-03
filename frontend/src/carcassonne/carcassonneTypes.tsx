@@ -30,9 +30,12 @@ export type CarcassonneLobbyDTO = {
 export type Player = {
     user: User
     color: Color
+    victoryPoints: number | null
+    meeples: number | null
 }
 
 export type CarcassonneMoveDTO = {
+    skip: boolean
     coordinate: Coordinate,
     pointOfCompass: PointOfCompass
 }
@@ -40,18 +43,21 @@ export type CarcassonneMoveDTO = {
 export type CarcassonneGameDTO = {
 
     players: Player[]
-    nextPlayer: User | null
-    winner: User
+    nextPlayer: Player | null
+    winners: Player[]
 
     tiles: TileDTO[]
     tile?: TileDTO
 
+    surrendered: Player
 
     lastTileCoordinate: Coordinate
     nextMoveType: MoveType
 
     legalParts: number[] | null
     playableTilePositions: TilePosition[]
+
+    deckSize: number
 }
 
 export enum MoveType {

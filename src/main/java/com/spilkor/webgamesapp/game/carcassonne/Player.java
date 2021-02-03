@@ -11,6 +11,24 @@ public class Player {
 
     private UserDTO user;
     private Color color;
+    private Integer victoryPoints;
+    private Integer meeples;
+
+    public Integer getMeeples() {
+        return meeples;
+    }
+
+    public void setMeeples(Integer meeples) {
+        this.meeples = meeples;
+    }
+
+    public Integer getVictoryPoints() {
+        return victoryPoints;
+    }
+
+    public void setVictoryPoints(Integer victoryPoints) {
+        this.victoryPoints = victoryPoints;
+    }
 
     public UserDTO getUser() {
         return user;

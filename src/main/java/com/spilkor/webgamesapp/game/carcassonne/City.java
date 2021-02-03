@@ -9,11 +9,20 @@ public class City {
     private int position;
     private Tile tile;
     private boolean hasShield;
+    private boolean closed;
 
     public City(Set<PointOfCompass> sides, int position, boolean hasShield) {
         this.sides = sides;
         this.position = position;
         this.hasShield = hasShield;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
     }
 
     public boolean isHasShield() {

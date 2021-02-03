@@ -90,14 +90,16 @@ public class TileFactory {
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(EAST_NORTH);
         halfSides_1.add(WEST_NORTH);
-        Field field_1 = new Field(halfSides_1, 2);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1, 2);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(EAST_SOUTH);
         halfSides_2.add(SOUTH_EAST);
         halfSides_2.add(SOUTH_WEST);
         halfSides_2.add(WEST_SOUTH);
-        Field field_2 = new Field(halfSides_2, 3);
+        Field field_2 = new Field(halfSides_2, new HashSet<>(), 3);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -123,12 +125,12 @@ public class TileFactory {
         halfSides_1.add(SOUTH_EAST);
         halfSides_1.add(SOUTH_WEST);
         halfSides_1.add(WEST_SOUTH);
-        Field field_1 = new Field(halfSides_1, 1);
+        Field field_1 = new Field(halfSides_1, new HashSet<>(), 1);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(WEST_NORTH);
         halfSides_2.add(NORTH_WEST);
-        Field field_2 = new Field(halfSides_2, 2);
+        Field field_2 = new Field(halfSides_2, new HashSet<>(), 2);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -151,14 +153,14 @@ public class TileFactory {
         halfSides_1.add(EAST_NORTH);
         halfSides_1.add(WEST_NORTH);
         halfSides_1.add(NORTH_WEST);
-        Field field_1 = new Field(halfSides_1, 1);
+        Field field_1 = new Field(halfSides_1, new HashSet<>(),1);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(EAST_SOUTH);
         halfSides_2.add(SOUTH_EAST);
         halfSides_2.add(SOUTH_WEST);
         halfSides_2.add(WEST_SOUTH);
-        Field field_2 = new Field(halfSides_2, 2);
+        Field field_2 = new Field(halfSides_2, new HashSet<>(),2);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -194,22 +196,22 @@ public class TileFactory {
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(NORTH_EAST);
         halfSides_1.add(EAST_NORTH);
-        Field field_1 = new Field(halfSides_1, 4);
+        Field field_1 = new Field(halfSides_1, new HashSet<>(), 4);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(EAST_SOUTH);
         halfSides_2.add(SOUTH_EAST);
-        Field field_2 = new Field(halfSides_2, 5);
+        Field field_2 = new Field(halfSides_2, new HashSet<>(), 5);
 
         Set<HalfSide> halfSides_3 = new HashSet<>();
         halfSides_3.add(SOUTH_WEST);
         halfSides_3.add(WEST_SOUTH);
-        Field field_3 = new Field(halfSides_3, 6);
+        Field field_3 = new Field(halfSides_3, new HashSet<>(), 6);
 
         Set<HalfSide> halfSides_4 = new HashSet<>();
         halfSides_4.add(WEST_NORTH);
         halfSides_4.add(NORTH_WEST);
-        Field field_4 = new Field(halfSides_4, 7);
+        Field field_4 = new Field(halfSides_4, new HashSet<>(), 7);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -244,17 +246,17 @@ public class TileFactory {
         halfSides_1.add(EAST_NORTH);
         halfSides_1.add(WEST_NORTH);
         halfSides_1.add(NORTH_WEST);
-        Field field_1 = new Field(halfSides_1, 3);
+        Field field_1 = new Field(halfSides_1, new HashSet<>(), 3);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(EAST_SOUTH);
         halfSides_2.add(SOUTH_EAST);
-        Field field_2 = new Field(halfSides_2, 4);
+        Field field_2 = new Field(halfSides_2, new HashSet<>(), 4);
 
         Set<HalfSide> halfSides_3 = new HashSet<>();
         halfSides_3.add(SOUTH_WEST);
         halfSides_3.add(WEST_SOUTH);
-        Field field_3 = new Field(halfSides_3, 5);
+        Field field_3 = new Field(halfSides_3, new HashSet<>(), 5);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -275,7 +277,7 @@ public class TileFactory {
         halfSides_1.add(WEST_SOUTH);
         halfSides_1.add(WEST_NORTH);
         halfSides_1.add(NORTH_WEST);
-        Field field_1 = new Field(halfSides_1, 0);
+        Field field_1 = new Field(halfSides_1, new HashSet<>(), 0);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -301,7 +303,7 @@ public class TileFactory {
         halfSides_1.add(WEST_SOUTH);
         halfSides_1.add(WEST_NORTH);
         halfSides_1.add(NORTH_WEST);
-        Field field_1 = new Field(halfSides_1, 1);
+        Field field_1 = new Field(halfSides_1, new HashSet<>(), 1);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -323,7 +325,9 @@ public class TileFactory {
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(NORTH_EAST);
         halfSides_1.add(NORTH_WEST);
-        Field field_1 = new Field(halfSides_1, 1);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,1);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -346,7 +350,9 @@ public class TileFactory {
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(NORTH_EAST);
         halfSides_1.add(NORTH_WEST);
-        Field field_1 = new Field(halfSides_1, 1);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1, 1);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -384,7 +390,9 @@ public class TileFactory {
         halfSides_1.add(EAST_SOUTH);
         halfSides_1.add(SOUTH_EAST);
         halfSides_1.add(SOUTH_WEST);
-        Field field_1 = new Field(halfSides_1, 1);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,1);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -407,7 +415,9 @@ public class TileFactory {
         halfSides_1.add(EAST_SOUTH);
         halfSides_1.add(SOUTH_EAST);
         halfSides_1.add(SOUTH_WEST);
-        Field field_1 = new Field(halfSides_1, 1);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,1);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -436,12 +446,14 @@ public class TileFactory {
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(EAST_NORTH);
         halfSides_1.add(SOUTH_WEST);
-        Field field_1 = new Field(halfSides_1, 2);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1, 2);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(EAST_SOUTH);
         halfSides_2.add(SOUTH_EAST);
-        Field field_2 = new Field(halfSides_2, 3);
+        Field field_2 = new Field(halfSides_2, new HashSet<>(), 3);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -471,12 +483,14 @@ public class TileFactory {
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(EAST_NORTH);
         halfSides_1.add(SOUTH_WEST);
-        Field field_1 = new Field(halfSides_1, 2);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,2);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(EAST_SOUTH);
         halfSides_2.add(SOUTH_EAST);
-        Field field_2 = new Field(halfSides_2, 3);
+        Field field_2 = new Field(halfSides_2, new HashSet<>(),3);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -504,7 +518,10 @@ public class TileFactory {
         halfSides_1.add(EAST_SOUTH);
         halfSides_1.add(SOUTH_EAST);
         halfSides_1.add(SOUTH_WEST);
-        Field field_1 = new Field(halfSides_1, 2);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        citiesOfField_1.add(city_2);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1, 2);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -528,7 +545,9 @@ public class TileFactory {
         halfSides_1.add(SOUTH_WEST);
         halfSides_1.add(WEST_SOUTH);
         halfSides_1.add(WEST_NORTH);
-        Field field_1 = new Field(halfSides_1, 1);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,1);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -565,17 +584,19 @@ public class TileFactory {
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(EAST_NORTH);
         halfSides_1.add(WEST_NORTH);
-        Field field_1 = new Field(halfSides_1, 4);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,4);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(EAST_SOUTH);
         halfSides_2.add(SOUTH_EAST);
-        Field field_2 = new Field(halfSides_2, 5);
+        Field field_2 = new Field(halfSides_2, new HashSet<>(),5);
 
         Set<HalfSide> halfSides_3 = new HashSet<>();
         halfSides_3.add(SOUTH_WEST);
         halfSides_3.add(WEST_SOUTH);
-        Field field_3 = new Field(halfSides_3, 6);
+        Field field_3 = new Field(halfSides_3, new HashSet<>(),6);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -607,12 +628,14 @@ public class TileFactory {
         halfSides_1.add(SOUTH_WEST);
         halfSides_1.add(WEST_SOUTH);
         halfSides_1.add(WEST_NORTH);
-        Field field_1 = new Field(halfSides_1, 2);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,2);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(EAST_SOUTH);
         halfSides_2.add(SOUTH_EAST);
-        Field field_2 = new Field(halfSides_2, 3);
+        Field field_2 = new Field(halfSides_2, new HashSet<>(),3);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -643,12 +666,14 @@ public class TileFactory {
         halfSides_1.add(EAST_SOUTH);
         halfSides_1.add(SOUTH_EAST);
         halfSides_1.add(WEST_NORTH);
-        Field field_1 = new Field(halfSides_1, 2);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,2);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(SOUTH_WEST);
         halfSides_2.add(WEST_SOUTH);
-        Field field_2 = new Field(halfSides_2, 3);
+        Field field_2 = new Field(halfSides_2, new HashSet<>(),3);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -676,7 +701,10 @@ public class TileFactory {
         halfSides_1.add(EAST_SOUTH);
         halfSides_1.add(WEST_SOUTH);
         halfSides_1.add(WEST_NORTH);
-        Field field_1 = new Field(halfSides_1, 2);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        citiesOfField_1.add(city_2);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1, 2);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -704,11 +732,15 @@ public class TileFactory {
 
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(NORTH_EAST);
-        Field field_1 = new Field(halfSides_1, 2);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,2);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(WEST_NORTH);
-        Field field_2 = new Field(halfSides_2, 3);
+        Set<City> citiesOfField_2 = new HashSet<>();
+        citiesOfField_2.add(city_1);
+        Field field_2 = new Field(halfSides_2, citiesOfField_2, 3);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -737,11 +769,15 @@ public class TileFactory {
 
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(NORTH_EAST);
-        Field field_1 = new Field(halfSides_1, 2);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1, 2);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(NORTH_WEST);
-        Field field_2 = new Field(halfSides_2, 3);
+        Set<City> citiesOfField_2 = new HashSet<>();
+        citiesOfField_2.add(city_1);
+        Field field_2 = new Field(halfSides_2, citiesOfField_2, 3);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -763,12 +799,16 @@ public class TileFactory {
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(NORTH_EAST);
         halfSides_1.add(NORTH_WEST);
-        Field field_1 = new Field(halfSides_1, 1);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,1);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(SOUTH_EAST);
         halfSides_2.add(SOUTH_WEST);
-        Field field_2 = new Field(halfSides_2, 2);
+        Set<City> citiesOfField_2 = new HashSet<>();
+        citiesOfField_2.add(city_1);
+        Field field_2 = new Field(halfSides_2, citiesOfField_2,2);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);
@@ -790,12 +830,16 @@ public class TileFactory {
         Set<HalfSide> halfSides_1 = new HashSet<>();
         halfSides_1.add(NORTH_EAST);
         halfSides_1.add(NORTH_WEST);
-        Field field_1 = new Field(halfSides_1, 1);
+        Set<City> citiesOfField_1 = new HashSet<>();
+        citiesOfField_1.add(city_1);
+        Field field_1 = new Field(halfSides_1, citiesOfField_1,1);
 
         Set<HalfSide> halfSides_2 = new HashSet<>();
         halfSides_2.add(SOUTH_EAST);
         halfSides_2.add(SOUTH_WEST);
-        Field field_2 = new Field(halfSides_2, 2);
+        Set<City> citiesOfField_2 = new HashSet<>();
+        citiesOfField_2.add(city_1);
+        Field field_2 = new Field(halfSides_2, citiesOfField_2,2);
 
         Set<Field> fields = new HashSet<>();
         fields.add(field_1);

@@ -122,4 +122,22 @@ public class Tile {
         }
     }
 
+    public Object getPart(int position) {
+        for (Road road: roads){
+            if (road.getPosition() == position){
+                return road;
+            }
+        }
+        for (City city: cities){
+            if (city.getPosition() == position){
+                return city;
+            }
+        }
+        for (Field field: fields){
+            if (field.getPosition() == position){
+                return field;
+            }
+        }
+        return null;
+    }
 }

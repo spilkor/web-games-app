@@ -36,6 +36,11 @@ public class Amoba extends Game {
     }
 
     @Override
+    public void surrender(UserDTO userDTO) {
+//        TODO
+    }
+
+    @Override
     public boolean updateLobby(String lobbyJSON) {
         try {
             AmobaLobbyDTO amobaLobbyDTO = Mapper.readValue(lobbyJSON, AmobaLobbyDTO.class);

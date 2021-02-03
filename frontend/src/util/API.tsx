@@ -263,6 +263,15 @@ export default class API {
         });
     }
 
+    public static async surrender() {
+        console.log("surrender");
+        await fetch('/api/surrender', {
+            method: 'GET',
+            credentials: 'include'
+        });
+    }
+
+
     public static async restartGame() {
         console.log("restart-game");
         await fetch('/api/restart-game', {

@@ -347,6 +347,15 @@ public class WebGamesApi {
         }
     }
 
+    @GetMapping("/surrender")
+    public void surrender(HttpServletResponse response, HttpServletRequest request) {
+        try {
+            GameHandler.surrender(getUserDTOFromRequest(request));
+        } catch (WebGamesApiException e) {
+            response.setStatus(e.getStatus());
+        }
+    }
+
     @GetMapping("/game")
     public String getGameData(HttpServletRequest request) {
         UserDTO user = getUserDTOFromRequest(request);

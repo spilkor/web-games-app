@@ -23,6 +23,11 @@ public class Chess extends Game {
     }
 
     @Override
+    public void surrender(UserDTO userDTO) {
+//        TODO
+    }
+
+    @Override
     public boolean updateLobby(String lobbyJSON) {
         try {
             ChessLobbyDTO chessLobbyDTO = Mapper.readValue(lobbyJSON, ChessLobbyDTO.class);

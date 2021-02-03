@@ -3,20 +3,20 @@ package com.spilkor.webgamesapp.game.carcassonne;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spilkor.webgamesapp.game.Game;
-import com.spilkor.webgamesapp.game.amoba.AmobaLobbyDTO;
 import com.spilkor.webgamesapp.model.dto.Coordinate;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
 import com.spilkor.webgamesapp.util.MathUtil;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.spilkor.webgamesapp.game.carcassonne.HalfSide.*;
 import static com.spilkor.webgamesapp.game.carcassonne.MoveType.MEEPLE;
 import static com.spilkor.webgamesapp.game.carcassonne.MoveType.TILE;
 import static com.spilkor.webgamesapp.game.carcassonne.PointOfCompass.*;
-import static com.spilkor.webgamesapp.game.carcassonne.TileID.*;
+import static com.spilkor.webgamesapp.game.carcassonne.TileID.TILE_0;
 
 //    -1|-1  0|-1  1|-1
 //    -1|0   0|0   1|0
@@ -26,7 +26,7 @@ public class Carcassonne extends Game {
 
     private List<Player> players = new ArrayList<>();
     private Player nextPlayer;
-    private Player winner;
+    private Set<Player> winners;
     private Set<Tile> tiles;
     private Tile tile;
     private MoveType nextMoveType;
@@ -34,6 +34,7 @@ public class Carcassonne extends Game {
     private Deck deck;
     private Set<TilePosition> playableTilePositions = null;
     private Set<Integer> legalParts = null;
+    private Player surrendered = null;
 
     public Carcassonne(UserDTO owner, GameType gameType){
         super(owner, gameType);
@@ -43,6 +44,11 @@ public class Carcassonne extends Game {
     @Override
     public void playerJoined(UserDTO user) {
         players.add(new Player(user, geColor(players.size())));
+    }
+
+    @Override
+    public void playerLeft(UserDTO user) {
+        players.remove(players.stream().filter(p-> p.getUser().equals(user)).findFirst().get());
     }
 
     @Override
@@ -67,7 +73,12 @@ public class Carcassonne extends Game {
             return false;
         }
 
+    }
 
+    @Override
+    public void surrender(UserDTO userDTO) {
+        surrendered = players.stream().filter(player -> player.getUser().equals(userDTO)).findFirst().get();
+        gameState = GameState.ENDED;
     }
 
     @Override
@@ -83,7 +94,6 @@ public class Carcassonne extends Game {
 
     @Override
     public void start() {
-
         List<Player> randomOrderedPlayers = new ArrayList<>();
         for(int x = 0; x < players.size() + 1; x ++){
             Player player = MathUtil.selectRandom(players);
@@ -91,6 +101,8 @@ public class Carcassonne extends Game {
             players.remove(player);
         }
         players = randomOrderedPlayers;
+
+        players.forEach(player -> {player.setMeeples(8); player.setVictoryPoints(0);});
 
         nextPlayer = players.get(0);
 
@@ -122,6 +134,11 @@ public class Carcassonne extends Game {
         playableCoordinates = null;
         legalParts = null;
         playableTilePositions = null;
+        winners = null;
+        nextMoveType = null;
+        deck = null;
+        surrendered = null;
+        players.forEach(player-> {player.setMeeples(null); player.setVictoryPoints(null);});
     }
 
     @Override
@@ -132,25 +149,27 @@ public class Carcassonne extends Game {
 
         if (GameState.IN_LOBBY.equals(gameState)){
 
-        } else if (GameState.IN_GAME.equals(gameState)){
+        } else if (GameState.IN_GAME.equals(gameState) || GameState.ENDED.equals(gameState)){
             carcassonneGameDTO.setNextPlayer(nextPlayer);
             carcassonneGameDTO.setTiles(tiles.stream().map(TileDTO::new).collect(Collectors.toSet()));
             carcassonneGameDTO.setNextMoveType(nextMoveType);
             carcassonneGameDTO.setTile(new TileDTO(tile));
             if (MoveType.TILE.equals(nextMoveType)){
                 if (nextPlayer.getUser().equals(user)){
-//                    playableTilePositions  = getPlayableTilePositions(tile); //FIXME nem kell
                     carcassonneGameDTO.setPlayableTilePositions(playableTilePositions);
                 }
             } else if (MoveType.MEEPLE.equals(nextMoveType)){
                 if (nextPlayer.getUser().equals(user)){
-//                    legalParts = getLegalParts(); //FIXME nem kell
                     carcassonneGameDTO.setLegalParts(legalParts);
                 }
             }
-        } else if (GameState.ENDED.equals(gameState)){
-            //TODO
-            carcassonneGameDTO.setWinner(winner);
+            carcassonneGameDTO.setDeckSize(deck.getSize());
+        }
+
+        if (GameState.ENDED.equals(gameState)){
+            carcassonneGameDTO.setWinners(winners);
+            carcassonneGameDTO.setSurrendered(surrendered);
+            carcassonneGameDTO.setDeckSize(deck.getSize());
         }
 
         try {
@@ -308,16 +327,23 @@ public class Carcassonne extends Game {
 
                 nextMoveType = MoveType.MEEPLE;
             } else if (MEEPLE.equals(nextMoveType)){
-//                MEEPLE
-                Meeple meeple = new Meeple();
-                meeple.setPosition(carcassonneMoveDTO.getCoordinate().getX());
-                meeple.setColor(nextPlayer.getColor());
-                tile.setMeeple(meeple);
+
+                if (!Boolean.TRUE.equals(carcassonneMoveDTO.getSkip())){
+                    Meeple meeple = new Meeple();
+                    meeple.setPosition(carcassonneMoveDTO.getCoordinate().getX());
+                    meeple.setColor(nextPlayer.getColor());
+                    tile.setMeeple(meeple);
+                    nextPlayer.setMeeples(nextPlayer.getMeeples() - 1);
+                }
+
+                closeRoads(false);
+                closeCities(false);
+                closeMonasteries(false);
 
                 nextMoveType = TILE;
 
                 //FIXME next player
-                nextPlayer = players.stream().filter(p-> !p.getUser().equals(nextPlayer.getUser())).findFirst().get();
+                nextPlayer = players.get((players.indexOf(nextPlayer) + 1) % players.size());
 
                 legalParts = null;
 
@@ -336,8 +362,353 @@ public class Carcassonne extends Game {
         }
     }
 
+    private void closeMonasteries(boolean isEnd) {
+        Set<Coordinate> positionsToCheck;
+        if (isEnd){
+            positionsToCheck = tiles.stream().map(Tile::getCoordinate).collect(Collectors.toSet());
+        } else {
+            int x = tile.getCoordinate().getX();
+            int y = tile.getCoordinate().getY();
+            positionsToCheck = new HashSet<>();
+            positionsToCheck.add(new Coordinate(x - 1, y - 1));
+            positionsToCheck.add(new Coordinate(x - 1, y));
+            positionsToCheck.add(new Coordinate(x - 1, y + 1));
+            positionsToCheck.add(new Coordinate(x, y - 1));
+            positionsToCheck.add(new Coordinate(x, y));
+            positionsToCheck.add(new Coordinate(x, y + 1));
+            positionsToCheck.add(new Coordinate(x + 1, y - 1));
+            positionsToCheck.add(new Coordinate(x + 1, y));
+            positionsToCheck.add(new Coordinate(x + 1, y + 1));
+        }
+
+        Set<Coordinate> positionsWithMonastery = new HashSet<>();
+        for (Coordinate position: positionsToCheck){
+            Tile t = getTile(position);
+            if (t != null && t.getMonasteryPosition() != null && t.getMeeple() != null && t.getMeeple().getPosition() == t.getMonasteryPosition()){
+                positionsWithMonastery.add(position);
+            }
+        }
+
+        for(Coordinate position: positionsWithMonastery){
+            int x2 = position.getX();
+            int y2 = position.getY();
+            int filled = 0;
+            if (getTile(x2 - 1, y2 - 1) != null){
+                filled ++;
+            }
+            if (getTile(x2 - 1, y2) != null){
+                filled ++;
+            }
+            if (getTile(x2 - 1, y2 + 1) != null){
+                filled ++;
+            }
+            if (getTile(x2, y2 - 1) != null){
+                filled ++;
+            }
+            if (getTile(x2, y2) != null){
+                filled ++;
+            }
+            if (getTile(x2, y2 + 1) != null){
+                filled ++;
+            }
+            if (getTile(x2 + 1, y2 - 1) != null){
+                filled ++;
+            }
+            if (getTile(x2 + 1, y2) != null){
+                filled ++;
+            }
+            if (getTile(x2 + 1, y2 + 1) != null){
+                filled ++;
+            }
+
+            if (isEnd || filled == 9){
+                Tile t2 = getTile(position);
+                Player player = getPlayer(t2.getMeeple().getColor());
+                player.setVictoryPoints(player.getVictoryPoints() + filled);
+                player.setMeeples(player.getMeeples() + 1);
+                t2.setMeeple(null);
+            }
+        }
+
+    }
+
+
+
+    private Player getPlayer(Color color){
+        return players.stream().filter(player -> player.getColor().equals(color)).findFirst().orElse(null);
+    }
+
+    private void closeRoads(boolean isEnd) {
+        Set<Road> checked = new HashSet<>();
+
+        Set<Road> roads = isEnd ? getAllRoadsWithMeeple() : tile.getRoads();
+
+        for(Road road: roads){
+            if (checked.add(road)){
+                Set<Road> connectedRoads = getConnectedRoads(road);
+                if(isEnd || roadIsClosed(connectedRoads)){
+                    Set<Tile> tilesWithRelevantMeeple = connectedRoads
+                            .stream()
+                            .filter(r -> r.getTile().getMeeple() != null && r.getTile().getMeeple().getPosition() == r.getPosition())
+                            .map(Road::getTile)
+                            .collect(Collectors.toSet());
+                    if(!tilesWithRelevantMeeple.isEmpty()){
+
+                        Set<Map.Entry<Color, Long>> colors = tilesWithRelevantMeeple.stream()
+                                .map(Tile::getMeeple)
+                                .map(Meeple::getColor)
+                                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                                .entrySet();
+                        Long maxNum = colors.stream().max(Comparator.comparing(Map.Entry::getValue)).get().getValue();
+                        Set<Color> maxColors = colors.stream().filter(c-> c.getValue().equals(maxNum)).map(Map.Entry::getKey).collect(Collectors.toSet());
+
+                        for(Color color: maxColors){
+                            Player player = getPlayer(color);
+                            player.setVictoryPoints(player.getVictoryPoints() + connectedRoads.size());
+                        }
+                        tilesWithRelevantMeeple.forEach(tile-> {
+                            Player player = getPlayer(tile.getMeeple().getColor());
+                            player.setMeeples(player.getMeeples() + 1);
+                            tile.setMeeple(null);
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    private Set<Road> getAllRoadsWithMeeple() {
+        Set<Road> result = new HashSet<>();
+        for (Tile tile : tiles){
+            if (tile.getMeeple() != null){
+                Object object = tile.getPart(tile.getMeeple().getPosition());
+                if (object instanceof Road){
+                    result.add((Road) object);
+                }
+            }
+        }
+        return result;
+    }
+
+    private boolean roadIsClosed(Set<Road> connectedRoads) {
+        Set<Tile> tiles = connectedRoads.stream().map(Road::getTile).collect(Collectors.toSet());
+        for(Road road: connectedRoads){
+            for(PointOfCompass side: road.getSides()){
+                Tile tile = getTile(getCoordinate(road.getTile().getCoordinate(), road.getTile().getPointOfCompass().add(side)));
+                if (tile == null || !tiles.contains(tile)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean cityIsClosed(Set<City> connectedCities) {
+        Set<Tile> tiles = connectedCities.stream().map(City::getTile).collect(Collectors.toSet());
+        for(City city: connectedCities){
+            for(PointOfCompass side: city.getSides()){
+                Tile tile = getTile(getCoordinate(city.getTile().getCoordinate(), city.getTile().getPointOfCompass().add(side)));
+                if (tile == null || !tiles.contains(tile)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private Coordinate getCoordinate(Coordinate coordinate, PointOfCompass pointOfCompass){
+        switch (pointOfCompass){
+            case NORTH:
+                return new Coordinate(coordinate.getX(), coordinate.getY() - 1);
+            case EAST:
+                return new Coordinate(coordinate.getX() + 1, coordinate.getY());
+            case SOUTH:
+                return new Coordinate(coordinate.getX(), coordinate.getY() + 1);
+            case WEST:
+                return new Coordinate(coordinate.getX() - 1, coordinate.getY());
+            default:return null;
+        }
+    }
+
+
+    private Set<Road> getConnectedRoads(Road road) {
+        Set<Road> checked = new HashSet<>();
+        checked.add(road);
+        return getConnectedRoads(road, checked);
+    }
+
+    private Set<City> getConnectedCities(City city) {
+        Set<City> checked = new HashSet<>();
+        checked.add(city);
+        return getConnectedCities(city, checked);
+    }
+
+    private Set<Field> getConnectedFields(Field field) {
+        Set<Field> checked = new HashSet<>();
+        checked.add(field);
+        return getConnectedFields(field, checked);
+    }
+
+    private Set<Field> getConnectedFields(Field field, Set<Field> checked) {
+        for(Field neighborField: getNeighborFields(field)){
+            if (checked.add(neighborField)){
+                checked.addAll(getConnectedFields(neighborField, checked));
+            }
+        }
+        return checked;
+    }
+
+    private Set<City> getConnectedCities(City city, Set<City> checked) {
+        for(City neighborCity: getNeighborCities(city)){
+            if (checked.add(neighborCity)){
+                checked.addAll(getConnectedCities(neighborCity, checked));
+            }
+        }
+        return checked;
+    }
+
+    private Set<Road> getConnectedRoads(Road road, Set<Road> checked) {
+        for(Road neighborRoad: getNeighborRoads(road)){
+            if (checked.add(neighborRoad)){
+                checked.addAll(getConnectedRoads(neighborRoad, checked));
+            }
+        }
+        return checked;
+    }
+
+    private void closeCities(boolean isEnd) {
+        Set<City> checked = new HashSet<>();
+
+        Set<City> cities = isEnd ? getAllCitiesWithMeeple() : tile.getCities();
+
+        for(City city: cities){
+            if (checked.add(city)){
+
+                Set<City> connectedCities = getConnectedCities(city);
+
+                if(isEnd || cityIsClosed(connectedCities)){
+                    cities.forEach(c-> c.setClosed(true));
+
+                    Set<Tile> tilesWithRelevantMeeple = connectedCities
+                            .stream()
+                            .filter(t -> t.getTile().getMeeple() != null && t.getTile().getMeeple().getPosition() == t.getPosition())
+                            .map(City::getTile)
+                            .collect(Collectors.toSet());
+                    if(!tilesWithRelevantMeeple.isEmpty()){
+
+                        Set<Map.Entry<Color, Long>> colors = tilesWithRelevantMeeple.stream()
+                                .map(Tile::getMeeple)
+                                .map(Meeple::getColor)
+                                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                                .entrySet();
+                        Long maxNum = colors.stream().max(Comparator.comparing(Map.Entry::getValue)).get().getValue();
+                        Set<Color> maxColors = colors.stream().filter(c-> c.getValue().equals(maxNum)).map(Map.Entry::getKey).collect(Collectors.toSet());
+
+                        for(Color color: maxColors){
+                            Player player = getPlayer(color);
+                            player.setVictoryPoints(player.getVictoryPoints() + (connectedCities.size() + connectedCities.stream().filter(City::isHasShield).collect(Collectors.toSet()).size()) * (isEnd ? 1 : 2));
+                        }
+                        tilesWithRelevantMeeple.forEach(tile-> {
+                            Player player = getPlayer(tile.getMeeple().getColor());
+                            player.setMeeples(player.getMeeples() + 1);
+                            tile.setMeeple(null);
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    private Set<City> getAllCitiesWithMeeple() {
+        Set<City> result = new HashSet<>();
+        for (Tile tile : tiles){
+            if (tile.getMeeple() != null){
+                Object object = tile.getPart(tile.getMeeple().getPosition());
+                if (object instanceof City){
+                    result.add((City) object);
+                }
+            }
+        }
+        return result;
+    }
+
+    private Set<Field> getAllFieldsWithMeeple() {
+        Set<Field> result = new HashSet<>();
+        for (Tile tile : tiles){
+            if (tile.getMeeple() != null){
+                Object object = tile.getPart(tile.getMeeple().getPosition());
+                if (object instanceof Field){
+                    result.add((Field) object);
+                }
+            }
+        }
+        return result;
+    }
+
+
     private void endGame() {
+        closeRoads(true);
+        closeCities(true);
+        closeMonasteries(true);
+        closeFields();
+
+        winners = players.stream().filter(player -> player.getVictoryPoints().equals(players.stream().map(Player::getVictoryPoints).max(Integer::compareTo).orElse(null))).collect(Collectors.toSet());
+
         gameState = GameState.ENDED;
+    }
+
+    private void closeFields() {
+
+        Set<Field> fields = getAllFieldsWithMeeple();
+
+        Set<Field> checked = new HashSet<>();
+        for(Field field: fields){
+            if (checked.add(field)){
+
+                Set<Field> connectedFields = getConnectedFields(field);
+
+                Set<Tile> tilesWithRelevantMeeple = connectedFields
+                        .stream()
+                        .filter(t -> t.getTile().getMeeple() != null && t.getTile().getMeeple().getPosition() == t.getPosition())
+                        .map(Field::getTile)
+                        .collect(Collectors.toSet());
+
+                Set<Map.Entry<Color, Long>> colors = tilesWithRelevantMeeple.stream()
+                        .map(Tile::getMeeple)
+                        .map(Meeple::getColor)
+                        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                        .entrySet();
+                Long maxNum = colors.stream().max(Comparator.comparing(Map.Entry::getValue)).get().getValue();
+                Set<Color> maxColors = colors.stream().filter(c-> c.getValue().equals(maxNum)).map(Map.Entry::getKey).collect(Collectors.toSet());
+
+                for(Color color: maxColors){
+                    Player player = getPlayer(color);
+                    player.setVictoryPoints(player.getVictoryPoints() + 3 * getNumberOfClosedCitiesOnField(connectedFields));
+                }
+                tilesWithRelevantMeeple.forEach(tile-> {
+                    Player player = getPlayer(tile.getMeeple().getColor());
+                    player.setMeeples(player.getMeeples() + 1);
+                    tile.setMeeple(null);
+                });
+            }
+        }
+
+    }
+
+    private int getNumberOfClosedCitiesOnField(Set<Field> fields){
+        int result = 0;
+        Set<City> checked = new HashSet<>();
+        for(Field field: fields){
+            for(City city: field.getCities()){
+                if (!checked.contains(city)){
+                    checked.addAll(getConnectedCities(city));
+                    if (city.isClosed()){
+                        result ++;
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     private TileID drawIfPossible(){
@@ -1220,6 +1591,9 @@ public class Carcassonne extends Game {
         return result;
     }
 
+    private Tile getTile(Coordinate coordinate){
+        return getTile(coordinate.getX(), coordinate.getY());
+    }
 
     private Tile getTile(int x, int y){
         return tiles.stream().filter(t -> t.getCoordinate().getX().equals(x) && t.getCoordinate().getY().equals(y)).findFirst().orElse(null);

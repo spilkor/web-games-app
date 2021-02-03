@@ -10,6 +10,7 @@ import java.util.Set;
 
 public abstract class Game {
 
+
     public enum GameState {
         IN_LOBBY,
         IN_GAME,
@@ -59,9 +60,11 @@ public abstract class Game {
     public abstract boolean updateLobby(String lobbyJSON);
     public abstract boolean legal(UserDTO userDTO, String moveJSON);
     public abstract void move(UserDTO userDTO, String moveJSON);
-
+    public abstract void surrender(UserDTO userDTO);
 
     public void playerJoined(UserDTO player){ };
+
+    public void playerLeft(UserDTO player){ };
 
     public UserDTO getSecondPlayer(){
         return players.stream().filter(player -> !player.equals(owner)).findFirst().orElse(null);

@@ -59,6 +59,23 @@ public class GameHandler {
         game.getPlayers().forEach(player-> updatePlayer(player, game));
     }
 
+    static void surrender(UserDTO user) throws WebGamesApi.WebGamesApiException {
+        Game game = GameHandler.getGameOfUser(user);
+
+        if (game == null){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
+        }
+
+
+        if (!Game.GameState.IN_GAME.equals(game.getGameState())){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
+        }
+
+        game.surrender(user);
+
+        updatePlayers(game);
+    }
+
     static void startGame(UserDTO user) throws WebGamesApi.WebGamesApiException {
         Game game = GameHandler.getGameOfUser(user);
 
@@ -244,6 +261,7 @@ public class GameHandler {
             game.setOwner(game.getSecondPlayer());
         }
         game.getPlayers().remove(user);
+        game.playerLeft(user);
 
         updatePlayers(game);
         updatePlayer(user);
@@ -278,6 +296,8 @@ public class GameHandler {
         if (!game.getPlayers().remove(player)){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
+
+        game.playerLeft(player);
 
         updatePlayers(game);
         updatePlayer(player);

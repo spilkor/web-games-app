@@ -8,6 +8,43 @@
   width: 100%;
   height: 100%;
 
+  .deck{
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    z-index: 110;
+    height: 100px;
+    width: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img:nth-last-of-type(2){
+      rotate: 20deg;
+    }
+
+    img:nth-last-of-type(3){
+      rotate: 70deg;
+    }
+
+    img:nth-last-of-type(4){
+      rotate: 10deg;
+    }
+
+    img{
+      position: absolute;
+      height: 100px;
+      left: 0;
+      top: 0;
+    }
+
+    .deck-size {
+      font-size: 2rem;
+      font-weight: bolder;
+      z-index: 101;
+    }
+  }
+
   .game{
     width: 100%;
     height: 100%;
@@ -17,56 +54,181 @@
     align-items: center;
     text-align: center;
 
-    .next-tile{
+    .surrender-flag{
       position: absolute;
-      top: 50px;
-      right: 50px;
+      width: 30px;
+      bottom: 30px;
+      fill: white;
+      left: 220px;
+      cursor: pointer;
+      transition: all .3s;
+    }
+
+    .surrender-flag.red{
+      fill: red;
+      bottom: 40px;
+      left: 230px;
+      transform: scale(1.2);
+    }
+
+    .surrender-flag:hover{
+      transform: scale(1.2);
+    }
+
+
+    .player-board{
+      background: #86c3e9;
+      position: absolute;
+      bottom: 30px;
+      left: 30px;
+      outline: 2px solid;
+      padding: 10px;
+      font-weight: bold;
+
+       table{
+        border-collapse: collapse;
+
+        td{
+          border: 1px solid black;
+          padding: 4px 10px;
+        }
+
+         td.border-none{
+           border:none;
+         }
+      }
+
+      .player-row.next{
+        border-left: 5px solid;
+      }
+      .player-row.winner{
+        background: rgba(255,255,0, .3);
+        border: 2px solid yellow;
+      }
+
+      .player-row.winner .player-victory-points{
+        color: yellow;
+      }
+
+      .player-row{
+
+
+        .player-name{
+          text-shadow: 0 0 10px white
+        }
+
+        .player-meeples{
+
+        }
+
+        .player-victory-points{
+          color: black;
+        }
+
+      }
+      .player-row.red .player-name{
+        color: red;
+      }
+      .player-row.blue .player-name{
+        color: blue;
+      }
+      .player-row.yellow .player-name{
+        color: yellow;
+        text-shadow: 0 0 10px black;
+      }
+      .player-row.green .player-name{
+        color: green;
+      }
+
+    }
+
+
+    .action{
+
+      position: absolute;
+      top: 30px;
+      right: 30px;
       background: #86c3e9;
       padding: 15px;
       border: 2px solid;
 
-      .tile-wrapper{
-        transition: transform .3s ease;
-      }
+      .next-meeple{
+        display: grid;
 
-      .tile-wrapper.north{
-        transform: rotate(0deg);
-      }
-      .tile-wrapper.east{
-        transform: rotate(90deg);
-      }
-      .tile-wrapper.south{
-        transform: rotate(180deg);
-      }
-      .tile-wrapper.west{
-        animation: north-to-west .3s ease;
-        transition-delay: .3s;
-        transform: rotate(270deg);
-        transition: 0s ease;
-      }
+        .meeple {
+          height: 70px;
+          width: 100px;
+          position: initial !important;
+          transform: translate(74px, 50px) scale(1.5);
+        }
 
-      @keyframes north-to-west {
-        0% {transform: rotate(0);}
-        100% {transform: rotate(-90deg);}
-      }
-
-      .rotate-icon{
-        cursor: pointer;
-        transition: .15s;
-        transform-origin: center;
-        margin: 20px auto auto;
-        width: min-content;
-        svg{
-          width: 40px !important;
-          height: 40px !important;
+        .skip{
+          background: white;
+          color: black;
+          font-weight: bold;
+          padding: 10px 20px;
+          border-radius: 4px;
+          font-size: 1rem;
+          z-index: 90;
+          transition: all .3s;
+          outline: 1px solid black;
+        }
+        
+        .skip:hover{
+          cursor: pointer;
+          transform: scale(1.1);
         }
       }
 
-      .rotate-icon:not(.rotating):hover{
-        transform: scale(1.15);
+      .next-tile{
+
+        .tile-wrapper{
+          transition: transform .3s ease;
+        }
+
+        .tile-wrapper.north{
+          transform: rotate(0deg);
+        }
+        .tile-wrapper.east{
+          transform: rotate(90deg);
+        }
+        .tile-wrapper.south{
+          transform: rotate(180deg);
+        }
+        .tile-wrapper.west{
+          animation: north-to-west .3s ease;
+          transition-delay: .3s;
+          transform: rotate(270deg);
+          transition: 0s ease;
+        }
+
+        @keyframes north-to-west {
+          0% {transform: rotate(0);}
+          100% {transform: rotate(-90deg);}
+        }
+
+        .rotate-icon{
+          cursor: pointer;
+          transition: .15s;
+          transform-origin: center;
+          margin: 20px auto auto;
+          width: min-content;
+          svg{
+            width: 40px !important;
+            height: 40px !important;
+          }
+        }
+
+        .rotate-icon:not(.rotating):hover{
+          transform: scale(1.15);
+        }
+
       }
 
     }
+
+
+
 
     .board{
       display: flex;
@@ -106,7 +268,7 @@
 
     /*CITY*/
     svg.tile .city{
-      fill: chocolate;
+      fill: #996600;
     }
     svg.tile .city{
       stroke: black;
@@ -291,6 +453,12 @@
       background-color: green;
     }
 
+  }
+
+  .system-message-wrapper{
+    position: absolute;
+    width: 100%;
+    bottom: 30px;
   }
 
 }

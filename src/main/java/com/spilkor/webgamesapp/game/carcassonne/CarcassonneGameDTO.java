@@ -9,14 +9,31 @@ import java.util.Set;
 public class CarcassonneGameDTO implements Serializable {
 
     private Player nextPlayer;
+    private Player surrendered;
     private List<Player> players;
-    private Player winner;
+    private Set<Player> winners;
     private Set<TileDTO> tiles;
     private TileDTO tile;
     private MoveType nextMoveType;
     private Set<TilePosition> playableTilePositions;
     private Set<Integer> legalParts;
+    private Integer deckSize;
 
+    public Integer getDeckSize() {
+        return deckSize;
+    }
+
+    public void setDeckSize(Integer deckSize) {
+        this.deckSize = deckSize;
+    }
+
+    public Player getSurrendered() {
+        return surrendered;
+    }
+
+    public void setSurrendered(Player surrendered) {
+        this.surrendered = surrendered;
+    }
 
     public Player getNextPlayer() {
         return nextPlayer;
@@ -34,12 +51,12 @@ public class CarcassonneGameDTO implements Serializable {
         this.players = players;
     }
 
-    public Player getWinner() {
-        return winner;
+    public Set<Player> getWinners() {
+        return winners;
     }
 
-    public void setWinner(Player winner) {
-        this.winner = winner;
+    public void setWinners(Set<Player> winners) {
+        this.winners = winners;
     }
 
     public Set<TileDTO> getTiles() {

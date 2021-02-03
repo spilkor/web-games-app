@@ -8,6 +8,15 @@ public class CarcassonneMoveDTO implements Serializable {
 
     private Coordinate coordinate;
     private PointOfCompass pointOfCompass;
+    private Boolean skip;
+
+    public Boolean getSkip() {
+        return skip;
+    }
+
+    public void setSkip(Boolean skip) {
+        this.skip = skip;
+    }
 
     public Coordinate getCoordinate() {
         return coordinate;
