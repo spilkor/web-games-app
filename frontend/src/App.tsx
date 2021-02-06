@@ -7,7 +7,7 @@ import {Login} from "./components/Login";
 import {MessageType} from "./util/enums";
 import API from "./util/API";
 import {Game, GameType} from "./Main Components/Game";
-import {IP, log, PORT, ws} from "./index";
+import {log, WEBSOCKET_URL} from "./index";
 import {Header} from "./Main Components/Header";
 import {Users, UsersLogo} from "./Main Components/Users";
 import {Invites, InvitesLogo} from "./Main Components/Invites";
@@ -279,11 +279,11 @@ export function App () {
     }
 
     async function createNewWebSocket(){
-        log("createNewWebSocket");
+        log("createNewWebSocket: " + WEBSOCKET_URL);
 
         let token = await API.getUserToken();
 
-        let newWebSocket = new WebSocket(ws + '://' + IP + PORT + '/websocket') as WebSocket;
+        let newWebSocket = new WebSocket(WEBSOCKET_URL) as WebSocket;
 
         newWebSocket.onmessage = (json) => {
             try{

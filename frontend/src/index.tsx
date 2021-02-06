@@ -11,14 +11,16 @@ enum Profile  {
     developer
 }
 
-const profile = Profile.container;
+const profile = Profile.container as Profile;
 
-export const IP = profile === Profile.container ? '84.3.87.47' : 'localhost';
-export const PORT = Profile.container ? '' : ':8080';
-export const ws = Profile.container ? 'wss' : 'ws';
+const IP = profile === Profile.container ? '84.3.87.47' : 'localhost';
+const PORT = profile === Profile.container ? '' : ':8080';
+const WS = profile === Profile.container ? 'wss' : 'ws';
+export const WEBSOCKET_URL = WS + '://' + IP + PORT + '/websocket';
+
 
 export function log(message?: any, ...optionalParams: any[]) {
-    console.log(message, ...optionalParams);
+    profile === Profile.developer && console.log(message, ...optionalParams);
 }
 
 ReactDOM.render(
