@@ -36,6 +36,8 @@ public class Carcassonne extends Game {
     private Set<Integer> legalParts = null;
     private Player surrendered = null;
 
+    private boolean locked = false;
+
     public Carcassonne(UserDTO owner, GameType gameType){
         super(owner, gameType);
         players.add(new Player(owner, geColor(players.size())));
@@ -53,6 +55,12 @@ public class Carcassonne extends Game {
 
     @Override
     public boolean updateLobby(String lobbyJSON) {
+        if (locked){
+            return false;
+        } else {
+            locked = true;
+        }
+
         try {
             CarcassonneLobbyDTO carcassonneLobbyDTO = Mapper.readValue(lobbyJSON, CarcassonneLobbyDTO.class);
 
@@ -67,12 +75,14 @@ public class Carcassonne extends Game {
 
             player.setColor(carcassonneLobbyDTO.getColor());
 
+            locked = false;
             return true;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+
+            locked = false;
             return false;
         }
-
     }
 
     @Override
@@ -84,6 +94,8 @@ public class Carcassonne extends Game {
     @Override
     public boolean isStartable() {
         return
+                !locked
+                        &&
                 players.size() > 1
                         &&
                 players.stream().map(Player::getColor).collect(Collectors.toList()).size() ==
@@ -94,6 +106,8 @@ public class Carcassonne extends Game {
 
     @Override
     public void start() {
+        locked = true;
+
         List<Player> randomOrderedPlayers = new ArrayList<>();
         for(int x = 0; x < players.size() + 1; x ++){
             Player player = MathUtil.selectRandom(players);
@@ -124,10 +138,14 @@ public class Carcassonne extends Game {
 
         tile = TileFactory.createTile(deck.draw(),this);
         playableTilePositions = getPlayableTilePositions(tile);
+
+        locked = false;
     }
 
     @Override
     public void restart() {
+        locked = true;
+
         tiles = null;
         nextPlayer = null;
         tile = null;
@@ -139,6 +157,7 @@ public class Carcassonne extends Game {
         deck = null;
         surrendered = null;
         players.forEach(player-> {player.setMeeples(null); player.setVictoryPoints(null);});
+        locked = false;
     }
 
     @Override
@@ -227,6 +246,10 @@ public class Carcassonne extends Game {
 
     @Override
     public boolean legal(UserDTO userDTO, String moveJSON) {
+        if (locked){
+            return false;
+        }
+
         try {
             CarcassonneMoveDTO carcassonneMoveDTO = Mapper.readValue(moveJSON, CarcassonneMoveDTO.class);
 
@@ -276,6 +299,8 @@ public class Carcassonne extends Game {
 
     @Override
     public void move(UserDTO userDTO, String moveJSON) {
+        locked = true;
+
         try {
             CarcassonneMoveDTO carcassonneMoveDTO = Mapper.readValue(moveJSON, CarcassonneMoveDTO.class);
 
@@ -344,8 +369,11 @@ public class Carcassonne extends Game {
             }
 
         } catch (JsonProcessingException e) {
+            locked = false;
             System.out.println(e.getMessage());
         }
+
+        locked = false;
     }
 
     private void closeMonasteries(boolean isEnd) {

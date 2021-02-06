@@ -7,6 +7,7 @@ import com.spilkor.webgamesapp.model.dto.*;
 import com.spilkor.webgamesapp.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,8 @@ public class WebGamesApi {
 
     final
     BusinessManager businessManager;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
     public WebGamesApi(BusinessManager businessManager) {
@@ -71,7 +74,7 @@ public class WebGamesApi {
 
         User foundUser = businessManager.findUserByUserName(userNameAndPassword.getUserName());
 
-        if (foundUser == null || !userNameAndPassword.getPassword().equals(foundUser.getPassword())){
+        if (foundUser == null || !passwordEncoder.matches(userNameAndPassword.getPassword(), foundUser.getPassword())){
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -206,7 +209,7 @@ public class WebGamesApi {
 
         User newUser = new User();
         newUser.setUserName(userNameAndPassword.getUserName());
-        newUser.setPassword(userNameAndPassword.getPassword());
+        newUser.setPassword(passwordEncoder.encode(userNameAndPassword.getPassword()));
         businessManager.save(newUser);
 
         session.setAttribute("user", new UserDTO(newUser, UserDTO.UserState.online));
