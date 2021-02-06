@@ -1,16 +1,18 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, WheelEvent} from 'react';
 
 
 import {
     CarcassonneGameDTO,
+    CarcassonneGameSettingsDTO,
     CarcassonneLobbyDTO,
     CarcassonneMoveDTO,
     Color,
-    MoveType, Player,
+    MoveType,
+    Player,
     TileDTO
 } from "./carcassonneTypes";
-import {Coordinate, GameState, PointOfCompass, UserState} from "../util/types";
-import Tile, {size} from "./Tile";
+import {Coordinate, GameState, PointOfCompass} from "../util/types";
+import Tile from "./Tile";
 import './carcassonne.scss';
 import {AppContext} from "../App";
 import {QuitButton, StartGameButton, SystemMessage} from "../Main Components/Game";
@@ -20,34 +22,118 @@ import logo from "./card-back-400X400.png";
 
 import API from "../util/API";
 import {Modal} from "../Main Components/Modal";
-import {ReactComponent as FriendsLogo} from "../svg/friends.svg";
-import {UsersLogo} from "../Main Components/Users";
-import {is} from "@babel/types";
 
 export function Carcassonne () {
 
-    const { gameData, user } = useContext(AppContext);
+    const { gameData, user, gameSettings, setGameSettings  } = useContext(AppContext);
+
+    const defaultNextTilePointOfCompass = PointOfCompass.NORTH;
+    const defaultIsRotating = false;
+    const defaultOffset_X = 0;
+    const defaultOffset_Y = 0;
+    const defaultSize = 80;
+    const maxSize = 150;
+    const minSize = 70;
+
+    const tempSetting = gameSettings as CarcassonneGameSettingsDTO;
+    const carcassonneGameSettingsDTO = {
+        nextTilePointOfCompass: tempSetting && tempSetting.nextTilePointOfCompass ? tempSetting.nextTilePointOfCompass : defaultNextTilePointOfCompass,
+        isRotating: tempSetting && tempSetting.isRotating ? tempSetting.isRotating : defaultIsRotating,
+        offset_X: tempSetting && tempSetting.offset_X ? tempSetting.offset_X : defaultOffset_X,
+        offset_Y: tempSetting && tempSetting.offset_Y ? tempSetting.offset_Y : defaultOffset_Y,
+        size: tempSetting && tempSetting.size ? tempSetting.size : defaultSize
+    } as CarcassonneGameSettingsDTO;
+    const {
+        nextTilePointOfCompass,
+        isRotating,
+        offset_X,
+        offset_Y,
+        size
+    } = carcassonneGameSettingsDTO;
 
     const carcassonneGameDTO = JSON.parse(gameData!.gameJSON) as CarcassonneGameDTO;
-
     const players = carcassonneGameDTO.players;
-
-
-    const [pointOfCompass, setPointOfCompass] = useState<PointOfCompass>(PointOfCompass.NORTH);
 
     const [surrenderOpen, setSurrenderOpen] = useState<boolean>(false);
 
-    console.log("carcassonneGameDTO: ", carcassonneGameDTO);
+    function setSize(newSize: number) {
+        setGameSettings!(
+            {
+                ...carcassonneGameSettingsDTO,
+                size: Math.min(maxSize, Math.max(minSize, newSize))
+            } as CarcassonneGameSettingsDTO
+        );
+    }
 
-    const [offset_X, setOffset_X] = useState<number>(0);
-    const [offset_Y, setOffset_Y] = useState<number>(0);
+    function stopRotate(fromPointOfCompass: PointOfCompass) {
+        switch (fromPointOfCompass) {
+            case PointOfCompass.NORTH:
+                setGameSettings!(
+                    {
+                        ...carcassonneGameSettingsDTO,
+                        isRotating: false,
+                        nextTilePointOfCompass: PointOfCompass.WEST
+                    } as CarcassonneGameSettingsDTO
+                ); return;
+            case PointOfCompass.EAST:
+                setGameSettings!(
+                    {
+                        ...carcassonneGameSettingsDTO,
+                        isRotating: false,
+                        nextTilePointOfCompass: PointOfCompass.NORTH
+                    } as CarcassonneGameSettingsDTO
+                ); return;
+            case PointOfCompass.SOUTH:
+                setGameSettings!(
+                    {
+                        ...carcassonneGameSettingsDTO,
+                        isRotating: false,
+                        nextTilePointOfCompass: PointOfCompass.EAST
+                    } as CarcassonneGameSettingsDTO
+                ); return;
+            case PointOfCompass.WEST:
+                setGameSettings!(
+                    {
+                        ...carcassonneGameSettingsDTO,
+                        isRotating: false,
+                        nextTilePointOfCompass: PointOfCompass.SOUTH
+                    } as CarcassonneGameSettingsDTO
+                ); return;
+        }
+    }
+
+    function setNextTilePointOfCompass(pointOfCompass: PointOfCompass) {
+        setTimeout(()=>{
+            stopRotate(carcassonneGameSettingsDTO.nextTilePointOfCompass);
+        }, 350);
+
+        setGameSettings!(
+            {
+                ...carcassonneGameSettingsDTO,
+                nextTilePointOfCompass: pointOfCompass,
+                isRotating: true
+            } as CarcassonneGameSettingsDTO
+        );
+    }
+
+    function setOffset(x: number, y: number) {
+        setGameSettings!(
+            {
+                ...carcassonneGameSettingsDTO,
+                offset_X: x,
+                offset_Y: y,
+            } as CarcassonneGameSettingsDTO
+        ); return;
+    }
 
     const onMouseMove = (event: React.MouseEvent) => {
         if (event.buttons === 1){
-            console.log(event.buttons);
-            setOffset_X(offset_X + event.movementX);
-            setOffset_Y(offset_Y + event.movementY);
+            setOffset(offset_X + event.movementX, offset_Y + event.movementY);
         }
+    };
+
+    const onWheel = (event: WheelEvent) => {
+        setSize(size - event.deltaY);
     };
 
     function Content () {
@@ -69,27 +155,12 @@ export function Carcassonne () {
         }
     }
 
-
     function Lobby () {
         return (
             <div className={"lobby"}>
-
                 <div className={"caption"}>
                     Carcassonne lobby
                 </div>
-
-                {/*<div className={"row"}>*/}
-                    {/*<div className={"key"}>*/}
-                        {/*Size:*/}
-                    {/*</div>*/}
-                    {/*<div className={"value"}>*/}
-                        {/*<select disabled={! (user!.id == gameData!.owner.id)} onChange={(e:ChangeEvent<HTMLSelectElement>)=> {}} value={"VALUE"}>*/}
-                            {/*<option value = {AmobaSizes.three.id}>{AmobaSizes.three.name}</option>*/}
-                            {/*<option value = {AmobaSizes.twoHundred.id}>{AmobaSizes.twoHundred.name}</option>*/}
-                        {/*</select>*/}
-                    {/*</div>*/}
-                {/*</div>*/}
-
                 <div className={"row"}>
                     <div className={"key"}>
                         Owner:
@@ -100,7 +171,6 @@ export function Carcassonne () {
                         </span>
                     </div>
                 </div>
-
                 <div className={"row"}>
                     <div className={"key"}>
                         Players:
@@ -119,16 +189,13 @@ export function Carcassonne () {
                                         <ColorPick color={Color.GREEN} userId={player.user.id}/>
                                     </>
                                 }
-
                             </div>
                         )}
                     </div>
                 </div>
-
                 {gameData!.owner.id === user!.id &&
                 <StartGameButton text={"START"} enabled={gameData!.startable === true}/>
                 }
-
             </div>
         );
 
@@ -146,41 +213,11 @@ export function Carcassonne () {
 
                 API.sendLobbyData(JSON.stringify(carcassonneLobbyData));
             }
-
         }
-
     }
 
     function Board () {
-
         const { tiles, nextMoveType, tile, legalParts } = carcassonneGameDTO;
-
-
-        // const tiles = [
-        //     {
-        //         id: TileID.TILE_0,
-        //         coordinate: {x: 0, y: 0} as Coordinate,
-        //         legalParts: [0, 1],
-        //         pointOfCompass: PointOfCompass.NORTH
-        //     } as TileDTO,
-        //     {
-        //         id: TileID.TILE_1,
-        //         coordinate: {x: 0, y: 1} as Coordinate,
-        //         legalParts: [0, 1],
-        //         pointOfCompass: PointOfCompass.NORTH
-        //     } as TileDTO,
-        //     {
-        //         id: TileID.TILE_2,
-        //         coordinate: {x: 1, y: 0} as Coordinate,
-        //         legalParts: [0, 1],
-        //         pointOfCompass: PointOfCompass.NORTH
-        //     } as TileDTO,        {
-        //         id: TileID.TILE_3,
-        //         coordinate: {x: 8, y: 12} as Coordinate,
-        //         legalParts: [0, 1],
-        //         pointOfCompass: PointOfCompass.NORTH
-        //     } as TileDTO
-        // ] as TileType[];
 
         const max_x = tiles.reduce(((currentValue, tile)=> {return Math.max(tile.coordinate.x, currentValue)}), 0);
         const min_x = tiles.reduce(((currentValue, tile)=> {return Math.min(tile.coordinate.x, currentValue)}), 0);
@@ -196,7 +233,7 @@ export function Carcassonne () {
                 columns.push(
                     <td key={x}>
                         <div className={"tile-wrapper" + (clickable ? " clickable" : "")} onClick={()=>{clickable && placeTile({x, y} as Coordinate)}} style={{height: size, width: size}}>
-                            {tile && <Tile legalParts={getLegalPartsForTile({x, y} as Coordinate)} {...tile}/>}
+                            {tile && <Tile legalParts={getLegalPartsForTile({x, y} as Coordinate)} size={size} {...tile}/>}
                         </div>
                     </td>
                 );
@@ -219,7 +256,8 @@ export function Carcassonne () {
         function placeTile(coordinate: Coordinate) {
             let carcassonneMoveDTO = {
                 coordinate,
-                pointOfCompass
+                pointOfCompass: nextTilePointOfCompass,
+                skip: false
             } as CarcassonneMoveDTO;
             API.move(JSON.stringify(carcassonneMoveDTO));
         }
@@ -229,7 +267,7 @@ export function Carcassonne () {
             return playableTilePositions && playableTilePositions.some((playableTilePosition) => {
                 return playableTilePosition.coordinate.x === coordinate.x
                     && playableTilePosition.coordinate.y === coordinate.y
-                    && playableTilePosition.pointOfCompass === pointOfCompass
+                    && playableTilePosition.pointOfCompass === nextTilePointOfCompass
             });
         }
 
@@ -266,8 +304,8 @@ export function Carcassonne () {
                                 VP
                             </td>
                         </tr>
-                    {players.map((player)=>
-                        <PlayerRow player={player}/>
+                    {players.map((player, key)=>
+                        <PlayerRow key = {key} player={player}/>
                     )}
                     </tbody>
                 </table>
@@ -309,19 +347,16 @@ export function Carcassonne () {
 
     function Action () {
 
-        const [rotating, setRotating] = useState<boolean>(false);
-        const nextMeepleSize = 100;
-
         return (
             <div className={"action"}>
                 {carcassonneGameDTO.tile && carcassonneGameDTO.nextMoveType === MoveType.TILE &&
                 <div className={"next-tile"}>
-                    <div className={"tile-wrapper " + pointOfCompass.toLowerCase()} style={{height: size, width: size}}>
-                        <Tile {...carcassonneGameDTO.tile!}/>
+                    <div className={"tile-wrapper " + nextTilePointOfCompass.toLowerCase() + (isRotating ? " rotating" : "")} style={{height: 100, width: 100}}>
+                        <Tile size={100} {...carcassonneGameDTO.tile!}/>
                     </div>
                     {
                         carcassonneGameDTO.nextPlayer && carcassonneGameDTO.nextPlayer.user.id === user!.id &&
-                        <div className={"rotate-icon" + (rotating ? " rotating" : "")} onClick={()=>rotateLeft()} >
+                        <div className={"rotate-icon" + (isRotating ? " rotating" : "")} onClick={()=>rotateLeft()} >
                             <RotateSVG/>
                         </div>
                     }
@@ -352,26 +387,21 @@ export function Carcassonne () {
         }
 
         function rotateLeft() {
-            if (rotating){
+            if (isRotating){
                 return;
             }
-            setRotating(true);
-            setTimeout(()=>{
-                setRotating(false);
-            }, 350);
-
-            switch (pointOfCompass) {
+            switch (nextTilePointOfCompass) {
                 case PointOfCompass.NORTH:
-                    setPointOfCompass(PointOfCompass.WEST);
+                    setNextTilePointOfCompass(PointOfCompass.WEST);
                     return;
                 case PointOfCompass.EAST:
-                    setPointOfCompass(PointOfCompass.NORTH);
+                    setNextTilePointOfCompass(PointOfCompass.NORTH);
                     return;
                 case PointOfCompass.SOUTH:
-                    setPointOfCompass(PointOfCompass.EAST);
+                    setNextTilePointOfCompass(PointOfCompass.EAST);
                     return;
                 case PointOfCompass.WEST:
-                    setPointOfCompass(PointOfCompass.SOUTH);
+                    setNextTilePointOfCompass(PointOfCompass.SOUTH);
                     return;
             }
         }
@@ -428,7 +458,7 @@ export function Carcassonne () {
     }
 
     return(
-        <div className={"carcassonne"} onMouseMove={(event)=>{onMouseMove(event)}}>
+        <div className={"carcassonne"} onMouseMove={(event)=>{onMouseMove(event)}} onWheel={(event)=>{gameData!.gameState !== GameState.IN_LOBBY && onWheel(event)}}>
             <Content />
         </div>
     );

@@ -182,29 +182,45 @@
 
       .next-tile{
 
-        .tile-wrapper{
-          transition: transform .3s ease;
+        .tile-wrapper:not(.rotating){
+          animation: none !important;
         }
 
         .tile-wrapper.north{
+          animation: east-to-north .3s ease;
           transform: rotate(0deg);
         }
         .tile-wrapper.east{
+          animation: south-to-east .3s ease;
           transform: rotate(90deg);
         }
         .tile-wrapper.south{
+          animation: west-to-south .3s ease;
           transform: rotate(180deg);
         }
         .tile-wrapper.west{
           animation: north-to-west .3s ease;
-          transition-delay: .3s;
           transform: rotate(270deg);
-          transition: 0s ease;
         }
 
         @keyframes north-to-west {
           0% {transform: rotate(0);}
           100% {transform: rotate(-90deg);}
+        }
+
+        @keyframes west-to-south {
+          0% {transform: rotate(270deg);}
+          100% {transform: rotate(180deg);}
+        }
+
+        @keyframes south-to-east {
+          0% {transform: rotate(180deg);}
+          100% {transform: rotate(90deg);}
+        }
+
+        @keyframes east-to-north {
+          0% {transform: rotate(90deg);}
+          100% {transform: rotate(0deg);}
         }
 
         .rotate-icon{

@@ -5,12 +5,17 @@ import App from './App';
 import {BrowserRouter} from "react-router-dom";
 import * as serviceWorker from './serviceWorker';
 import { Route} from "react-router-dom";
-import {Dev} from "./Dev";
 
+enum Profile  {
+    container,
+    developer
+}
 
-export const IP = 'localhost';// export const IP = '84.3.87.47';
-export const PORT = ':8080';// export const PORT = '';
+const profile = Profile.container;
 
+export const IP = profile === Profile.container ? '84.3.87.47' : 'localhost';
+export const PORT = Profile.container ? '' : ':8080';
+export const ws = Profile.container ? 'wss' : 'ws';
 
 export function log(message?: any, ...optionalParams: any[]) {
     console.log(message, ...optionalParams);

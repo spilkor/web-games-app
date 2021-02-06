@@ -7,13 +7,14 @@ import {Login} from "./components/Login";
 import {MessageType} from "./util/enums";
 import API from "./util/API";
 import {Game, GameType} from "./Main Components/Game";
-import {IP, log, PORT} from "./index";
+import {IP, log, PORT, ws} from "./index";
 import {Header} from "./Main Components/Header";
 import {Users, UsersLogo} from "./Main Components/Users";
 import {Invites, InvitesLogo} from "./Main Components/Invites";
 import {Home} from "./Main Components/Home";
 import {Chat} from "./Main Components/Chat";
 import {FriendRequests, FriendRequestsLogo} from "./Main Components/FriendRequests";
+import {CarcassonneGameSettingsDTO} from "./carcassonne/carcassonneTypes";
 
 export const AppContext = React.createContext<Partial<ContextProps>>({});
 
@@ -110,13 +111,14 @@ export function App () {
 
     const [gameSettings, _setGameSettings] = useState<any>(null);
     function setGameSettings(gameSettings: any){
+        const carcassonneGameSettingsDTO = gameSettings as CarcassonneGameSettingsDTO;
         _setGameSettings(gameSettings);
     }
 
-    const gameType = gameData && gameData.gameType;
-    useEffect(() => {
-        setGameSettings(null);
-    }, [gameType]);
+    // const gameType = gameData && gameData.gameType;
+    // useEffect(() => {
+    //     setGameSettings(null);
+    // }, [gameType]);
 
     useEffect(() => {
         log("useEffect");
@@ -281,9 +283,7 @@ export function App () {
 
         let token = await API.getUserToken();
 
-        let newWebSocket = new WebSocket('ws://' + IP + PORT + '/websocket') as WebSocket;
-        // let newWebSocket = new WebSocket('ws://192.168.0.16/websocket') as WebSocket;
-        // let newWebSocket = new WebSocket('wsS://192.168.0.16/websocket') as WebSocket;
+        let newWebSocket = new WebSocket(ws + '://' + IP + PORT + '/websocket') as WebSocket;
 
         newWebSocket.onmessage = (json) => {
             try{

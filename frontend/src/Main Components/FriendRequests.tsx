@@ -11,11 +11,11 @@ import API from "../util/API";
 
 export function FriendRequestsLogo(){
 
-    const { friendRequestsOpen, setFriendRequestsOpen, friendRequests } = useContext(AppContext);
+    const { friendRequestsOpen, setFriendRequestsOpen, friendRequests, gameData } = useContext(AppContext);
 
     const hasFriendRequest = friendRequests!.length != 0;
 
-    if (hasFriendRequest || friendRequestsOpen){
+    if (hasFriendRequest || friendRequestsOpen && !gameData){
         return(
             <div className={"friend-requests-logo" + (friendRequestsOpen ? " open" : "")} onClick={()=> setFriendRequestsOpen!(!friendRequestsOpen)}>
                 <Logo/>

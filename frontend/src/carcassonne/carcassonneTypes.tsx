@@ -1,6 +1,5 @@
 import {PointOfCompass, Coordinate, User} from "../util/types";
 import React from "react";
-import {AmobaSize, OwnerAs} from "../amoba/amobaTypes";
 
 export enum Color {
     RED = "RED",
@@ -15,6 +14,7 @@ export type TileDTO = {
     pointOfCompass: PointOfCompass
     coordinate: Coordinate
     legalParts: number[] | null
+    size: number
 }
 
 export type MeepleType = {
@@ -58,6 +58,14 @@ export type CarcassonneGameDTO = {
     playableTilePositions: TilePosition[]
 
     deckSize: number
+}
+
+export type CarcassonneGameSettingsDTO = {
+    nextTilePointOfCompass: PointOfCompass
+    isRotating: boolean
+    offset_X: number
+    offset_Y: number
+    size: number
 }
 
 export enum MoveType {

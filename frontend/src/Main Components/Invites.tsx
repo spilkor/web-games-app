@@ -22,9 +22,9 @@ export function InvitesLogo(){
     const { user, invitesOpen, setInvitesOpen, invites, gameData} = useContext(AppContext);
 
     const hasInvite = invites && invites.length != 0;
-    const gameInProgress = gameData && gameData.gameState === GameState.IN_GAME;
+    // const gameInProgress = gameData && gameData.gameState === GameState.IN_GAME;
 
-    if (hasInvite || invitesOpen && !gameInProgress){
+    if (hasInvite || invitesOpen && !gameData){
         return(
             <div className={"invites-logo" + (hasInvite && " default_yellow") + (invitesOpen ? " open" : "")} onClick={()=> setInvitesOpen!(!invitesOpen)}>
                 <Logo/>
