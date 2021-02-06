@@ -532,7 +532,7 @@ export default function Tile (tileProps: TileDTO) {
 
         const meeplePositionMap = [] as Coordinate[];
         meeplePositionMap[0] = {x: 1/2, y: 0} as Coordinate;
-        meeplePositionMap[1] = {x: 0, y: 1/2} as Coordinate;
+        meeplePositionMap[1] = {x: 1/2, y: 1} as Coordinate;
         meeplePositionMap[2] = {x: 1/2, y: 1/2} as Coordinate;
 
         return(

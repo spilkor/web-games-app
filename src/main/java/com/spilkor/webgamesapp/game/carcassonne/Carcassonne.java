@@ -227,65 +227,51 @@ public class Carcassonne extends Game {
 
     @Override
     public boolean legal(UserDTO userDTO, String moveJSON) {
-//        try {
-//            CarcassonneMoveDTO carcassonneMoveDTO = Mapper.readValue(moveJSON, CarcassonneMoveDTO.class);
-//
-//            if (!nextMoveType.equals(carcassonneMoveDTO.getMoveType())){
-//                return false;
-//            }
-//
-//            if (TILE.equals(nextMoveType)){
-//                PointOfCompass pointOfCompass = carcassonneMoveDTO.getPointOfCompass();
-//                if (pointOfCompass == null){
-//                    return false;
-//                }
-//
-//                Coordinate coordinate = carcassonneMoveDTO.getCoordinate();
-//                if (coordinate == null || coordinate.getX() == null || coordinate.getY() == null){
-//                    return false;
-//                }
-//
-//                if (!placeableCoordinates.contains(coordinate)){
-//                    return false;
-//                }
-//
-//                Tile tileAbove = getTile(coordinate.getX() -1, coordinate.getY());
-//                if (tileAbove != null){
-//                    if (!tile.getUpperSide().equals(tileAbove.getLowerSide())){
-//                        return false;
-//                    }
-//                }
-//
-//                Tile tileToTheRight = getTile(coordinate.getX(), coordinate.getY() + 1);
-//                if (tileToTheRight != null){
-//                    if (!tile.getRightSide().equals(tileToTheRight.getLeftSide())){
-//                        return false;
-//                    }
-//                }
-//
-//                Tile tileBelow = getTile(coordinate.getX() + 1, coordinate.getY());
-//                if (tileBelow != null){
-//                    if (!tile.getLowerSide().equals(tileBelow.getUpperSide())){
-//                        return false;
-//                    }
-//                }
-//
-//                Tile tileToTheLeft = getTile(coordinate.getX(), coordinate.getY() -1);
-//                if (tileToTheLeft != null){
-//                    if (!tile.getLeftSide().equals(tileToTheLeft.getRightSide())){
-//                        return false;
-//                    }
-//                }
-//            } else {
-////                MEEPLE
-//                return false;
-//            }
-//
-//        } catch (JsonProcessingException e) {
-//            return false;
-//        }
+        try {
+            CarcassonneMoveDTO carcassonneMoveDTO = Mapper.readValue(moveJSON, CarcassonneMoveDTO.class);
 
-        return true;
+            if (!GameState.IN_GAME.equals(gameState) || tiles == null || tile == null || nextMoveType == null || nextPlayer == null || !nextPlayer.getUser().equals(userDTO)){
+                return false;
+            }
+
+            Coordinate coordinate = carcassonneMoveDTO.getCoordinate();
+            PointOfCompass pointOfCompass = carcassonneMoveDTO.getPointOfCompass();
+
+            switch (nextMoveType){
+                case TILE:
+
+                    if (coordinate == null || coordinate.getX() == null || coordinate.getY() == null || pointOfCompass == null){
+                        return false;
+                    }
+
+                    if (playableCoordinates == null || !playableCoordinates.contains(coordinate)){
+                        return false;
+                    }
+
+                    return playableTilePositions != null && playableTilePositions.stream().anyMatch(tilePosition ->
+                            coordinate.equals(tilePosition.getCoordinate()) && pointOfCompass.equals(tilePosition.getPointOfCompass()));
+                case MEEPLE:
+
+                    if (Boolean.TRUE.equals(carcassonneMoveDTO.getSkip())){
+                        return true;
+                    }
+
+                    if (nextPlayer.getMeeples() == null || nextPlayer.getMeeples() < 1){
+                        return false;
+                    }
+
+                    if (coordinate == null || coordinate.getX() == null){
+                        return false;
+                    }
+
+                    return legalParts != null && legalParts.contains(carcassonneMoveDTO.getCoordinate().getX());
+            }
+
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+
+        return false;
     }
 
     @Override
@@ -1565,6 +1551,10 @@ public class Carcassonne extends Game {
 
     public Set<Integer> getLegalParts() {
         Set<Integer> result = new HashSet<>();
+
+        if (nextPlayer == null || nextPlayer.getMeeples() < 1){
+            return result;
+        }
 
         tile.getRoads().forEach(road-> {
             if (!roadHasMeeple(road)){
