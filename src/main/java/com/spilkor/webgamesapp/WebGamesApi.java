@@ -25,8 +25,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api")
 public class WebGamesApi {
 
-    final
-    BusinessManager businessManager;
+    private final BusinessManager businessManager;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 

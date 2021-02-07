@@ -319,7 +319,7 @@
     transition: all .3s;
     width: 40px;
     height: 40px;
-    z-index: 98;
+    z-index: 105;
 }
 
 .friend-requests-logo.open{
