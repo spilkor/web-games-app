@@ -7,7 +7,6 @@ import java.util.Set;
 
 public class Tile {
 
-    private Carcassonne carcassonne;
     private TileID id;
     private Coordinate coordinate;
     private Set<Road> roads;
@@ -17,8 +16,7 @@ public class Tile {
     private PointOfCompass pointOfCompass;
     private Meeple meeple;
 
-    public Tile(Carcassonne carcassonne, TileID id, Coordinate coordinate, Set<Road> roads, Set<City> cities, Set<Field> fields, Integer monasteryPosition, PointOfCompass pointOfCompass, Meeple meeple) {
-        this.carcassonne = carcassonne;
+    public Tile(TileID id, Coordinate coordinate, Set<Road> roads, Set<City> cities, Set<Field> fields, Integer monasteryPosition, PointOfCompass pointOfCompass, Meeple meeple) {
         this.id = id;
         this.coordinate = coordinate;
         this.roads = roads == null ? new HashSet<>() : roads;

@@ -456,7 +456,7 @@ export function Carcassonne () {
                     </div>}
                     {carcassonneGameDTO.winners &&
                     <div className={"system-message-wrapper"}>
-                        <SystemMessage text = {"" + carcassonneGameDTO.winners.map(winner => {return winner.user.name}).reduce(((result, name)=> {return result +  name}), "") + " won."}/>
+                        <SystemMessage text = {"" + carcassonneGameDTO.winners.map(winner => {return winner.user.name}).reduce(((result, name)=> {return result + (result.length === 0 ? "" : ", ") + name}), "") + " won."}/>
                     </div>}
                 </>
             );

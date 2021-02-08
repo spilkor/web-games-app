@@ -33,6 +33,7 @@ public class GameHandler {
                 break;
         }
 
+        game.unLock();
         games.add(game);
 
         return game;
@@ -66,12 +67,21 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
 
+        if (game.isLocked()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
 
         if (!Game.GameState.IN_GAME.equals(game.getGameState())){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
         }
 
+        if (!game.lock()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
         game.surrender(user);
+
+        game.unLock();
 
         updatePlayers(game);
     }
@@ -83,6 +93,10 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
 
+        if (game.isLocked()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
         if (!game.getOwner().equals(user)){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_UNAUTHORIZED);
         }
@@ -91,12 +105,18 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
         }
 
-        Set<UserDTO> invitedUsers = game.getInvitedUsers();
-        game.setInvitedUsers(new HashSet<>());
-        invitedUsers.forEach(GameHandler::updateInviteList);
+//        Set<UserDTO> invitedUsers = game.getInvitedUsers();
+//        game.setInvitedUsers(new HashSet<>());
+//        invitedUsers.forEach(GameHandler::updateInviteList);
+
+        if (!game.lock()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
 
         game.setGameState(Game.GameState.IN_GAME);
         game.start();
+
+        game.unLock();
 
         updatePlayers(game);
     }
@@ -134,7 +154,15 @@ public class GameHandler {
     public static void invite(UserDTO user, UserDTO friend) throws WebGamesApi.WebGamesApiException {
         Game game = GameHandler.getGameOfUser(user);
 
-        if (game == null || !Game.GameState.IN_LOBBY.equals(game.getGameState())){
+        if (game == null){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
+        }
+
+        if (game.isLocked()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
+        if (!Game.GameState.IN_LOBBY.equals(game.getGameState())){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_BAD_REQUEST);
         }
 
@@ -142,11 +170,18 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_UNAUTHORIZED);
         }
 
+        if (!game.lock()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
         if (!game.getInvitedUsers().add(friend)){
+            game.unLock();
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FOUND);
         }
 
         game.getInvitedUsers().add(friend);
+
+        game.unLock();
 
         updateInviteList(user);
         updateInviteList(friend);
@@ -161,6 +196,10 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
 
+        if (gameOfOwner.isLocked()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
         if (!Game.GameState.IN_LOBBY.equals(gameOfOwner.getGameState()) || !gameOfOwner.getOwner().equals(owner) || !gameOfOwner.getInvitedUsers().contains(user)){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
         }
@@ -169,6 +208,10 @@ public class GameHandler {
         Game gameOfUser = GameHandler.getGameOfUser(user);
         if (gameOfUser != null && Game.GameState.IN_GAME.equals(gameOfUser.getGameState())){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
+        }
+
+        if (!gameOfOwner.lock() || (gameOfUser != null && !gameOfUser.lock())){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
         }
 
         if (gameOfUser != null){
@@ -183,13 +226,39 @@ public class GameHandler {
 
         gameOfOwner.playerJoined(user);
 
+        gameOfOwner.unLock();
+
+        if (gameOfUser != null){
+            gameOfUser.unLock();
+        }
+
         updatePlayers(gameOfOwner);
     }
 
     static void declineInvite(UserDTO user, UserDTO owner) throws WebGamesApi.WebGamesApiException {
         Game game = getGameOfUser(owner);
 
-        if (game == null || !game.getInvitedUsers().remove(user)){
+        if (game == null){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
+        }
+
+        if (game.isLocked()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
+        if (!game.getInvitedUsers().contains(user)){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
+        }
+
+        if (!game.lock()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
+        boolean success = game.getInvitedUsers().remove(user);
+
+        game.unLock();
+
+        if (!success){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
 
@@ -205,6 +274,10 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
 
+        if (game.isLocked()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
         if (!game.getOwner().equals(user)){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_UNAUTHORIZED);
         }
@@ -213,9 +286,15 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
         }
 
+        if (!game.lock()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
         game.setGameState(Game.GameState.IN_LOBBY);
 
         game.restart();
+
+        game.unLock();
 
         updatePlayers(game);
     }
@@ -227,8 +306,16 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
 
+        if (game.isLocked()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
         if (!Game.GameState.IN_GAME.equals(game.getGameState())){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
+        }
+
+        if (!game.lock()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
         }
 
         if (!game.legal(user, moveJSON)){
@@ -236,6 +323,8 @@ public class GameHandler {
         }
 
         game.move(user, moveJSON);
+
+        game.unLock();
 
         GameHandler.updatePlayers(game);
     }
@@ -247,10 +336,17 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
 
+        if (game.isLocked()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
         if (Game.GameState.IN_GAME.equals(game.getGameState())){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
         }
 
+        if (!game.lock()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
 
         if(game.getPlayers().size() == 1){
             removeGame(game);
@@ -262,6 +358,8 @@ public class GameHandler {
         }
         game.getPlayers().remove(user);
         game.playerLeft(user);
+
+        game.unLock();
 
         updatePlayers(game);
         updatePlayer(user);
@@ -281,6 +379,10 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
 
+        if (game.isLocked()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
         if (!game.getOwner().equals(owner)){
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_UNAUTHORIZED);
         }
@@ -293,13 +395,21 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_FORBIDDEN);
         }
 
+        if (!game.lock()){
+            throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
+        }
+
         if (!game.getPlayers().remove(player)){
+            game.unLock();
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_NOT_FOUND);
         }
 
         game.playerLeft(player);
 
+        game.unLock();
+
         updatePlayers(game);
         updatePlayer(player);
     }
+
 }

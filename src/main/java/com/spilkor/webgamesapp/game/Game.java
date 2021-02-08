@@ -11,6 +11,24 @@ import java.util.Set;
 public abstract class Game {
 
 
+    public boolean lock(){
+        if (locked){
+            return false;
+        } else {
+            locked = true;
+            return true;
+        }
+    }
+
+    public boolean unLock(){
+        if (locked){
+            locked = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public enum GameState {
         IN_LOBBY,
         IN_GAME,
@@ -22,6 +40,7 @@ public abstract class Game {
         CHESS,
         CARCASSONNE
     }
+    private boolean locked = true;
 
     protected UserDTO owner;
     protected Set<UserDTO> players = new HashSet<>();
@@ -34,6 +53,10 @@ public abstract class Game {
         this.gameType = gameType;
         players.add(owner);
         gameState = GameState.IN_LOBBY;
+    }
+
+    public boolean isLocked() {
+        return locked;
     }
 
     public GameDTO getGameDTO(UserDTO user) {
