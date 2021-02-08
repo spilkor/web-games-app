@@ -497,7 +497,7 @@ public class Carcassonne extends Game {
         return true;
     }
 
-    private boolean cityIsClosed(Set<City> connectedCities) {
+    private boolean isCityClosed(Set<City> connectedCities) {
         Set<Tile> tiles = connectedCities.stream().map(City::getTile).collect(Collectors.toSet());
         for(City city: connectedCities){
             for(PointOfCompass side: city.getSides()){
@@ -582,8 +582,13 @@ public class Carcassonne extends Game {
 
                 checked.addAll(connectedCities);
 
-                if(isEnd || cityIsClosed(connectedCities)){
-                    cities.forEach(c-> c.setClosed(true));
+                boolean closeCity = !isEnd && isCityClosed(connectedCities);
+
+                if (closeCity){
+                    connectedCities.forEach(c-> c.setClosed(true));
+                }
+
+                if(isEnd || closeCity){
 
                     Set<Tile> tilesWithRelevantMeeple = connectedCities
                             .stream()
