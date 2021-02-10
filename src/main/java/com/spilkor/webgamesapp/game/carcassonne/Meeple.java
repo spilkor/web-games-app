@@ -4,6 +4,7 @@ public class Meeple {
 
     private Color color;
     private int position;
+    private Integer victoryPoints;
 
     public Color getColor() {
         return color;
@@ -19,5 +20,13 @@ public class Meeple {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public Integer getVictoryPoints() {
+        return victoryPoints;
+    }
+
+    public void setVictoryPoints(Integer victoryPoints) {
+        this.victoryPoints = victoryPoints;
     }
 }

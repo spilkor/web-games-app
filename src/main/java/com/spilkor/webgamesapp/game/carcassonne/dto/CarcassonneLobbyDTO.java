@@ -1,6 +1,8 @@
-package com.spilkor.webgamesapp.game.carcassonne;
+package com.spilkor.webgamesapp.game.carcassonne.dto;
 
 
+
+import com.spilkor.webgamesapp.game.carcassonne.Color;
 
 import java.io.Serializable;
 import java.util.Set;

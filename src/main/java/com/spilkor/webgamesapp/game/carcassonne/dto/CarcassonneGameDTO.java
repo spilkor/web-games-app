@@ -1,6 +1,10 @@
-package com.spilkor.webgamesapp.game.carcassonne;
+package com.spilkor.webgamesapp.game.carcassonne.dto;
 
 
+
+import com.spilkor.webgamesapp.game.carcassonne.MoveType;
+import com.spilkor.webgamesapp.game.carcassonne.Player;
+import com.spilkor.webgamesapp.game.carcassonne.TilePosition;
 
 import java.io.Serializable;
 import java.util.List;

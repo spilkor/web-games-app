@@ -3,6 +3,10 @@ package com.spilkor.webgamesapp.game.carcassonne;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spilkor.webgamesapp.game.Game;
+import com.spilkor.webgamesapp.game.carcassonne.dto.CarcassonneGameDTO;
+import com.spilkor.webgamesapp.game.carcassonne.dto.CarcassonneLobbyDTO;
+import com.spilkor.webgamesapp.game.carcassonne.dto.CarcassonneMoveDTO;
+import com.spilkor.webgamesapp.game.carcassonne.dto.TileDTO;
 import com.spilkor.webgamesapp.model.dto.Coordinate;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
@@ -288,6 +292,8 @@ public class Carcassonne extends Game {
             CarcassonneMoveDTO carcassonneMoveDTO = Mapper.readValue(moveJSON, CarcassonneMoveDTO.class);
 
             if (TILE.equals(nextMoveType)){
+                pickUpVictoryPointMeeples();
+
                 Coordinate coordinate = carcassonneMoveDTO.getCoordinate();
                 tile.setCoordinate(coordinate);
                 tile.setPointOfCompass(carcassonneMoveDTO.getPointOfCompass());
@@ -421,7 +427,7 @@ public class Carcassonne extends Game {
                 Player player = getPlayer(t2.getMeeple().getColor());
                 player.setVictoryPoints(player.getVictoryPoints() + filled);
                 player.setMeeples(player.getMeeples() + 1);
-                t2.setMeeple(null);
+                t2.getMeeple().setVictoryPoints(filled);
             }
         }
 
@@ -460,10 +466,20 @@ public class Carcassonne extends Game {
                             Player player = getPlayer(color);
                             player.setVictoryPoints(player.getVictoryPoints() + connectedRoads.size());
                         }
+
+                        Map<Color, Meeple> replaceWithVictoryPoint = new HashMap<>();
+                        maxColors.forEach(color-> replaceWithVictoryPoint.put(color, null));
+
                         tilesWithRelevantMeeple.forEach(tile-> {
-                            Player player = getPlayer(tile.getMeeple().getColor());
+                            Color color = tile.getMeeple().getColor();
+                            Player player = getPlayer(color);
                             player.setMeeples(player.getMeeples() + 1);
-                            tile.setMeeple(null);
+                            if (maxColors.contains(color) && replaceWithVictoryPoint.get(color) == null){
+                                tile.getMeeple().setVictoryPoints(connectedRoads.size());
+                                replaceWithVictoryPoint.put(color, tile.getMeeple());
+                            } else {
+                                tile.setMeeple(null);
+                            }
                         });
                     }
                 }
@@ -605,14 +621,26 @@ public class Carcassonne extends Game {
                         Long maxNum = colors.stream().max(Comparator.comparing(Map.Entry::getValue)).get().getValue();
                         Set<Color> maxColors = colors.stream().filter(c-> c.getValue().equals(maxNum)).map(Map.Entry::getKey).collect(Collectors.toSet());
 
+                        int cityValue = (connectedCities.size() + connectedCities.stream().filter(City::isHasShield).collect(Collectors.toSet()).size()) * (isEnd ? 1 : 2);
+
                         for(Color color: maxColors){
                             Player player = getPlayer(color);
-                            player.setVictoryPoints(player.getVictoryPoints() + (connectedCities.size() + connectedCities.stream().filter(City::isHasShield).collect(Collectors.toSet()).size()) * (isEnd ? 1 : 2));
+                            player.setVictoryPoints(player.getVictoryPoints() + cityValue);
                         }
+
+                        Map<Color, Meeple> replaceWithVictoryPoint = new HashMap<>();
+                        maxColors.forEach(color-> replaceWithVictoryPoint.put(color, null));
+
                         tilesWithRelevantMeeple.forEach(tile-> {
-                            Player player = getPlayer(tile.getMeeple().getColor());
+                            Color color = tile.getMeeple().getColor();
+                            Player player = getPlayer(color);
                             player.setMeeples(player.getMeeples() + 1);
-                            tile.setMeeple(null);
+                            if (maxColors.contains(color) && replaceWithVictoryPoint.get(color) == null){
+                                tile.getMeeple().setVictoryPoints(cityValue);
+                                replaceWithVictoryPoint.put(color, tile.getMeeple());
+                            } else {
+                                tile.setMeeple(null);
+                            }
                         });
                     }
                 }
@@ -648,6 +676,8 @@ public class Carcassonne extends Game {
 
 
     private void endGame() {
+        pickUpVictoryPointMeeples();
+
         closeRoads(true);
         closeCities(true);
         closeMonasteries(true);
@@ -665,6 +695,14 @@ public class Carcassonne extends Game {
         gameState = GameState.ENDED;
     }
 
+    private void pickUpVictoryPointMeeples(){
+        tiles.forEach(tile-> {
+            if (tile.getMeeple() != null && tile.getMeeple().getVictoryPoints()!= null){
+                tile.setMeeple(null);
+            }
+        });
+    }
+
     private void closeFields() {
 
         Set<Field> fields = getAllFieldsWithMeeple();
@@ -680,7 +718,7 @@ public class Carcassonne extends Game {
 
                 Set<Tile> tilesWithRelevantMeeple = connectedFields
                         .stream()
-                        .filter(t -> t.getTile().getMeeple() != null && t.getTile().getMeeple().getPosition() == t.getPosition())
+                        .filter(f -> f.getTile().getMeeple() != null && f.getTile().getMeeple().getPosition() == f.getPosition())
                         .map(Field::getTile)
                         .collect(Collectors.toSet());
 
@@ -692,14 +730,26 @@ public class Carcassonne extends Game {
                 Long maxNum = colors.stream().max(Comparator.comparing(Map.Entry::getValue)).get().getValue();
                 Set<Color> maxColors = colors.stream().filter(c-> c.getValue().equals(maxNum)).map(Map.Entry::getKey).collect(Collectors.toSet());
 
+                int fieldValue = 3 * getNumberOfClosedCitiesOnField(connectedFields);
+
                 for(Color color: maxColors){
                     Player player = getPlayer(color);
-                    player.setVictoryPoints(player.getVictoryPoints() + 3 * getNumberOfClosedCitiesOnField(connectedFields));
+                    player.setVictoryPoints(player.getVictoryPoints() + fieldValue);
                 }
+
+                Map<Color, Meeple> replaceWithVictoryPoint = new HashMap<>();
+                maxColors.forEach(color-> replaceWithVictoryPoint.put(color, null));
+
                 tilesWithRelevantMeeple.forEach(tile-> {
-                    Player player = getPlayer(tile.getMeeple().getColor());
+                    Color color = tile.getMeeple().getColor();
+                    Player player = getPlayer(color);
                     player.setMeeples(player.getMeeples() + 1);
-                    tile.setMeeple(null);
+                    if (maxColors.contains(color) && replaceWithVictoryPoint.get(color) == null && fieldValue != 0){
+                        tile.getMeeple().setVictoryPoints(fieldValue);
+                        replaceWithVictoryPoint.put(color, tile.getMeeple());
+                    } else {
+                        tile.setMeeple(null);
+                    }
                 });
             }
         }

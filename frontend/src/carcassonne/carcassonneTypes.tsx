@@ -20,6 +20,7 @@ export type TileDTO = {
 export type MeepleType = {
     color: Color,
     position: number
+    victoryPoints?: number
 }
 
 export type CarcassonneLobbyDTO = {
@@ -117,6 +118,7 @@ export type MeepleProps = {
     position: Coordinate
     color: Color
     pointOfCompass: PointOfCompass
+    victoryPoints?: number
 }
 
 export const pointOfCompassMap : {[x: string]:number}= {

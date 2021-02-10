@@ -359,6 +359,10 @@
       overflow: visible;
       stroke: black;
       stroke-width: 2px;
+
+      .victory-point{
+        fill: white;
+      }
     }
     svg.meeple.red{
       fill: red;

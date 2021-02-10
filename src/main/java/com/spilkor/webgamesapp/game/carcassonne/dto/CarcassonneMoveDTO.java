@@ -1,5 +1,6 @@
-package com.spilkor.webgamesapp.game.carcassonne;
+package com.spilkor.webgamesapp.game.carcassonne.dto;
 
+import com.spilkor.webgamesapp.game.carcassonne.PointOfCompass;
 import com.spilkor.webgamesapp.model.dto.Coordinate;
 
 import java.io.Serializable;

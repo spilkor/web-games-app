@@ -1,7 +1,11 @@
-package com.spilkor.webgamesapp.game.carcassonne;
+package com.spilkor.webgamesapp.game.carcassonne.dto;
 
 
 
+import com.spilkor.webgamesapp.game.carcassonne.Meeple;
+import com.spilkor.webgamesapp.game.carcassonne.PointOfCompass;
+import com.spilkor.webgamesapp.game.carcassonne.Tile;
+import com.spilkor.webgamesapp.game.carcassonne.TileID;
 import com.spilkor.webgamesapp.model.dto.Coordinate;
 
 import java.io.Serializable;

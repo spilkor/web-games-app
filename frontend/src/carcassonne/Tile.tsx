@@ -40,11 +40,19 @@ export default function Tile (tileProps: TileDTO) {
         );
     }
 
-    function Meeple({position, color, pointOfCompass}: MeepleProps){
+    function Meeple({position, color, pointOfCompass, victoryPoints}: MeepleProps){
         return(
             <svg height={size} width={size} className={"meeple " + color.toLowerCase()} transform={"rotate(" + pointOfCompassMap[pointOfCompass] + ")"}>
-                <path transform={"translate(" + position.x*size + " " + position.y*size + ") scale(" + size/100 + ") rotate(" + -pointOfCompassMap[pointOfCompass] + ")"} d="M 0.000 -15.704 c -2.109 0.000 -3.626 1.116 -4.503 2.518 -0.784 1.254 -1.110 2.708 -1.173 3.981 -2.391 1.182 -5.040 2.375 -7.173 3.593 -1.119 0.639 -2.094 1.282 -2.828 1.973 C -16.411 -2.947 -16.953 -2.169 -16.953 -1.251 c 0.000 0.391 0.191 0.709 0.405 0.943 0.215 0.234 0.473 0.415 0.767 0.584 0.587 0.339 1.327 0.621 2.142 0.865 1.210 0.363 2.564 0.633 3.742 0.748 -1.172 2.019 -2.731 3.873 -4.097 5.650 C -15.574 9.593 -16.953 11.562 -16.953 13.749 c 0.000 0.313 -0.003 0.556 0.024 0.802 0.028 0.245 0.098 0.551 0.345 0.793 0.246 0.243 0.548 0.308 0.794 0.334 0.246 0.027 0.493 0.024 0.811 0.024 h 8.714 c 0.633 0.000 1.096 0.038 1.572 -0.268 0.477 -0.306 0.650 -0.725 0.990 -1.350 l 0.007 -0.013 0.006 -0.013 s 0.760 -1.545 1.666 -3.077 c 0.453 -0.766 0.945 -1.529 1.373 -2.070 0.214 -0.270 0.414 -0.485 0.559 -0.606 0.044 -0.037 0.064 -0.044 0.093 -0.059 0.028 0.016 0.048 0.023 0.093 0.059 0.144 0.121 0.345 0.335 0.559 0.606 0.428 0.541 0.920 1.304 1.373 2.070 0.906 1.533 1.666 3.077 1.666 3.077 l 0.006 0.013 0.007 0.013 c 0.340 0.625 0.512 1.041 0.985 1.348 0.473 0.307 0.935 0.270 1.559 0.270 H 15.000 c 0.313 0.000 0.556 0.003 0.800 -0.024 0.244 -0.027 0.547 -0.095 0.791 -0.338 0.244 -0.244 0.311 -0.547 0.338 -0.791 0.027 -0.244 0.024 -0.488 0.024 -0.800 0.000 -2.188 -1.379 -4.157 -2.958 -6.210 -1.367 -1.777 -2.926 -3.631 -4.097 -5.650 1.178 -0.115 2.533 -0.385 3.742 -0.748 0.814 -0.244 1.554 -0.527 2.142 -0.865 0.294 -0.169 0.551 -0.351 0.766 -0.584 0.215 -0.234 0.406 -0.552 0.406 -0.943 0.000 -0.918 -0.542 -1.696 -1.276 -2.387 -0.734 -0.691 -1.710 -1.334 -2.828 -1.973 -2.133 -1.219 -4.782 -2.411 -7.173 -3.593 -0.064 -1.273 -0.390 -2.728 -1.173 -3.981 C 3.626 -14.588 2.109 -15.704 0.000 -15.704 z"/>
-            </svg>
+                {victoryPoints ?
+                    <g transform={"translate(" + (position.x*size-(size/100)*0) + " " + (position.y*size+(size/100)*0) + ") scale(" + size/100 + ") rotate(" + -pointOfCompassMap[pointOfCompass] + ")"} strokeWidth={1.2} stroke={color.toLowerCase()}>
+                        <circle className={"victory-point"} r={15}/>
+                        <text x={victoryPoints > 9 ? -16 : -10} y={5}>+{victoryPoints}</text>
+                    </g>
+
+                    :
+                    <path transform={"translate(" + position.x*size + " " + position.y*size + ") scale(" + size/100 + ") rotate(" + -pointOfCompassMap[pointOfCompass] + ")"} d="M 0.000 -15.704 c -2.109 0.000 -3.626 1.116 -4.503 2.518 -0.784 1.254 -1.110 2.708 -1.173 3.981 -2.391 1.182 -5.040 2.375 -7.173 3.593 -1.119 0.639 -2.094 1.282 -2.828 1.973 C -16.411 -2.947 -16.953 -2.169 -16.953 -1.251 c 0.000 0.391 0.191 0.709 0.405 0.943 0.215 0.234 0.473 0.415 0.767 0.584 0.587 0.339 1.327 0.621 2.142 0.865 1.210 0.363 2.564 0.633 3.742 0.748 -1.172 2.019 -2.731 3.873 -4.097 5.650 C -15.574 9.593 -16.953 11.562 -16.953 13.749 c 0.000 0.313 -0.003 0.556 0.024 0.802 0.028 0.245 0.098 0.551 0.345 0.793 0.246 0.243 0.548 0.308 0.794 0.334 0.246 0.027 0.493 0.024 0.811 0.024 h 8.714 c 0.633 0.000 1.096 0.038 1.572 -0.268 0.477 -0.306 0.650 -0.725 0.990 -1.350 l 0.007 -0.013 0.006 -0.013 s 0.760 -1.545 1.666 -3.077 c 0.453 -0.766 0.945 -1.529 1.373 -2.070 0.214 -0.270 0.414 -0.485 0.559 -0.606 0.044 -0.037 0.064 -0.044 0.093 -0.059 0.028 0.016 0.048 0.023 0.093 0.059 0.144 0.121 0.345 0.335 0.559 0.606 0.428 0.541 0.920 1.304 1.373 2.070 0.906 1.533 1.666 3.077 1.666 3.077 l 0.006 0.013 0.007 0.013 c 0.340 0.625 0.512 1.041 0.985 1.348 0.473 0.307 0.935 0.270 1.559 0.270 H 15.000 c 0.313 0.000 0.556 0.003 0.800 -0.024 0.244 -0.027 0.547 -0.095 0.791 -0.338 0.244 -0.244 0.311 -0.547 0.338 -0.791 0.027 -0.244 0.024 -0.488 0.024 -0.800 0.000 -2.188 -1.379 -4.157 -2.958 -6.210 -1.367 -1.777 -2.926 -3.631 -4.097 -5.650 1.178 -0.115 2.533 -0.385 3.742 -0.748 0.814 -0.244 1.554 -0.527 2.142 -0.865 0.294 -0.169 0.551 -0.351 0.766 -0.584 0.215 -0.234 0.406 -0.552 0.406 -0.943 0.000 -0.918 -0.542 -1.696 -1.276 -2.387 -0.734 -0.691 -1.710 -1.334 -2.828 -1.973 -2.133 -1.219 -4.782 -2.411 -7.173 -3.593 -0.064 -1.273 -0.390 -2.728 -1.173 -3.981 C 3.626 -14.588 2.109 -15.704 0.000 -15.704 z"/>
+                }
+                </svg>
         );
     }
 
@@ -80,7 +88,7 @@ export default function Tile (tileProps: TileDTO) {
                         <line className={"inside"} x1={0} y1={size/2} x2={size} y2={size/2} />
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -102,7 +110,7 @@ export default function Tile (tileProps: TileDTO) {
                         <path className={"inside"} fill="none" d={"M " + (size/2) + ",0 A " + (size/2) + " " + (size/2) + " 0 0 1 0 " + (size/2)} />
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -124,7 +132,7 @@ export default function Tile (tileProps: TileDTO) {
                         <line className={"inside"} x1={0} y1={size/2} x2={size} y2={size/2} />
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -166,7 +174,7 @@ export default function Tile (tileProps: TileDTO) {
                     </g>
                     <House/>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -201,7 +209,7 @@ export default function Tile (tileProps: TileDTO) {
                     </g>
                     <House/>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -218,7 +226,7 @@ export default function Tile (tileProps: TileDTO) {
                     <rect onClick={()=>{clickable(legalParts,0) && move(0)}} className={"field" + clickable(legalParts,0)} x={0} y={0} width={size} height={size}/>
                     <Monastery legalParts={legalParts} partIndex={1}/>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -240,7 +248,7 @@ export default function Tile (tileProps: TileDTO) {
                     </g>
                     <Monastery legalParts={legalParts} partIndex={2}/>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -259,7 +267,7 @@ export default function Tile (tileProps: TileDTO) {
                         <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + (size*2) + " " + (size*2) + " L -" + size + " " + (size*2) + " z"} />
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -279,7 +287,7 @@ export default function Tile (tileProps: TileDTO) {
                         <Shield position={{x: 1/6, y: 5/6} as Coordinate}/>
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -297,7 +305,7 @@ export default function Tile (tileProps: TileDTO) {
                         <Shield position={{x: 1/6, y: 5/6} as Coordinate}/>
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -316,7 +324,7 @@ export default function Tile (tileProps: TileDTO) {
                         <polygon points={"-5 -5 " + (size + 5) + " -5 -5 " + (size + 5)}/>
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -336,7 +344,7 @@ export default function Tile (tileProps: TileDTO) {
                         <Shield position={{x: 1/6, y: 7/12} as Coordinate}/>
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -362,7 +370,7 @@ export default function Tile (tileProps: TileDTO) {
                         <polygon points={"-5 -5 " + (size+5) + " -5 -5 " + (size+5)}/>
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -389,7 +397,7 @@ export default function Tile (tileProps: TileDTO) {
                         <Shield position={{x: 1/6, y: 7/12} as Coordinate}/>
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -412,7 +420,7 @@ export default function Tile (tileProps: TileDTO) {
                         <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + ", " + (size*30/100) + " " + (size*70/100) + " 0 " + size} />
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -431,7 +439,7 @@ export default function Tile (tileProps: TileDTO) {
                         <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0"} />
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -470,7 +478,7 @@ export default function Tile (tileProps: TileDTO) {
                     </g>
                     <House/>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -497,7 +505,7 @@ export default function Tile (tileProps: TileDTO) {
                     </g>
 
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -523,7 +531,7 @@ export default function Tile (tileProps: TileDTO) {
                         <path className={"inside"} fill="none" d={"M 0 " + (size/2) + " A " + (size/2) + " " + (size/2) + " 0 0 1 " + (size/2) + " " + size}/>
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -546,7 +554,7 @@ export default function Tile (tileProps: TileDTO) {
                         <path d={"M 0 " + size + " C " + (size*30/100) + " " + (size*70/100) + " " + (size*70/100) + " " + (size*70/100) + " " + size + " " + size} />
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -572,7 +580,7 @@ export default function Tile (tileProps: TileDTO) {
                         <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + (size*2) + " " + (size*2) + " L -" + size + " " + (size*2) + " z"} />
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -599,7 +607,7 @@ export default function Tile (tileProps: TileDTO) {
                         <Shield position={{x: 1/6, y: 5/6} as Coordinate}/>
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -620,7 +628,7 @@ export default function Tile (tileProps: TileDTO) {
                         <path d={"M 0 0 C " + (size*30/100) + " " + (size*30/100) + " " + (size*70/100) + " " + (size*30/100) + " " + size + " 0 L " + size*2 + " " + size + " L " + size + " " + size + " C " + (size*70/100) + " " + (size*70/100) + " " + (size*30/100) + " " + (size*70/100) + " 0 " + size} />
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
@@ -642,7 +650,7 @@ export default function Tile (tileProps: TileDTO) {
                         <Shield position={{x: 1/6, y: 4/6} as Coordinate}/>
                     </g>
                 </svg>
-                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]}/>}
+                {meeple && <Meeple pointOfCompass={pointOfCompass} color={meeple.color} position={meeplePositionMap[meeple.position]} victoryPoints={meeple.victoryPoints}/>}
             </>
         );
     }
