@@ -211,6 +211,8 @@ public class GameHandler {
             throw new WebGamesApi.WebGamesApiException(HttpServletResponse.SC_CONFLICT);
         }
 
+        //everything is locked!
+
         if (!Game.GameState.IN_LOBBY.equals(gameOfOwner.getGameState()) || !gameOfOwner.getOwner().equals(owner) || !gameOfOwner.getInvitedUsers().contains(user)){
             gameOfOwner.unLock();
             if (gameOfUser != null){
@@ -220,8 +222,22 @@ public class GameHandler {
         }
 
         if (gameOfUser != null){
-            leaveGame(user);
+            if(gameOfUser.getPlayers().size() == 1){
+                games.remove(gameOfUser);
+                gameOfUser.getInvitedUsers().forEach(GameHandler::updateInviteList);
+            } else {
+                if (gameOfUser.getOwner().equals(user)){
+                    gameOfUser.setOwner(gameOfUser.getSecondPlayer());
+                }
+                gameOfUser.getPlayers().remove(user);
+                gameOfUser.playerLeft(user);
+
+                gameOfUser.unLock();
+
+                updatePlayers(gameOfUser);
+            }
         }
+
         gameOfOwner.getInvitedUsers().remove(user);
         gameOfOwner.getPlayers().add(user);
         gameOfOwner.playerJoined(user);

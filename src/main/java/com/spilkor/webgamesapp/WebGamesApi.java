@@ -429,7 +429,6 @@ public class WebGamesApi {
             GameHandler.leaveGame(user);
         } catch (WebGamesApiException e) {
             response.setStatus(e.getStatus());
-            return;
         }
     }
 

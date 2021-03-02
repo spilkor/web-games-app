@@ -33,6 +33,7 @@ export type Player = {
     color: Color
     victoryPoints: number | null
     meeples: number | null
+    isWinner: boolean
 }
 
 export type CarcassonneMoveDTO = {
@@ -42,10 +43,9 @@ export type CarcassonneMoveDTO = {
 }
 
 export type CarcassonneGameDTO = {
-
     players: Player[]
     nextPlayer: Player | null
-    winners: Player[]
+    finalPlayers: Player[]
 
     tiles: TileDTO[]
     tile?: TileDTO

@@ -52,7 +52,7 @@ export function Carcassonne () {
     } = carcassonneGameSettingsDTO;
 
     const carcassonneGameDTO = JSON.parse(gameData!.gameJSON) as CarcassonneGameDTO;
-    const players = carcassonneGameDTO.players;
+    const {players, finalPlayers} = carcassonneGameDTO;
 
     const [surrenderOpen, setSurrenderOpen] = useState<boolean>(false);
 
@@ -291,7 +291,6 @@ export function Carcassonne () {
     function PlayerBoard () {
         return (
             <div className={"player-board"}>
-
                 <table>
                     <tbody>
                         <tr>
@@ -304,9 +303,15 @@ export function Carcassonne () {
                                 VP
                             </td>
                         </tr>
-                    {players.map((player, key)=>
-                        <PlayerRow key = {key} player={player}/>
-                    )}
+                    {GameState.ENDED === gameData!.gameState ?
+                        finalPlayers.map((player, key)=>
+                            <PlayerRow key = {key} player={player}/>
+                        )
+                        :
+                        players.map((player, key)=>
+                            <PlayerRow key = {key} player={player}/>
+                        )
+                    }
                     </tbody>
                 </table>
             </div>
@@ -318,13 +323,12 @@ export function Carcassonne () {
     }
 
     function PlayerRow ({player}: PlayerRowProps) {
-        const isWinner = carcassonneGameDTO.winners && carcassonneGameDTO.winners.map((winner) => {return winner.user.id}).filter((id) => {return id === player.user.id}).length !== 0;
         const isNextPlayer = carcassonneGameDTO.nextPlayer && carcassonneGameDTO.nextPlayer.user.id === player.user.id === true;
         return(
             <tr className={
                 "player-row " +
                 player.color.toLowerCase() +
-                (isWinner ? " winner" : (!carcassonneGameDTO.winners && isNextPlayer ? " next" : ""))
+                (player.isWinner ? " winner" : (isNextPlayer ? " next" : ""))
             }>
                 <td>
                     <div className={"player-name"}>
@@ -450,14 +454,15 @@ export function Carcassonne () {
                 <>
                     <Game/>
                     {gameData!.owner.id === user!.id && <QuitButton/>}
-                    {carcassonneGameDTO.surrendered &&
-                    <div className={"system-message-wrapper"}>
-                        <SystemMessage text = {carcassonneGameDTO.surrendered.user.name + " gave up."}/>
-                    </div>}
-                    {carcassonneGameDTO.winners &&
-                    <div className={"system-message-wrapper"}>
-                        <SystemMessage text = {"" + carcassonneGameDTO.winners.map(winner => {return winner.user.name}).reduce(((result, name)=> {return result + (result.length === 0 ? "" : ", ") + name}), "") + " won."}/>
-                    </div>}
+                    {carcassonneGameDTO.surrendered ?
+                        <div className={"system-message-wrapper"}>
+                            <SystemMessage text = {carcassonneGameDTO.surrendered.user.name + " gave up."}/>
+                        </div>
+                        :
+                        <div className={"system-message-wrapper"}>
+                            <SystemMessage text = {"" + carcassonneGameDTO.finalPlayers.filter(fp => fp.isWinner).map(winner => {return winner.user.name}).reduce(((result, name)=> {return result + (result.length === 0 ? "" : ", ") + name}), "") + " won."}/>
+                        </div>
+                    }
                 </>
             );
     }

@@ -13,7 +13,7 @@ enum Profile  {
 
 const profile = Profile.container as Profile;
 
-const IP = profile === Profile.container ? '84.3.87.47' : 'localhost';
+const IP = profile === Profile.container ? 'spilkor.com' : 'localhost';
 const PORT = profile === Profile.container ? '' : ':8080';
 const WS = profile === Profile.container ? 'wss' : 'ws';
 export const WEBSOCKET_URL = WS + '://' + IP + PORT + '/websocket';

@@ -30,7 +30,7 @@ public class Carcassonne extends Game {
 
     private List<Player> players = new ArrayList<>();
     private Player nextPlayer;
-    private Set<Player> winners;
+    private Set<Player> finalPlayers;
     private Set<Tile> tiles;
     private Tile tile;
     private MoveType nextMoveType;
@@ -57,7 +57,6 @@ public class Carcassonne extends Game {
 
     @Override
     public boolean updateLobby(String lobbyJSON) {
-
         try {
             CarcassonneLobbyDTO carcassonneLobbyDTO = Mapper.readValue(lobbyJSON, CarcassonneLobbyDTO.class);
 
@@ -83,6 +82,13 @@ public class Carcassonne extends Game {
     @Override
     public void surrender(UserDTO userDTO) {
         surrendered = players.stream().filter(player -> player.getUser().equals(userDTO)).findFirst().get();
+
+        finalPlayers = new HashSet<>();
+        for(Player player: players){
+            Player finalPlayer = new Player(player);
+            finalPlayers.add(finalPlayer);
+        }
+
         gameState = GameState.ENDED;
     }
 
@@ -99,7 +105,6 @@ public class Carcassonne extends Game {
 
     @Override
     public void start() {
-
         List<Player> randomOrderedPlayers = new ArrayList<>();
         while (!players.isEmpty()){
             Player player = MathUtil.selectRandom(players);
@@ -130,19 +135,17 @@ public class Carcassonne extends Game {
 
         tile = TileFactory.createTile(deck.draw());
         playableTilePositions = getPlayableTilePositions(tile);
-
     }
 
     @Override
     public void restart() {
-
         tiles = null;
         nextPlayer = null;
         tile = null;
         playableCoordinates = null;
         legalParts = null;
         playableTilePositions = null;
-        winners = null;
+        finalPlayers = null;
         nextMoveType = null;
         deck = null;
         surrendered = null;
@@ -177,7 +180,7 @@ public class Carcassonne extends Game {
         }
 
         if (GameState.ENDED.equals(gameState)){
-            carcassonneGameDTO.setWinners(winners);
+            carcassonneGameDTO.setFinalPlayers(finalPlayers);
             carcassonneGameDTO.setSurrendered(surrendered);
             carcassonneGameDTO.setDeckSize(deck.getSize());
         }
@@ -237,7 +240,6 @@ public class Carcassonne extends Game {
 
     @Override
     public boolean legal(UserDTO userDTO, String moveJSON) {
-
         try {
             CarcassonneMoveDTO carcassonneMoveDTO = Mapper.readValue(moveJSON, CarcassonneMoveDTO.class);
 
@@ -287,7 +289,6 @@ public class Carcassonne extends Game {
 
     @Override
     public void move(UserDTO userDTO, String moveJSON) {
-
         try {
             CarcassonneMoveDTO carcassonneMoveDTO = Mapper.readValue(moveJSON, CarcassonneMoveDTO.class);
 
@@ -360,7 +361,6 @@ public class Carcassonne extends Game {
         } catch (JsonProcessingException e) {
             System.out.println(e.getMessage());
         }
-
     }
 
     private void closeMonasteries(boolean isEnd) {
@@ -430,7 +430,6 @@ public class Carcassonne extends Game {
                 t2.getMeeple().setVictoryPoints(filled);
             }
         }
-
     }
 
     private Player getPlayer(Color color){
@@ -539,7 +538,6 @@ public class Carcassonne extends Game {
             default:return null;
         }
     }
-
 
     private Set<Road> getConnectedRoads(Road road) {
         Set<Road> checked = new HashSet<>();
@@ -674,7 +672,6 @@ public class Carcassonne extends Game {
         return result;
     }
 
-
     private void endGame() {
         pickUpVictoryPointMeeples();
 
@@ -683,7 +680,13 @@ public class Carcassonne extends Game {
         closeMonasteries(true);
         closeFields();
 
-        winners = players.stream().filter(player -> player.getVictoryPoints().equals(players.stream().map(Player::getVictoryPoints).max(Integer::compareTo).orElse(null))).collect(Collectors.toSet());
+        finalPlayers = new HashSet<>();
+        int maxPoints = players.stream().map(Player::getVictoryPoints).max(Integer::compareTo).get();
+        for(Player player: players){
+            Player finalPlayer = new Player(player);
+            finalPlayer.setIsWinner(player.getVictoryPoints().equals(maxPoints));
+            finalPlayers.add(finalPlayer);
+        }
 
         tile = null;
         nextPlayer = null;
@@ -704,7 +707,6 @@ public class Carcassonne extends Game {
     }
 
     private void closeFields() {
-
         Set<Field> fields = getAllFieldsWithMeeple();
         Set<Field> checked = new HashSet<>();
 
@@ -753,7 +755,6 @@ public class Carcassonne extends Game {
                 });
             }
         }
-
     }
 
     private int getNumberOfClosedCitiesOnField(Set<Field> fields){
@@ -854,7 +855,6 @@ public class Carcassonne extends Game {
         return false;
     }
 
-
     private boolean roadHasMeeple(Road road) {
         if (road.getTile().getMeeple() != null && road.getTile().getMeeple().getPosition() == road.getPosition()){
             return true;
@@ -899,7 +899,6 @@ public class Carcassonne extends Game {
         }
         return false;
     }
-
 
     private Set<Field> getNeighborFields(Field field){
         Set<Field> neighborFields = new HashSet<>();
@@ -1432,7 +1431,6 @@ public class Carcassonne extends Game {
             }
         }
 
-
         return neighborCities;
     }
 
@@ -1620,7 +1618,6 @@ public class Carcassonne extends Game {
             }
         }
 
-
         return neighborRoads;
     }
 
@@ -1663,7 +1660,6 @@ public class Carcassonne extends Game {
     private Tile getTile(int x, int y){
         return tiles.stream().filter(t -> t.getCoordinate().getX().equals(x) && t.getCoordinate().getY().equals(y)).findFirst().orElse(null);
     }
-
 
     public Tile getTile() {
         return tile;

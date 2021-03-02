@@ -15,7 +15,7 @@ public class CarcassonneGameDTO implements Serializable {
     private Player nextPlayer;
     private Player surrendered;
     private List<Player> players;
-    private Set<Player> winners;
+    private Set<Player> finalPlayers;
     private Set<TileDTO> tiles;
     private TileDTO tile;
     private MoveType nextMoveType;
@@ -55,12 +55,12 @@ public class CarcassonneGameDTO implements Serializable {
         this.players = players;
     }
 
-    public Set<Player> getWinners() {
-        return winners;
+    public Set<Player> getFinalPlayers() {
+        return finalPlayers;
     }
 
-    public void setWinners(Set<Player> winners) {
-        this.winners = winners;
+    public void setFinalPlayers(Set<Player> finalPlayers) {
+        this.finalPlayers = finalPlayers;
     }
 
     public Set<TileDTO> getTiles() {

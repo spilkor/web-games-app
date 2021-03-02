@@ -4,15 +4,23 @@ import com.spilkor.webgamesapp.model.dto.UserDTO;
 
 public class Player {
 
+    private UserDTO user;
+    private Color color;
+    private Integer victoryPoints;
+    private Integer meeples;
+    private Boolean isWinner;
+
     public Player (UserDTO user, Color color) {
         this.user = user;
         this.color = color;
     }
 
-    private UserDTO user;
-    private Color color;
-    private Integer victoryPoints;
-    private Integer meeples;
+    public Player (Player player) {
+        this.user = player.user;
+        this.color = player.color;
+        this.victoryPoints = player.victoryPoints;
+        this.meeples = player.meeples;
+    }
 
     public Integer getMeeples() {
         return meeples;
@@ -44,5 +52,13 @@ public class Player {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public Boolean getIsWinner() {
+        return isWinner;
+    }
+
+    public void setIsWinner(Boolean isWinner) {
+        this.isWinner = isWinner;
     }
 }
