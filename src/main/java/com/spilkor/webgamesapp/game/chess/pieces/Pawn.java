@@ -52,9 +52,15 @@ public class Pawn extends Piece {
                 }
             }
         } else {
-            // capture
             Piece targetField = table[target.getRow()][target.getColumn()];
-            return targetField != null && Math.abs(offsetColumn) == 1 && Math.abs(offsetRow) == 1;
+            // en passant
+            if (targetField == null) {
+                // FIXME
+                return false;
+            } else {
+                // capture
+                return Math.abs(offsetColumn) == 1 && Math.abs(offsetRow) == 1;
+            }
         }
 
         return true;

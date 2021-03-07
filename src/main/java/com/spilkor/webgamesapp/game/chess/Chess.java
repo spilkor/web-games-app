@@ -53,6 +53,10 @@ public class Chess extends Game {
     private OwnerAs ownerAs;
     private UserDTO nextPlayer;
 
+    private Color ownerColor;
+
+    private int counterFiftyMoves;
+
     private boolean draw;
     private UserDTO winner;
 
@@ -207,6 +211,7 @@ public class Chess extends Game {
         try {
             ChessMoveDTO chessMoveDTO = Mapper.readValue(moveJSON, ChessMoveDTO.class);
             Piece actualPiece = table[chessMoveDTO.getSource().getRow()][chessMoveDTO.getSource().getColumn()];
+            Piece targetPiece = table[chessMoveDTO.getTarget().getRow()][chessMoveDTO.getTarget().getColumn()];
 
             Position source = chessMoveDTO.getSource();
             Position target = chessMoveDTO.getTarget();
@@ -223,7 +228,16 @@ public class Chess extends Game {
             }
 
             if (legal) {
-                legal = isPlayerInCheck(source, target);
+                Piece[][] tableCopy = Arrays.stream(table).map(Piece[]::clone).toArray($ -> table.clone());
+
+                tableCopy[target.getRow()][target.getColumn()] = getPiece(source);
+                tableCopy[source.getRow()][source.getColumn()] = null;
+
+                if (actualPiece.getType() == KING) {
+                    legal = !isPlayerInCheck(tableCopy, target);
+                } else {
+                    legal = !isPlayerInCheck(tableCopy, WHITE.equals(actualPiece.getColor()) ? whiteKing : blackKing);
+                }
             }
 
         } catch (JsonProcessingException e) {
@@ -245,6 +259,11 @@ public class Chess extends Game {
                 if (validRow) {
                     targetPiece = PieceFactory.create(chessMoveDTO.getPromoteType(), getUserColor(userDTO), table);
                 }
+                counterFiftyMoves = 0;
+            } else if (getPiece(chessMoveDTO.getTarget()) == null) {
+                counterFiftyMoves++;
+            } else {
+                counterFiftyMoves = 0;
             }
 
             table[chessMoveDTO.getTarget().getRow()][chessMoveDTO.getTarget().getColumn()] = targetPiece;
@@ -267,25 +286,40 @@ public class Chess extends Game {
         }
     }
 
-    private void checkWinCondition() {
-        // TODO
+    private void checkWinCondition(UserDTO user) {
+        if (counterFiftyMoves == 50) {
+            draw = true;
+        }
+
+       //  Color opponentColor = getOpponentColor(user);
+
+        // Piece[][] tableCopy = Arrays.stream(table).map(Piece[]::clone).toArray($ -> table.clone());
+
+       // boolean isOpponentInCheck = isPlayerInCheck(tableCopy, opponentColor);
+
+        // is enemy in check?
+            // true
+                // canEnemyMove?
+                    // true
+                        // continue
+                    // false
+                        // win
+            // false
+                // canEnemyMove?
+                    // true
+                        // continue
+                    // false
+                        // draw
     }
 
-    private boolean isPlayerInCheck(Position source, Position target) {
-        Piece[][] tableCopy = Arrays.stream(table).map(Piece[]::clone).toArray($ -> table.clone());
-
-        Piece actualPiece = tableCopy[source.getRow()][source.getColumn()];
-
-        tableCopy[target.getRow()][target.getColumn()] = getPiece(source);
-        tableCopy[source.getRow()][source.getColumn()] = null;
-
+    private boolean isPlayerInCheck(Piece[][] tableCopy, Position kingPosition) {
+        Color color = getPiece(kingPosition).getColor();
         for (int i = 0; i < tableCopy.length; i++) {
             for (int k = 0; k < tableCopy[i].length; k++) {
                 Piece piece = tableCopy[i][k];
-                if (piece != null && !piece.getColor().equals(actualPiece.getColor())) {
-                    Position opponentPosition = WHITE.equals(actualPiece.getColor()) ? whiteKing : blackKing;
-                    if (!getPiece(opponentPosition).equals(piece) && piece.validateMove(new Position(i, k), opponentPosition)) {
-                        return false;
+                if (piece != null && !piece.getColor().equals(color)) {
+                    if (piece.validateMove(new Position(i, k), kingPosition)) {
+                        return true;
                     }
                 }
             }
@@ -303,6 +337,14 @@ public class Chess extends Game {
             return ownerColor;
         } else {
             return WHITE.equals(ownerColor) ? BLACK : WHITE;
+        }
+    }
+
+    private Color getOpponentColor(UserDTO user) {
+        if (user.equals(owner)) {
+            return WHITE.equals(ownerColor) ? BLACK : WHITE;
+        } else {
+            return ownerColor;
         }
     }
 }
