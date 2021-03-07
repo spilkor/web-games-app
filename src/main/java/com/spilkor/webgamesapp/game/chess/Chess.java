@@ -22,6 +22,25 @@ import static com.spilkor.webgamesapp.game.chess.enums.Color.WHITE;
 import static com.spilkor.webgamesapp.game.chess.enums.OwnerAs.Random;
 import static com.spilkor.webgamesapp.game.chess.enums.PieceType.*;
 
+
+// 00|01|02|03|04|05|06|07
+// 10|11|12|13|14|15|16|17
+// 20|21|22|23|24|25|26|27
+// 30|31|32|33|34|35|36|37
+// 40|41|42|43|44|45|46|47
+// 50|51|52|53|54|55|56|57
+// 60|61|62|63|64|65|66|67
+// 70|71|72|73|74|75|76|77
+
+// BR|BK|BB|BQ|BK|BB|BK|BR
+// BP|BP|BP|BP|BP|BP|BP|BP
+// --|--|--|--|--|--|--|--
+// --|--|--|--|--|--|--|--
+// --|--|--|--|--|--|--|--
+// --|--|--|--|--|--|--|--
+// WP|WP|WP|WP|WP|WP|WP|WP
+// WR|WK|WB|WQ|WK|WB|WK|WR
+
 public class Chess extends Game {
 
     private static final PieceType[] PIECE_ORDER = {ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK};
