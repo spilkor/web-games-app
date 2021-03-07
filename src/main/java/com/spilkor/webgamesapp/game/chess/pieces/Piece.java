@@ -17,6 +17,7 @@ public abstract class Piece {
 
     public Piece(Piece[][] table, Color color) {
         this.table = table;
+        this.color = color;
     }
 
     protected boolean checkLinearFields(Position source, Position target) {

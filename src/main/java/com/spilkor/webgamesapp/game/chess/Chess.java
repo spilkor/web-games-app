@@ -6,16 +6,20 @@ import com.spilkor.webgamesapp.game.Game;
 import com.spilkor.webgamesapp.game.chess.dto.ChessGameDTO;
 import com.spilkor.webgamesapp.game.chess.dto.ChessLobbyDTO;
 import com.spilkor.webgamesapp.game.chess.dto.ChessMoveDTO;
+import com.spilkor.webgamesapp.game.chess.dto.PieceDTO;
 import com.spilkor.webgamesapp.game.chess.enums.Color;
+import com.spilkor.webgamesapp.game.chess.enums.OwnerAs;
 import com.spilkor.webgamesapp.game.chess.enums.PieceType;
 import com.spilkor.webgamesapp.game.chess.pieces.Piece;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
+import com.spilkor.webgamesapp.util.MathUtil;
 
 import java.util.Arrays;
 
 import static com.spilkor.webgamesapp.game.chess.enums.Color.BLACK;
 import static com.spilkor.webgamesapp.game.chess.enums.Color.WHITE;
+import static com.spilkor.webgamesapp.game.chess.enums.OwnerAs.Random;
 import static com.spilkor.webgamesapp.game.chess.enums.PieceType.*;
 
 public class Chess extends Game {
@@ -24,18 +28,20 @@ public class Chess extends Game {
 
     private Piece[][] table;
 
-    private Position whiteKing = new Position(7, 4);
-    private Position blackKing = new Position(0, 4);
+    private Position whiteKing;
+    private Position blackKing;
+
+    private OwnerAs ownerAs;
+    private UserDTO nextPlayer;
 
     private Color ownerColor;
-    private UserDTO nextPlayer;
 
     private boolean draw;
     private UserDTO winner;
 
-
     public Chess(UserDTO owner, GameType gameType) {
         super(owner, gameType);
+        ownerAs = Random;
     }
 
     @Override
@@ -48,9 +54,13 @@ public class Chess extends Game {
         try {
             ChessLobbyDTO chessLobbyDTO = Mapper.readValue(lobbyJSON, ChessLobbyDTO.class);
 
-            ownerColor = chessLobbyDTO.getOwnerColor();
-            nextPlayer = WHITE.equals(ownerColor) ? owner : getSecondPlayer();
+            OwnerAs ownerAs = chessLobbyDTO.getOwnerAs();
 
+            if (ownerAs == null){
+                return false;
+            }
+
+            this.ownerAs = ownerAs;
             return true;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -65,7 +75,30 @@ public class Chess extends Game {
 
     @Override
     public void start() {
+        switch (ownerAs){
+            case Random:
+                if(MathUtil.coinToss()){
+                    nextPlayer = owner;
+                    ownerColor = WHITE;
+                } else {
+                    nextPlayer = getSecondPlayer();
+                    ownerColor = BLACK;
+                }
+                break;
+            case WHITE:
+                nextPlayer = owner;
+                ownerColor = WHITE;
+                break;
+            case BLACK:
+                nextPlayer = getSecondPlayer();
+                ownerColor = BLACK;
+                break;
+        }
+
         table = getNewChessTable();
+
+        whiteKing = new Position(7, 4);
+        blackKing = new Position(0, 4);
     }
 
     private Piece[][] getNewChessTable() {
@@ -99,15 +132,20 @@ public class Chess extends Game {
     public void restart() {
         table = null;
         nextPlayer = null;
+        whiteKing = null;
+        blackKing = null;
         ownerColor = null;
+        draw = false;
+        winner = null;
     }
 
     @Override
     public String getGameJSON(UserDTO user) {
         ChessGameDTO chessGameDTO = new ChessGameDTO();
 
+        chessGameDTO.setOwnerAs(ownerAs);
         chessGameDTO.setOwnerColor(ownerColor);
-        chessGameDTO.setTable(table);
+        chessGameDTO.setTable(convertTable(table));
         chessGameDTO.setNextPlayer(nextPlayer);
         chessGameDTO.setDraw(draw);
         chessGameDTO.setWinner(winner);
@@ -118,6 +156,24 @@ public class Chess extends Game {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private PieceDTO[][] convertTable(Piece[][] table) {
+        if (table == null){
+            return null;
+        }
+
+        PieceDTO[][] result = new PieceDTO[8][8];
+
+        for (int i = 0; i < table.length; i++) {
+            for (int k = 0; k < table[i].length; k++) {
+                Piece piece = table[i][k];
+                if (piece != null){
+                    result[i][k] = new PieceDTO(piece);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -132,7 +188,7 @@ public class Chess extends Game {
             Position source = chessMoveDTO.getSource();
             Position target = chessMoveDTO.getTarget();
 
-            if (actualPiece == null || nextPlayer.equals(userDTO) || chessMoveDTO.getTarget().equals(chessMoveDTO.getSource())) {
+            if (actualPiece == null || !nextPlayer.equals(userDTO) || chessMoveDTO.getTarget().equals(chessMoveDTO.getSource())) {
                 return false;
             }
 

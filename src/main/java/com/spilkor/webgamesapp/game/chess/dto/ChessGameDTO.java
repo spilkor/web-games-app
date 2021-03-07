@@ -2,6 +2,7 @@ package com.spilkor.webgamesapp.game.chess.dto;
 
 
 import com.spilkor.webgamesapp.game.chess.enums.Color;
+import com.spilkor.webgamesapp.game.chess.enums.OwnerAs;
 import com.spilkor.webgamesapp.game.chess.pieces.Piece;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 
@@ -10,10 +11,11 @@ import java.io.Serializable;
 public class ChessGameDTO implements Serializable {
 
     private Color ownerColor;
-    private Piece[][] table;
+    private PieceDTO[][] table;
     private UserDTO nextPlayer;
     private UserDTO winner;
     private boolean draw;
+    private OwnerAs ownerAs;
 
     public Color getOwnerColor() {
         return ownerColor;
@@ -23,11 +25,11 @@ public class ChessGameDTO implements Serializable {
         this.ownerColor = ownerColor;
     }
 
-    public Piece[][] getTable() {
+    public PieceDTO[][] getTable() {
         return table;
     }
 
-    public void setTable(Piece[][] table) {
+    public void setTable(PieceDTO[][] table) {
         this.table = table;
     }
 
@@ -53,5 +55,13 @@ public class ChessGameDTO implements Serializable {
 
     public void setDraw(boolean draw) {
         this.draw = draw;
+    }
+
+    public OwnerAs getOwnerAs() {
+        return ownerAs;
+    }
+
+    public void setOwnerAs(OwnerAs ownerAs) {
+        this.ownerAs = ownerAs;
     }
 }

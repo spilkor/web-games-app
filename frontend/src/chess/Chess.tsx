@@ -2,7 +2,7 @@ import React, {ChangeEvent, useContext, useState} from 'react';
 import {AppContext} from "../App";
 import {StartGameButton, SystemMessage} from "../Main Components/Game";
 import API from "../util/API";
-import {GameState, Coordinate} from "../util/types";
+import {Coordinate, GameState} from "../util/types";
 
 import {ReactComponent as KingSVG} from './king.svg';
 import {ReactComponent as QueenSVG} from './queen.svg';
@@ -12,16 +12,7 @@ import {ReactComponent as KnightSVG} from './knight.svg';
 import {ReactComponent as PawnSVG} from './pawn.svg';
 
 import './chess.scss';
-import {
-    ChessGameDTO,
-    ChessLobbyDTO,
-    ChessMoveDTO,
-    ChessPiece,
-    ChessPieceType,
-    Color,
-    OwnerAs,
-    SquireProps
-} from "./chessTypes";
+import {ChessGameDTO, ChessLobbyDTO, ChessMoveDTO, Color, OwnerAs, PieceType, SquireProps} from "./chessTypes";
 
 
 export function Chess () {
@@ -29,7 +20,9 @@ export function Chess () {
     const { user, gameData } = useContext(AppContext);
 
     const chessGameDTO = JSON.parse(gameData!.gameJSON) as ChessGameDTO;
-    // const myMove = chessGameDTO && chessGameDTO.nextPlayer && chessGameDTO.nextPlayer.id === user!.id;
+    const myMove = chessGameDTO && chessGameDTO.nextPlayer && chessGameDTO.nextPlayer.id === user!.id;
+
+    const myColor = gameData!.owner.id === user!.id ? chessGameDTO.ownerColor : (chessGameDTO.ownerColor === Color.WHITE ? Color.BLACK : Color.WHITE) as Color;
 
     const [fromPosition, setFromPosition] = useState<Coordinate | null>(null);
 
@@ -118,7 +111,7 @@ export function Chess () {
 
 
     function Table() {
-        const isInverse = chessGameDTO.startingPlayer.id !== user!.id;
+        const isInverse = myColor === Color.BLACK;
 
         const rows = [];
         for (let x = 0; x < 8; x++) {
@@ -148,10 +141,16 @@ export function Chess () {
 
 
 
-    async function move(fromPosition: Coordinate, toPosition: Coordinate) {
+    async function move(source: Coordinate, target: Coordinate) {
         let chessMoveDTO = {
-            fromPosition,
-            toPosition
+            source: {
+                column: source.y,
+                row: source.x
+            },
+            target: {
+                column: target.y,
+                row: target.x
+            }
         } as ChessMoveDTO;
         API.move(JSON.stringify(chessMoveDTO));
     }
@@ -168,40 +167,40 @@ export function Chess () {
 
     function Squire({position}: SquireProps) {
         const piece = chessGameDTO.table[position.x][position.y];
-        const clickable = true; //FIXME
+        const clickable = myMove;
 
         const isSelected = fromPosition && fromPosition.x === position.x && fromPosition.y === position.y;
 
         return(
-            <div className={"square" + (isSelected ? " selected" : "") + (piece === null ? "" : piece.color === Color.WHITE ? " white" : " black")} onClick={()=> clickable && selectSquare(position)}>
-                {piece&& <ChessPiece/>}
+            <div className={"square" + (isSelected ? " selected" : "") + (clickable ? " clickable" : "") + (piece === null ? "" : piece.color === Color.WHITE ? " white" : " black")} onClick={()=> clickable && selectSquare(position)}>
+                {piece && <ChessPiece/>}
             </div>
         );
 
 
         function ChessPiece() {
-            switch (piece.type) {
-                case ChessPieceType.KING:
+            switch (piece.pieceType) {
+                case PieceType.KING:
                     return(
                         <KingSVG/>
                     );
-                case ChessPieceType.QUEEN:
+                case PieceType.QUEEN:
                     return(
                         <QueenSVG/>
                     );
-                case ChessPieceType.ROOK:
+                case PieceType.ROOK:
                     return(
                         <RookSVG/>
                     );
-                case ChessPieceType.BISHOP:
+                case PieceType.BISHOP:
                     return(
                         <BishopSVG/>
                     );
-                case ChessPieceType.KNIGHT:
+                case PieceType.KNIGHT:
                     return(
                         <KnightSVG/>
                     );
-                case ChessPieceType.PAWN:
+                case PieceType.PAWN:
                     return(
                         <PawnSVG/>
                     );

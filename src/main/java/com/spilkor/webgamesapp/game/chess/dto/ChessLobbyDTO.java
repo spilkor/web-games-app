@@ -1,20 +1,19 @@
 package com.spilkor.webgamesapp.game.chess.dto;
 
 
-import com.spilkor.webgamesapp.game.chess.enums.Color;
+import com.spilkor.webgamesapp.game.chess.enums.OwnerAs;
 
 import java.io.Serializable;
 
 public class ChessLobbyDTO implements Serializable {
 
-    // null means random
-    private Color ownerColor;
+    private OwnerAs ownerAs;
 
-    public Color getOwnerColor() {
-        return ownerColor;
+    public OwnerAs getOwnerAs() {
+        return ownerAs;
     }
 
-    public void setOwnerColor(Color ownerColor) {
-        this.ownerColor = ownerColor;
+    public void setOwnerAs(OwnerAs ownerAs) {
+        this.ownerAs = ownerAs;
     }
 }
