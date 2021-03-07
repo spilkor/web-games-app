@@ -209,14 +209,15 @@ public class Chess extends Game {
         boolean legal = false;
 
         try {
+            // TODO - source, target null check
+            // TODO - row, column 0-7
             ChessMoveDTO chessMoveDTO = Mapper.readValue(moveJSON, ChessMoveDTO.class);
             Piece actualPiece = table[chessMoveDTO.getSource().getRow()][chessMoveDTO.getSource().getColumn()];
-            Piece targetPiece = table[chessMoveDTO.getTarget().getRow()][chessMoveDTO.getTarget().getColumn()];
 
             Position source = chessMoveDTO.getSource();
             Position target = chessMoveDTO.getTarget();
 
-            if (actualPiece == null || actualPiece.getColor().equals(getUserColor(userDTO)) || targetPiece == null || !nextPlayer.equals(userDTO) || chessMoveDTO.getTarget().equals(chessMoveDTO.getSource())) {
+            if (actualPiece == null || !actualPiece.getColor().equals(getUserColor(userDTO)) || !nextPlayer.equals(userDTO) || chessMoveDTO.getTarget().equals(chessMoveDTO.getSource())) {
                 return false;
             }
 
@@ -291,6 +292,7 @@ public class Chess extends Game {
             draw = true;
         }
 
+        // TODO
        //  Color opponentColor = getOpponentColor(user);
 
         // Piece[][] tableCopy = Arrays.stream(table).map(Piece[]::clone).toArray($ -> table.clone());
@@ -313,7 +315,7 @@ public class Chess extends Game {
     }
 
     private boolean isPlayerInCheck(Piece[][] tableCopy, Position kingPosition) {
-        Color color = getPiece(kingPosition).getColor();
+        Color color = tableCopy[kingPosition.getRow()][kingPosition.getColumn()].getColor();
         for (int i = 0; i < tableCopy.length; i++) {
             for (int k = 0; k < tableCopy[i].length; k++) {
                 Piece piece = tableCopy[i][k];
