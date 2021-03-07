@@ -3,28 +3,44 @@ package com.spilkor.webgamesapp.game.chess;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spilkor.webgamesapp.game.Game;
-import com.spilkor.webgamesapp.model.dto.Coordinate;
+import com.spilkor.webgamesapp.game.chess.dto.ChessGameDTO;
+import com.spilkor.webgamesapp.game.chess.dto.ChessLobbyDTO;
+import com.spilkor.webgamesapp.game.chess.dto.ChessMoveDTO;
+import com.spilkor.webgamesapp.game.chess.enums.Color;
+import com.spilkor.webgamesapp.game.chess.enums.PieceType;
+import com.spilkor.webgamesapp.game.chess.pieces.Piece;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
-import com.spilkor.webgamesapp.util.MathUtil;
 
+import java.util.Arrays;
+
+import static com.spilkor.webgamesapp.game.chess.enums.Color.BLACK;
+import static com.spilkor.webgamesapp.game.chess.enums.Color.WHITE;
+import static com.spilkor.webgamesapp.game.chess.enums.PieceType.*;
 
 public class Chess extends Game {
 
-    private OwnerAs ownerAs;
-    private ChessPiece[][] table;
+    private static final PieceType[] PIECE_ORDER = {ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK};
+
+    private Piece[][] table;
+
+    private Position whiteKing = new Position(7, 4);
+    private Position blackKing = new Position(0, 4);
+
+    private Color ownerColor;
     private UserDTO nextPlayer;
-    private UserDTO startingPlayer;
 
-    public Chess(UserDTO owner, GameType gameType){
+    private boolean draw;
+    private UserDTO winner;
+
+
+    public Chess(UserDTO owner, GameType gameType) {
         super(owner, gameType);
-
-        ownerAs = OwnerAs.Random;
     }
 
     @Override
     public void surrender(UserDTO userDTO) {
-//        TODO
+        gameState = GameState.ENDED;
     }
 
     @Override
@@ -32,11 +48,8 @@ public class Chess extends Game {
         try {
             ChessLobbyDTO chessLobbyDTO = Mapper.readValue(lobbyJSON, ChessLobbyDTO.class);
 
-            if (chessLobbyDTO.getOwnerAs() == null){
-                return false;
-            }
-
-            ownerAs = chessLobbyDTO.getOwnerAs();
+            ownerColor = chessLobbyDTO.getOwnerColor();
+            nextPlayer = WHITE.equals(ownerColor) ? owner : getSecondPlayer();
 
             return true;
         } catch (JsonProcessingException e) {
@@ -52,78 +65,52 @@ public class Chess extends Game {
 
     @Override
     public void start() {
-
         table = getNewChessTable();
-
-        switch (ownerAs){
-            case WHITE:
-                startingPlayer = owner;
-                break;
-            case BLACK:
-                startingPlayer = getSecondPlayer();
-                break;
-            case Random:
-                startingPlayer = MathUtil.coinToss() ? owner : getSecondPlayer();
-                break;
-        }
-        nextPlayer = startingPlayer;
     }
 
-    private ChessPiece[][] getNewChessTable() {
-        ChessPiece[][] tempTable = new ChessPiece[8][8];
+    private Piece[][] getNewChessTable() {
+        Piece[][] table = new Piece[8][8];
 
-        tempTable[0][0] = new ChessPiece(ChessPieceType.ROOK, Color.BLACK);
-        tempTable[0][1] = new ChessPiece(ChessPieceType.KNIGHT, Color.BLACK);
-        tempTable[0][2] = new ChessPiece(ChessPieceType.BISHOP, Color.BLACK);
-        tempTable[0][3] = new ChessPiece(ChessPieceType.QUEEN, Color.BLACK);
-        tempTable[0][4] = new ChessPiece(ChessPieceType.KING, Color.BLACK);
-        tempTable[0][5] = new ChessPiece(ChessPieceType.BISHOP, Color.BLACK);
-        tempTable[0][6] = new ChessPiece(ChessPieceType.KNIGHT, Color.BLACK);
-        tempTable[0][7] = new ChessPiece(ChessPieceType.ROOK, Color.BLACK);
+        for (int i = 0; i < table.length; i++) {
+            for (int k = 0; k < table[i].length; k++) {
+                switch (i) {
+                    case 0:
+                        table[i][k] = PieceFactory.create(PIECE_ORDER[k], BLACK, table);
+                        break;
+                    case 1:
+                        table[i][k] = PieceFactory.create(PAWN, BLACK, table);
+                        break;
+                    case 6:
+                        table[i][k] = PieceFactory.create(PAWN, WHITE, table);
+                        break;
+                    case 7:
+                        table[i][k] = PieceFactory.create(PIECE_ORDER[k], WHITE, table);
+                        break;
+                    default:
+                        table[i][k] = null;
+                }
+            }
+        }
 
-        tempTable[1][0] = new ChessPiece(ChessPieceType.PAWN, Color.BLACK);
-        tempTable[1][1] = new ChessPiece(ChessPieceType.PAWN, Color.BLACK);
-        tempTable[1][2] = new ChessPiece(ChessPieceType.PAWN, Color.BLACK);
-        tempTable[1][3] = new ChessPiece(ChessPieceType.PAWN, Color.BLACK);
-        tempTable[1][4] = new ChessPiece(ChessPieceType.PAWN, Color.BLACK);
-        tempTable[1][5] = new ChessPiece(ChessPieceType.PAWN, Color.BLACK);
-        tempTable[1][6] = new ChessPiece(ChessPieceType.PAWN, Color.BLACK);
-        tempTable[1][7] = new ChessPiece(ChessPieceType.PAWN, Color.BLACK);
-
-        tempTable[6][0] = new ChessPiece(ChessPieceType.PAWN, Color.WHITE);
-        tempTable[6][1] = new ChessPiece(ChessPieceType.PAWN, Color.WHITE);
-        tempTable[6][2] = new ChessPiece(ChessPieceType.PAWN, Color.WHITE);
-        tempTable[6][3] = new ChessPiece(ChessPieceType.PAWN, Color.WHITE);
-        tempTable[6][4] = new ChessPiece(ChessPieceType.PAWN, Color.WHITE);
-        tempTable[6][5] = new ChessPiece(ChessPieceType.PAWN, Color.WHITE);
-        tempTable[6][6] = new ChessPiece(ChessPieceType.PAWN, Color.WHITE);
-        tempTable[6][7] = new ChessPiece(ChessPieceType.PAWN, Color.WHITE);
-
-        tempTable[7][0] = new ChessPiece(ChessPieceType.ROOK, Color.WHITE);
-        tempTable[7][1] = new ChessPiece(ChessPieceType.KNIGHT, Color.WHITE);
-        tempTable[7][2] = new ChessPiece(ChessPieceType.BISHOP, Color.WHITE);
-        tempTable[7][3] = new ChessPiece(ChessPieceType.QUEEN, Color.WHITE);
-        tempTable[7][4] = new ChessPiece(ChessPieceType.KING, Color.WHITE);
-        tempTable[7][5] = new ChessPiece(ChessPieceType.BISHOP, Color.WHITE);
-        tempTable[7][6] = new ChessPiece(ChessPieceType.KNIGHT, Color.WHITE);
-        tempTable[7][7] = new ChessPiece(ChessPieceType.ROOK, Color.WHITE);
-
-        return tempTable;
+        return table;
     }
 
     @Override
     public void restart() {
         table = null;
+        nextPlayer = null;
+        ownerColor = null;
     }
 
     @Override
     public String getGameJSON(UserDTO user) {
         ChessGameDTO chessGameDTO = new ChessGameDTO();
 
-        chessGameDTO.setOwnerAs(ownerAs);
+        chessGameDTO.setOwnerColor(ownerColor);
         chessGameDTO.setTable(table);
         chessGameDTO.setNextPlayer(nextPlayer);
-        chessGameDTO.setStartingPlayer(startingPlayer);
+        chessGameDTO.setDraw(draw);
+        chessGameDTO.setWinner(winner);
 
         try {
             return Mapper.writeValueAsString(chessGameDTO);
@@ -135,35 +122,108 @@ public class Chess extends Game {
 
     @Override
     public boolean legal(UserDTO userDTO, String moveJSON) {
+
+        boolean legal = false;
+
         try {
             ChessMoveDTO chessMoveDTO = Mapper.readValue(moveJSON, ChessMoveDTO.class);
+            Piece actualPiece = table[chessMoveDTO.getSource().getRow()][chessMoveDTO.getSource().getColumn()];
 
-            //TODO, FIXME...
+            Position source = chessMoveDTO.getSource();
+            Position target = chessMoveDTO.getTarget();
 
-            return getChessPiece(chessMoveDTO.getFromPosition()) != null;
+            if (actualPiece == null || nextPlayer.equals(userDTO) || chessMoveDTO.getTarget().equals(chessMoveDTO.getSource())) {
+                return false;
+            }
+
+            legal = actualPiece.validateMove(source, target);
+
+            // check if capture is on same color
+            if ((getPiece(chessMoveDTO.getTarget()) != null) && legal) {
+                legal = !getPiece(chessMoveDTO.getTarget()).getColor().equals(getPiece(chessMoveDTO.getSource()).getColor());
+            }
+
+            if (legal) {
+                legal = isPlayerInCheck(source, target);
+            }
+
         } catch (JsonProcessingException e) {
-            return false;
+            e.printStackTrace();
         }
-    }
 
-    private ChessPiece getChessPiece(Coordinate position){
-        return table[position.getX()][position.getY()];
+        return legal;
     }
 
     @Override
     public void move(UserDTO userDTO, String moveJSON) {
         try {
             ChessMoveDTO chessMoveDTO = Mapper.readValue(moveJSON, ChessMoveDTO.class);
+            Piece targetPiece = getPiece(chessMoveDTO.getSource());
 
-//            TODO, FIXME...
-            table[chessMoveDTO.getToPosition().getX()][chessMoveDTO.getToPosition().getY()] = getChessPiece(chessMoveDTO.getFromPosition());
-            table[chessMoveDTO.getFromPosition().getX()][chessMoveDTO.getFromPosition().getY()] = null;
+            // promote
+            if (chessMoveDTO.getPromoteType() != null && PAWN.equals(targetPiece.getType())) {
+                boolean validRow = getUserColor(userDTO).equals(WHITE) ? chessMoveDTO.getTarget().getRow() == 0 : chessMoveDTO.getTarget().getRow() == 7;
+                if (validRow) {
+                    targetPiece = PieceFactory.create(chessMoveDTO.getPromoteType(), getUserColor(userDTO), table);
+                }
+            }
 
-            nextPlayer = nextPlayer.equals(owner) ? getSecondPlayer() : owner;
+            table[chessMoveDTO.getTarget().getRow()][chessMoveDTO.getTarget().getColumn()] = targetPiece;
+            table[chessMoveDTO.getSource().getRow()][chessMoveDTO.getSource().getColumn()] = null;
+
+            // update king positions
+            if (targetPiece != null && KING.equals(targetPiece.getType())) {
+                if (WHITE.equals(targetPiece.getColor()))
+                    whiteKing = chessMoveDTO.getTarget();
+                else {
+                    blackKing = chessMoveDTO.getTarget();
+                }
+            }
+
+            checkWinCondition();
+
+            nextPlayer = owner.equals(userDTO) ? getSecondPlayer() : owner;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
 
+    private void checkWinCondition() {
+        // TODO
+    }
 
+    private boolean isPlayerInCheck(Position source, Position target) {
+        Piece[][] tableCopy = Arrays.stream(table).map(Piece[]::clone).toArray($ -> table.clone());
+
+        Piece actualPiece = tableCopy[source.getRow()][source.getColumn()];
+
+        tableCopy[target.getRow()][target.getColumn()] = getPiece(source);
+        tableCopy[source.getRow()][source.getColumn()] = null;
+
+        for (int i = 0; i < tableCopy.length; i++) {
+            for (int k = 0; k < tableCopy[i].length; k++) {
+                Piece piece = tableCopy[i][k];
+                if (piece != null && !piece.getColor().equals(actualPiece.getColor())) {
+                    Position opponentPosition = WHITE.equals(actualPiece.getColor()) ? whiteKing : blackKing;
+                    if (!getPiece(opponentPosition).equals(piece) && piece.validateMove(new Position(i, k), opponentPosition)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private Piece getPiece(Position position) {
+        return table[position.getRow()][position.getColumn()];
+    }
+
+    private Color getUserColor(UserDTO user) {
+        if (user.equals(owner)) {
+            return ownerColor;
+        } else {
+            return WHITE.equals(ownerColor) ? BLACK : WHITE;
+        }
+    }
 }

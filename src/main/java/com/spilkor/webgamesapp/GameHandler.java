@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class GameHandler {
 
-    private static Set<Game> games = new HashSet<>();
+    private static final Set<Game> games = new HashSet<>();
 
     static Game createGame(UserDTO owner, Game.GameType gameType){
         Game game = null;
