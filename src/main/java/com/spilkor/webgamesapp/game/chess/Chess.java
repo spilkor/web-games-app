@@ -53,8 +53,6 @@ public class Chess extends Game {
     private OwnerAs ownerAs;
     private UserDTO nextPlayer;
 
-    private Color ownerColor;
-
     private boolean draw;
     private UserDTO winner;
 
@@ -79,7 +77,7 @@ public class Chess extends Game {
 
             OwnerAs ownerAs = chessLobbyDTO.getOwnerAs();
 
-            if (ownerAs == null){
+            if (ownerAs == null) {
                 return false;
             }
 
@@ -98,9 +96,9 @@ public class Chess extends Game {
 
     @Override
     public void start() {
-        switch (ownerAs){
+        switch (ownerAs) {
             case Random:
-                if(MathUtil.coinToss()){
+                if (MathUtil.coinToss()) {
                     nextPlayer = owner;
                     ownerColor = WHITE;
                 } else {
@@ -184,7 +182,7 @@ public class Chess extends Game {
     }
 
     private PieceDTO[][] convertTable(Piece[][] table) {
-        if (table == null){
+        if (table == null) {
             return null;
         }
 
@@ -193,7 +191,7 @@ public class Chess extends Game {
         for (int i = 0; i < table.length; i++) {
             for (int k = 0; k < table[i].length; k++) {
                 Piece piece = table[i][k];
-                if (piece != null){
+                if (piece != null) {
                     result[i][k] = new PieceDTO(piece);
                 }
             }
@@ -213,8 +211,7 @@ public class Chess extends Game {
             Position source = chessMoveDTO.getSource();
             Position target = chessMoveDTO.getTarget();
 
-            // TODO checknull
-            if (actualPiece == null || !nextPlayer.equals(userDTO) || chessMoveDTO.getTarget().equals(chessMoveDTO.getSource())) {
+            if (actualPiece == null || actualPiece.getColor().equals(getUserColor(userDTO)) || targetPiece == null || !nextPlayer.equals(userDTO) || chessMoveDTO.getTarget().equals(chessMoveDTO.getSource())) {
                 return false;
             }
 
@@ -262,7 +259,7 @@ public class Chess extends Game {
                 }
             }
 
-            checkWinCondition();
+            checkWinCondition(userDTO);
 
             nextPlayer = owner.equals(userDTO) ? getSecondPlayer() : owner;
         } catch (JsonProcessingException e) {
@@ -294,7 +291,7 @@ public class Chess extends Game {
             }
         }
 
-        return true;
+        return false;
     }
 
     private Piece getPiece(Position position) {
