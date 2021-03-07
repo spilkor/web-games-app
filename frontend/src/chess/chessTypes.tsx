@@ -30,6 +30,7 @@ export type ChessGameDTO = {
     winner: User
     draw: boolean
     ownerAs: OwnerAs
+    surrendered: User
 }
 
 export type ChessMoveDTO = {

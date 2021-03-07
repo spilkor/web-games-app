@@ -58,6 +58,8 @@ public class Chess extends Game {
     private boolean draw;
     private UserDTO winner;
 
+    private UserDTO surrendered;
+
     public Chess(UserDTO owner, GameType gameType) {
         super(owner, gameType);
         ownerAs = Random;
@@ -66,6 +68,8 @@ public class Chess extends Game {
     @Override
     public void surrender(UserDTO userDTO) {
         gameState = GameState.ENDED;
+        surrendered = userDTO;
+        nextPlayer = null;
     }
 
     @Override
@@ -156,6 +160,7 @@ public class Chess extends Game {
         ownerColor = null;
         draw = false;
         winner = null;
+        surrendered = null;
     }
 
     @Override
@@ -168,6 +173,7 @@ public class Chess extends Game {
         chessGameDTO.setNextPlayer(nextPlayer);
         chessGameDTO.setDraw(draw);
         chessGameDTO.setWinner(winner);
+        chessGameDTO.setSurrendered(surrendered);
 
         try {
             return Mapper.writeValueAsString(chessGameDTO);

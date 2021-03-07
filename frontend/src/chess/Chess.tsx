@@ -1,6 +1,6 @@
 import React, {ChangeEvent, useContext, useState} from 'react';
 import {AppContext} from "../App";
-import {StartGameButton, SystemMessage} from "../Main Components/Game";
+import {QuitButton, StartGameButton, SystemMessage} from "../Main Components/Game";
 import API from "../util/API";
 import {Coordinate, GameState} from "../util/types";
 
@@ -13,6 +13,8 @@ import {ReactComponent as PawnSVG} from './pawn.svg';
 
 import './chess.scss';
 import {ChessGameDTO, ChessLobbyDTO, ChessMoveDTO, Color, OwnerAs, PieceType, SquireProps} from "./chessTypes";
+import {ReactComponent as SurrenderFlag} from "../svg/surrender-flag.svg";
+import {Modal} from "../Main Components/Modal";
 
 
 export function Chess () {
@@ -25,6 +27,8 @@ export function Chess () {
     const myColor = gameData!.owner.id === user!.id ? chessGameDTO.ownerColor : (chessGameDTO.ownerColor === Color.WHITE ? Color.BLACK : Color.WHITE) as Color;
 
     const [fromPosition, setFromPosition] = useState<Coordinate | null>(null);
+
+    const [surrenderOpen, setSurrenderOpen] = useState<boolean>(false);
 
     return(
         <div className={"chess"}>
@@ -42,11 +46,10 @@ export function Chess () {
                 return(
                     <ChessGame/>
                 );
-                // TODO
-            // case GameState.ENDED:
-            //     return(
-            //         <ChessEnd/>
-            //     );
+            case GameState.ENDED:
+                return(
+                    <ChessEnd/>
+                );
             default:
                 return null;
         }
@@ -102,9 +105,36 @@ export function Chess () {
 
     function ChessGame() {
         return (
-            <div className={"relative"}>
+            <div className={"game"}>
                 <Table/>
                 <SystemMessage text = {chessGameDTO.nextPlayer && chessGameDTO.nextPlayer.id === user!.id ? "Your move" : "Waiting for opponent"}/>
+                {!surrenderOpen && gameData!.gameState === GameState.IN_GAME && <div className={"surrender-flag"} onClick={()=>setSurrenderOpen(true)}><SurrenderFlag/></div>}
+                {surrenderOpen &&
+                <Modal isOpen={surrenderOpen} closeOnBackGroundClick={true} close={()=> {setSurrenderOpen(false)}}>
+                    <div className={"surrender-flag red"} onClick={()=> API.surrender()}><SurrenderFlag/></div>
+                </Modal>
+                }
+            </div>
+        );
+    }
+
+    function ChessEnd() {
+        return (
+            <div className={"end"}>
+                <Table/>
+                {
+                    chessGameDTO.winner &&
+                    <SystemMessage text = {chessGameDTO.winner.name + " won."}/>
+                }
+                {
+                    chessGameDTO.draw &&
+                    <SystemMessage text = {"Game ended in a draw."}/>
+                }
+                {
+                    chessGameDTO.surrendered &&
+                    <SystemMessage text = {chessGameDTO.surrendered.name + " gave up."}/>
+                }
+                {gameData!.owner.id === user!.id && <QuitButton/>}
             </div>
         );
     }
@@ -157,7 +187,10 @@ export function Chess () {
 
     async function selectSquare(position: Coordinate) {
         if (fromPosition === null){
-            setFromPosition(position);
+            let piece = chessGameDTO.table[position.x][position.y];
+            if (piece !== null && piece.color === myColor){
+                setFromPosition(position);
+            }
         } else {
             let fp = fromPosition;
             setFromPosition(null);

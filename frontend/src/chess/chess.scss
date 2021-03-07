@@ -40,10 +40,28 @@
     }
 
     .square.clickable:hover{
-      box-shadow: 0 0 0 3px white inset;
+      box-shadow: 0 0 0 2px white inset;
     }
   }
 
+  .surrender-flag{
+    position: absolute;
+    width: 30px;
+    bottom: 30px;
+    fill: white;
+    left: 30px;
+    cursor: pointer;
+    transition: all .3s;
+  }
+
+  .surrender-flag.red{
+    fill: red;
+    transform: scale(1.2);
+  }
+
+  .surrender-flag:hover{
+    transform: scale(1.2);
+  }
 
 }
 

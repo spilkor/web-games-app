@@ -16,6 +16,7 @@ public class ChessGameDTO implements Serializable {
     private UserDTO winner;
     private boolean draw;
     private OwnerAs ownerAs;
+    private UserDTO surrendered;
 
     public Color getOwnerColor() {
         return ownerColor;
@@ -63,5 +64,13 @@ public class ChessGameDTO implements Serializable {
 
     public void setOwnerAs(OwnerAs ownerAs) {
         this.ownerAs = ownerAs;
+    }
+
+    public UserDTO getSurrendered() {
+        return surrendered;
+    }
+
+    public void setSurrendered(UserDTO surrendered) {
+        this.surrendered = surrendered;
     }
 }
