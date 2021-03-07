@@ -19,8 +19,8 @@ public class King extends Piece {
 
     @Override
     public boolean validateMove(Position source, Position target) {
-        int offsetRow = source.getRow() - target.getRow();
-        int offsetColumn = source.getColumn() - target.getColumn();
+        int offsetRow = target.getRow() - source.getRow();
+        int offsetColumn = target.getColumn() - source.getColumn();
 
         Color color = table[source.getRow()][source.getColumn()].getColor();
         boolean isCastling = (offsetRow == 2 || offsetRow == 3) && offsetColumn == 0;

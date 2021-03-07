@@ -19,8 +19,8 @@ public class Knight extends Piece {
 
     @Override
     public boolean validateMove(Position source, Position target) {
-        int offsetRow = source.getRow() - target.getRow();
-        int offsetColumn = source.getColumn() - target.getColumn();
+        int offsetRow = target.getRow() - source.getRow();
+        int offsetColumn = target.getColumn() - source.getColumn();
 
         switch (Math.abs(offsetRow)) {
             case 1:

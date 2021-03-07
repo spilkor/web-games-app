@@ -207,6 +207,7 @@ public class Chess extends Game {
             Position source = chessMoveDTO.getSource();
             Position target = chessMoveDTO.getTarget();
 
+            // TODO checknull
             if (actualPiece == null || !nextPlayer.equals(userDTO) || chessMoveDTO.getTarget().equals(chessMoveDTO.getSource())) {
                 return false;
             }

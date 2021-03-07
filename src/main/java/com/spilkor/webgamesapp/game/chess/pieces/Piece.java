@@ -21,12 +21,12 @@ public abstract class Piece {
     }
 
     protected boolean checkLinearFields(Position source, Position target) {
-        int offsetRow = source.getRow() - target.getRow();
-        int offsetColumn = source.getColumn() - target.getColumn();
+        int offsetRow = target.getRow() - source.getRow();
+        int offsetColumn = target.getColumn() - source.getColumn();
 
         if (offsetRow == 0) {
             for (int i = 1; i <= Math.abs(offsetColumn) - 1; i++) {
-                if (table[source.getRow()][target.getColumn() + Integer.signum(offsetColumn) * i] != null) {
+                if (table[source.getRow()][source.getColumn() + Integer.signum(offsetColumn) * i] != null) {
                     return false;
                 }
             }
@@ -44,15 +44,15 @@ public abstract class Piece {
     }
 
     protected boolean checkDiagonalFields(Position source, Position target) {
-        int offsetRow = source.getRow() - target.getRow();
-        int offsetColumn = source.getColumn() - target.getColumn();
+        int offsetRow = target.getRow() - source.getRow();
+        int offsetColumn = target.getColumn() - source.getColumn();
 
         if (Math.abs(offsetColumn) != Math.abs(offsetRow)) {
             return false;
         }
 
         for (int i = 1; i <= Math.abs(offsetRow) - 1; i++) {
-            if (table[target.getRow() + Integer.signum(offsetRow) * i][target.getColumn() + Integer.signum(offsetColumn) * i] != null) {
+            if (table[source.getRow() + Integer.signum(offsetRow) * i][source.getColumn() + Integer.signum(offsetColumn) * i] != null) {
                 return false;
             }
         }
