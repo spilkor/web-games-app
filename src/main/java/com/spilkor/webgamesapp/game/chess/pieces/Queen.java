@@ -8,8 +8,8 @@ import static com.spilkor.webgamesapp.game.chess.enums.PieceType.*;
 
 public class Queen extends Piece {
 
-    public Queen(Piece[][] table, Color color) {
-        super(table, color);
+    public Queen(Color color) {
+        super(color);
     }
 
     @Override
@@ -18,11 +18,11 @@ public class Queen extends Piece {
     }
 
     @Override
-    public boolean validateMove(Position source, Position target) {
+    public boolean validateMove(Piece[][] table, Position source, Position target) {
         if (source.getRow() == target.getRow() || source.getColumn() == target.getColumn()) {
-            return checkLinearFields(source, target);
+            return checkLinearFields(table, target, source);
         } else {
-            return checkDiagonalFields(source, target);
+            return checkDiagonalFields(table, source, target);
         }
     }
 

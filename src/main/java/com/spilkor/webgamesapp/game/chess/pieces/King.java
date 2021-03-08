@@ -8,8 +8,8 @@ import static com.spilkor.webgamesapp.game.chess.enums.PieceType.*;
 
 public class King extends Piece {
 
-    public King(Piece[][] table, Color color) {
-        super(table, color);
+    public King(Color color) {
+        super(color);
     }
 
     @Override
@@ -18,7 +18,7 @@ public class King extends Piece {
     }
 
     @Override
-    public boolean validateMove(Position source, Position target) {
+    public boolean validateMove(Piece[][] table, Position source, Position target) {
         int offsetRow = target.getRow() - source.getRow();
         int offsetColumn = target.getColumn() - source.getColumn();
 

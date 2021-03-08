@@ -9,8 +9,8 @@ import static com.spilkor.webgamesapp.game.chess.enums.PieceType.*;
 
 public class Rook extends Piece {
 
-    public Rook(Piece[][] table, Color color) {
-        super(table, color);
+    public Rook(Color color) {
+        super(color);
     }
 
     @Override
@@ -19,8 +19,8 @@ public class Rook extends Piece {
     }
 
     @Override
-    public boolean validateMove(Position source, Position target) {
-        return checkLinearFields(source, target);
+    public boolean validateMove(Piece[][] table, Position source, Position target) {
+        return checkLinearFields(table, target, source);
     }
 
 }

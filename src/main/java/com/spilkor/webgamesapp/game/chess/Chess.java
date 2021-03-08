@@ -133,16 +133,16 @@ public class Chess extends Game {
             for (int k = 0; k < table[i].length; k++) {
                 switch (i) {
                     case 0:
-                        table[i][k] = PieceFactory.create(PIECE_ORDER[k], BLACK, table);
+                        table[i][k] = PieceFactory.create(PIECE_ORDER[k], BLACK);
                         break;
                     case 1:
-                        table[i][k] = PieceFactory.create(PAWN, BLACK, table);
+                        table[i][k] = PieceFactory.create(PAWN, BLACK);
                         break;
                     case 6:
-                        table[i][k] = PieceFactory.create(PAWN, WHITE, table);
+                        table[i][k] = PieceFactory.create(PAWN, WHITE);
                         break;
                     case 7:
-                        table[i][k] = PieceFactory.create(PIECE_ORDER[k], WHITE, table);
+                        table[i][k] = PieceFactory.create(PIECE_ORDER[k], WHITE);
                         break;
                     default:
                         table[i][k] = null;
@@ -221,7 +221,7 @@ public class Chess extends Game {
                 return false;
             }
 
-            legal = actualPiece.validateMove(source, target);
+            legal = actualPiece.validateMove(table, source, target);
 
             // check if capture is on same color
             if ((getPiece(chessMoveDTO.getTarget()) != null) && legal) {
@@ -258,7 +258,7 @@ public class Chess extends Game {
             if (chessMoveDTO.getPromoteType() != null && PAWN.equals(targetPiece.getType())) {
                 boolean validRow = getUserColor(userDTO).equals(WHITE) ? chessMoveDTO.getTarget().getRow() == 0 : chessMoveDTO.getTarget().getRow() == 7;
                 if (validRow) {
-                    targetPiece = PieceFactory.create(chessMoveDTO.getPromoteType(), getUserColor(userDTO), table);
+                    targetPiece = PieceFactory.create(chessMoveDTO.getPromoteType(), getUserColor(userDTO));
                 }
                 counterFiftyMoves = 0;
             } else if (getPiece(chessMoveDTO.getTarget()) == null) {
@@ -320,7 +320,7 @@ public class Chess extends Game {
             for (int k = 0; k < tableCopy[i].length; k++) {
                 Piece piece = tableCopy[i][k];
                 if (piece != null && !piece.getColor().equals(color)) {
-                    if (piece.validateMove(new Position(i, k), kingPosition)) {
+                    if (piece.validateMove(tableCopy, new Position(i, k), kingPosition)) {
                         return true;
                     }
                 }

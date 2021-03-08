@@ -9,18 +9,16 @@ import java.util.Objects;
 
 public abstract class Piece {
 
-    protected Piece[][] table;
     protected Color color;
 
     public abstract PieceType getType();
-    public abstract boolean validateMove(Position source, Position target);
+    public abstract boolean validateMove(Piece[][] table, Position source, Position target);
 
-    public Piece(Piece[][] table, Color color) {
-        this.table = table;
+    public Piece(Color color) {
         this.color = color;
     }
 
-    protected boolean checkLinearFields(Position source, Position target) {
+    protected boolean checkLinearFields(Piece[][] table, Position target, Position source) {
         int offsetRow = target.getRow() - source.getRow();
         int offsetColumn = target.getColumn() - source.getColumn();
 
@@ -43,7 +41,7 @@ public abstract class Piece {
         return true;
     }
 
-    protected boolean checkDiagonalFields(Position source, Position target) {
+    protected boolean checkDiagonalFields(Piece[][] table, Position source, Position target) {
         int offsetRow = target.getRow() - source.getRow();
         int offsetColumn = target.getColumn() - source.getColumn();
 
@@ -69,14 +67,11 @@ public abstract class Piece {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Piece piece = (Piece) o;
-        return Arrays.equals(table, piece.table) &&
-                color == piece.color;
+        return color == piece.color;
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(color);
-        result = 31 * result + Arrays.hashCode(table);
-        return result;
+        return Objects.hash(color);
     }
 }

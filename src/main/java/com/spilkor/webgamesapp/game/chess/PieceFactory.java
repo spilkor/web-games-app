@@ -6,20 +6,20 @@ import com.spilkor.webgamesapp.game.chess.pieces.*;
 
 public class PieceFactory {
 
-    public static Piece create(PieceType pieceType, Color color, Piece[][] table) {
+    public static Piece create(PieceType pieceType, Color color) {
         switch (pieceType) {
             case ROOK:
-                return new Rook(table, color);
+                return new Rook(color);
             case KNIGHT:
-                return new Knight(table, color);
+                return new Knight(color);
             case BISHOP:
-                return new Bishop(table, color);
+                return new Bishop(color);
             case QUEEN:
-                return new Queen(table, color);
+                return new Queen(color);
             case KING:
-                return new King(table, color);
+                return new King(color);
             case PAWN:
-                return new Pawn(table, color);
+                return new Pawn(color);
             default:
                 return null;
         }

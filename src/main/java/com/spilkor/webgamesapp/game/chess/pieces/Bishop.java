@@ -8,8 +8,8 @@ import static com.spilkor.webgamesapp.game.chess.enums.PieceType.*;
 
 public class Bishop extends Piece {
 
-    public Bishop(Piece[][] table, Color color) {
-        super(table, color);
+    public Bishop(Color color) {
+        super(color);
     }
 
     @Override
@@ -18,8 +18,8 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public boolean validateMove(Position source, Position target) {
-        return checkDiagonalFields(source, target);
+    public boolean validateMove(Piece[][] table, Position source, Position target) {
+        return checkDiagonalFields(table, source, target);
     }
 
 }
