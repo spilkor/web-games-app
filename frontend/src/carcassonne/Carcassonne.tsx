@@ -233,7 +233,7 @@ export function Carcassonne () {
                 columns.push(
                     <td key={x}>
                         <div className={"tile-wrapper" + (clickable ? " clickable" : "") + ((carcassonneGameDTO.tile && carcassonneGameDTO.tile.coordinate && carcassonneGameDTO.tile.coordinate.x === x && carcassonneGameDTO.tile.coordinate.y === y) ? " last-tile" : "")} onClick={()=>{clickable && placeTile({x, y} as Coordinate)}} style={{height: size, width: size}}>
-                            {tile && <Tile legalParts={getLegalPartsForTile({x, y} as Coordinate)} size={size} {...tile}/>}
+                            {tile && <Tile legalParts={getLegalPartsForTile({x, y} as Coordinate)}  {...tile} size={size}/>}
                         </div>
                     </td>
                 );
@@ -356,7 +356,7 @@ export function Carcassonne () {
                 {carcassonneGameDTO.tile && carcassonneGameDTO.nextMoveType === MoveType.TILE &&
                 <div className={"next-tile"}>
                     <div className={"tile-wrapper " + nextTilePointOfCompass.toLowerCase() + (isRotating ? " rotating" : "")} style={{height: 100, width: 100}}>
-                        <Tile size={100} {...carcassonneGameDTO.tile!}/>
+                        <Tile {...carcassonneGameDTO.tile!} size={100}  />
                     </div>
                     {
                         carcassonneGameDTO.nextPlayer && carcassonneGameDTO.nextPlayer.user.id === user!.id &&
