@@ -3,16 +3,16 @@ package com.spilkor.webgamesapp.game.chess;
 import java.io.Serializable;
 import java.util.Objects;
 
-// indexed from 0
-public class Position implements Serializable {
+
+public class ChessCoordinate implements Serializable {
 
     private int row;
     private int column;
 
-    public Position() {
+    public ChessCoordinate() {
     }
 
-    public Position(int row, int column) {
+    public ChessCoordinate(int row, int column) {
         this.row = row;
         this.column = column;
     }
@@ -37,7 +37,7 @@ public class Position implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Position that = (Position) o;
+        ChessCoordinate that = (ChessCoordinate) o;
         return row == that.row &&
                 column == that.column;
     }

@@ -1,27 +1,27 @@
-package com.spilkor.webgamesapp.game.chess;
+package com.spilkor.webgamesapp.game.chess.chesspieces;
 
 import com.spilkor.webgamesapp.game.chess.enums.Color;
 import com.spilkor.webgamesapp.game.chess.enums.PieceType;
-import com.spilkor.webgamesapp.game.chess.pieces.*;
 
-public class PieceFactory {
+import static com.spilkor.webgamesapp.game.chess.enums.PieceType.QUEEN;
 
-    public static Piece create(PieceType pieceType, Color color) {
-        switch (pieceType) {
+public class ChessPieceFactory {
+
+    public static ChessPiece createChessPiece(PieceType pieceType, Color color) {
+        switch (pieceType == null ? QUEEN : pieceType) {
             case ROOK:
                 return new Rook(color);
             case KNIGHT:
                 return new Knight(color);
             case BISHOP:
                 return new Bishop(color);
-            case QUEEN:
-                return new Queen(color);
             case KING:
                 return new King(color);
             case PAWN:
                 return new Pawn(color);
+            case QUEEN:
             default:
-                return null;
+                return new Queen(color);
         }
     }
 }

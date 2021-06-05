@@ -10,9 +10,20 @@ import {ReactComponent as RookSVG} from './rook.svg';
 import {ReactComponent as BishopSVG} from './bishop.svg';
 import {ReactComponent as KnightSVG} from './knight.svg';
 import {ReactComponent as PawnSVG} from './pawn.svg';
+import {ReactComponent as ScalesSVG} from './scales.svg';
 
 import './chess.scss';
-import {ChessGameDTO, ChessLobbyDTO, ChessMoveDTO, Color, OwnerAs, PieceType, SquireProps} from "./chessTypes";
+import {
+    ChessGameDTO,
+    ChessLobbyDTO,
+    ChessMoveDTO,
+    Color,
+    DrawReason,
+    OwnerAs,
+    PieceType,
+    Player,
+    SquireProps
+} from "./chessTypes";
 import {ReactComponent as SurrenderFlag} from "../svg/surrender-flag.svg";
 import {Modal} from "../Main Components/Modal";
 
@@ -21,14 +32,32 @@ export function Chess () {
 
     const { user, gameData } = useContext(AppContext);
 
-    const chessGameDTO = JSON.parse(gameData!.gameJSON) as ChessGameDTO;
-    const myMove = chessGameDTO && chessGameDTO.nextPlayer && chessGameDTO.nextPlayer.id === user!.id;
+    const {gameState} = gameData!;
 
-    const myColor = gameData!.owner.id === user!.id ? chessGameDTO.ownerColor : (chessGameDTO.ownerColor === Color.WHITE ? Color.BLACK : Color.WHITE) as Color;
+    const chessGameDTO = JSON.parse(gameData!.gameJSON) as ChessGameDTO;
+
+    const {players, nextColor, drawReason, waitingForPromotionType, drawActive} = chessGameDTO;
+
+    const myPlayer = players.find(player => player.user.id === user!.id) as Player;
+
+    const myMove = gameState === GameState.IN_GAME && myPlayer.color === nextColor;
+
+    const myColor = myPlayer.color;
 
     const [fromPosition, setFromPosition] = useState<Coordinate | null>(null);
 
     const [surrenderOpen, setSurrenderOpen] = useState<boolean>(false);
+
+    const getDrawReasonText = (drawReason: DrawReason) => {
+        switch (drawReason) {
+            case DrawReason.STALEMATE: return "Stalemate.";
+            case DrawReason.AGREED_TO_DRAW: return "Players agreed to a draw.";
+            case DrawReason.FIFTY_MOVE_RULE: return "Fifty move rule.";
+            case DrawReason.INSUFFICIENT_MATERIAL: return "Insufficient material.";
+            case DrawReason.THREEFOLD_REPETITION: return "Threefold repetition.";
+            case DrawReason.FIVEFOLD_REPETITION: return "Fivefold repetition.";
+        }
+    };
 
     return(
         <div className={"chess"}>
@@ -106,14 +135,20 @@ export function Chess () {
     function ChessGame() {
         return (
             <div className={"game"}>
-                <Table/>
-                <SystemMessage text = {chessGameDTO.nextPlayer && chessGameDTO.nextPlayer.id === user!.id ? "Your move" : "Waiting for opponent"}/>
-                {!surrenderOpen && gameData!.gameState === GameState.IN_GAME && <div className={"surrender-flag"} onClick={()=>setSurrenderOpen(true)}><SurrenderFlag/></div>}
+                {myMove && waitingForPromotionType ? <PromotionTypeSelector/> : <Table/>}
+
+                {waitingForPromotionType || <SystemMessage text = {myMove ? "Your move" : "Waiting for opponent"}/>}
+
+                {!surrenderOpen && <div className={"surrender-flag"} onClick={()=>setSurrenderOpen(true)}><SurrenderFlag/></div>}
                 {surrenderOpen &&
                 <Modal isOpen={surrenderOpen} closeOnBackGroundClick={true} close={()=> {setSurrenderOpen(false)}}>
                     <div className={"surrender-flag red"} onClick={()=> API.surrender()}><SurrenderFlag/></div>
                 </Modal>
                 }
+
+                <div className={"draw" + (drawActive ? " red" : "")} onClick={()=>draw()}>
+                    <ScalesSVG />
+                </div>
             </div>
         );
     }
@@ -124,15 +159,19 @@ export function Chess () {
                 <Table/>
                 {
                     chessGameDTO.winner &&
-                    <SystemMessage text = {chessGameDTO.winner.name + " won."}/>
+                    <SystemMessage text = {chessGameDTO.winner.user.name + " won by checkmate."}/>
                 }
                 {
                     chessGameDTO.draw &&
-                    <SystemMessage text = {"Game ended in a draw."}/>
+                        <>
+                            <SystemMessage text = {"Game ended in a draw."}/>
+                            <SystemMessage text = {getDrawReasonText(drawReason)}/>
+                        </>
+
                 }
                 {
                     chessGameDTO.surrendered &&
-                    <SystemMessage text = {chessGameDTO.surrendered.name + " gave up."}/>
+                    <SystemMessage text = {chessGameDTO.surrendered.user.name + " gave up."}/>
                 }
                 {gameData!.owner.id === user!.id && <QuitButton/>}
             </div>
@@ -170,6 +209,25 @@ export function Chess () {
     }
 
 
+    function PromotionTypeSelector() {
+        return (
+            <div className={"promotion-type-selector" + (myColor === Color.WHITE ? " white" : " black")}>
+                <div className={"promotion-piece-type"} onClick={()=> promote(PieceType.QUEEN)}>
+                    <QueenSVG/>
+                </div>
+                <div className={"promotion-piece-type"} onClick={()=> promote(PieceType.ROOK)}>
+                    <RookSVG/>
+                </div>
+                <div className={"promotion-piece-type"} onClick={()=> promote(PieceType.KNIGHT)}>
+                    <KnightSVG/>
+                </div>
+                <div className={"promotion-piece-type"} onClick={()=> promote(PieceType.BISHOP)}>
+                    <BishopSVG/>
+                </div>
+            </div>
+        );
+
+    }
 
     async function move(source: Coordinate, target: Coordinate) {
         let chessMoveDTO = {
@@ -185,7 +243,22 @@ export function Chess () {
         API.move(JSON.stringify(chessMoveDTO));
     }
 
+    async function promote(promoteType: PieceType) {
+        let chessMoveDTO = {
+            promoteType
+        } as ChessMoveDTO;
+        API.move(JSON.stringify(chessMoveDTO));
+    }
+
+    async function draw() {
+        let chessMoveDTO = {
+            draw: true
+        } as ChessMoveDTO;
+        API.move(JSON.stringify(chessMoveDTO));
+    }
+
     async function selectSquare(position: Coordinate) {
+        // alert(position.x + " " + position.y);
         if (fromPosition === null){
             let piece = chessGameDTO.table[position.x][position.y];
             if (piece !== null && piece.color === myColor){

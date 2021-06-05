@@ -44,6 +44,62 @@
     }
   }
 
+  .promotion-type-selector{
+    display: flex;
+
+    .promotion-piece-type{
+      transition: all .2s;
+      cursor: pointer;
+      padding: 5px;
+      margin: 5px;
+    }
+
+    .promotion-piece-type svg{
+      height: 50px;
+      width: 50px;
+    }
+  }
+
+  .promotion-type-selector.white{
+    .promotion-piece-type:hover{
+      box-shadow: 0 0 10px 1px deepskyblue;
+    }
+    .promotion-piece-type svg{
+      fill: deepskyblue;
+    }
+  }
+
+  .promotion-type-selector.black{
+    .promotion-piece-type:hover{
+      box-shadow: 0 0 10px 1px coral;
+    }
+    .promotion-piece-type svg{
+      fill: coral;
+    }
+  }
+
+
+
+
+  .draw{
+    position: absolute;
+    width: 30px;
+    bottom: 30px;
+    left: 70px;
+    cursor: pointer;
+    transition: all .3s;
+    fill: white;
+  }
+
+  .draw.red{
+    fill: red;
+  }
+
+  .draw:hover{
+    transform: scale(1.2);
+  }
+
+
   .surrender-flag{
     position: absolute;
     width: 30px;

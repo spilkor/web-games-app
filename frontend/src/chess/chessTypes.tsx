@@ -1,7 +1,5 @@
 
 import {Coordinate, User} from "../util/types";
-import {number} from "prop-types";
-
 
 export type SquireProps = {
     position: Coordinate
@@ -13,30 +11,43 @@ export enum OwnerAs {
     BLACK = "BLACK"
 }
 
+export enum DrawReason {
+    STALEMATE = "STALEMATE",
+    AGREED_TO_DRAW = "AGREED_TO_DRAW",
+    FIFTY_MOVE_RULE = "FIFTY_MOVE_RULE",
+    INSUFFICIENT_MATERIAL = "INSUFFICIENT_MATERIAL",
+    THREEFOLD_REPETITION = "THREEFOLD_REPETITION",
+    FIVEFOLD_REPETITION = "FIVEFOLD_REPETITION"
+}
+
 export type ChessLobbyDTO = {
     ownerAs: OwnerAs
 }
 
+export type Player = {
+    user: User
+    color: Color
+    isWinner: boolean
+}
+
 export type ChessGameDTO = {
-    // nextPlayer: User | null,
-    // ownerAs: OwnerAs,
-    // startingPlayer: User,
-    // table: ChessPiece[][]
-
-
-    ownerColor: Color
-    table: Piece[][]
-    nextPlayer: User
-    winner: User
-    draw: boolean
     ownerAs: OwnerAs
-    surrendered: User
+    players: Player[]
+    nextColor: Color
+    table: Piece[][]
+    winner: Player
+    draw: boolean
+    surrendered: Player
+    drawReason: DrawReason
+    waitingForPromotionType: boolean
+    drawActive: boolean
 }
 
 export type ChessMoveDTO = {
-    source: Position,
+    source: Position
     target: Position
     promoteType: PieceType
+    draw: boolean
 }
 
 export type Piece = {

@@ -10,25 +10,6 @@ import java.util.Set;
 
 public abstract class Game {
 
-
-    public boolean lock(){
-        if (locked){
-            return false;
-        } else {
-            locked = true;
-            return true;
-        }
-    }
-
-    public boolean unLock(){
-        if (locked){
-            locked = false;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public enum GameState {
         IN_LOBBY,
         IN_GAME,
@@ -40,8 +21,8 @@ public abstract class Game {
         CHESS,
         CARCASSONNE
     }
-    private boolean locked = true;
 
+    private boolean locked = true;
     protected UserDTO owner;
     protected Set<UserDTO> players = new HashSet<>();
     protected GameType gameType;
@@ -55,8 +36,19 @@ public abstract class Game {
         gameState = GameState.IN_LOBBY;
     }
 
-    public boolean isLocked() {
-        return locked;
+    public abstract String getGameJSON(UserDTO player);
+    public abstract boolean isStartable();
+    public abstract void start();
+    public abstract void restart();
+    public abstract boolean updateLobby(String lobbyJSON);
+    public abstract boolean legal(UserDTO userDTO, String moveJSON);
+    public abstract void move(UserDTO userDTO, String moveJSON);
+    public abstract void surrender(UserDTO userDTO);
+
+    public void playerJoined(UserDTO player){
+    }
+
+    public void playerLeft(UserDTO player){
     }
 
     public GameDTO getGameDTO(UserDTO user) {
@@ -76,21 +68,30 @@ public abstract class Game {
         return gameDTO;
     }
 
-    public abstract String getGameJSON(UserDTO player);
-    public abstract boolean isStartable();
-    public abstract void start();
-    public abstract void restart();
-    public abstract boolean updateLobby(String lobbyJSON);
-    public abstract boolean legal(UserDTO userDTO, String moveJSON);
-    public abstract void move(UserDTO userDTO, String moveJSON);
-    public abstract void surrender(UserDTO userDTO);
-
-    public void playerJoined(UserDTO player){ };
-
-    public void playerLeft(UserDTO player){ };
-
     public UserDTO getSecondPlayer(){
         return players.stream().filter(player -> !player.equals(owner)).findFirst().orElse(null);
+    }
+
+    public boolean lock(){
+        if (locked){
+            return false;
+        } else {
+            locked = true;
+            return true;
+        }
+    }
+
+    public boolean unLock(){
+        if (locked){
+            locked = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isLocked() {
+        return locked;
     }
 
     public UserDTO getOwner() {

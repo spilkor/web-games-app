@@ -1,29 +1,30 @@
 package com.spilkor.webgamesapp.game.chess.dto;
 
-import com.spilkor.webgamesapp.game.chess.Position;
+import com.spilkor.webgamesapp.game.chess.ChessCoordinate;
 import com.spilkor.webgamesapp.game.chess.enums.PieceType;
 
 import java.io.Serializable;
 
 public class ChessMoveDTO implements Serializable {
 
-    private Position source;
-    private Position target;
+    private ChessCoordinate source;
+    private ChessCoordinate target;
     private PieceType promoteType;
+    private boolean draw;
 
-    public Position getSource() {
+    public ChessCoordinate getSource() {
         return source;
     }
 
-    public void setSource(Position source) {
+    public void setSource(ChessCoordinate source) {
         this.source = source;
     }
 
-    public Position getTarget() {
+    public ChessCoordinate getTarget() {
         return target;
     }
 
-    public void setTarget(Position target) {
+    public void setTarget(ChessCoordinate target) {
         this.target = target;
     }
 
@@ -33,6 +34,14 @@ public class ChessMoveDTO implements Serializable {
 
     public void setPromoteType(PieceType promoteType) {
         this.promoteType = promoteType;
+    }
+
+    public boolean isDraw() {
+        return draw;
+    }
+
+    public void setDraw(boolean draw) {
+        this.draw = draw;
     }
 }
 

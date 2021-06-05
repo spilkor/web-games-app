@@ -85,8 +85,6 @@ export function Game () {
             );
 
             function createGame(gameType: GameType) {
-                // TODO
-
                 API.createGame(gameType);
             }
         }
@@ -114,7 +112,7 @@ export function GameButton({text, onClick, enabled}: GameButtonProps) {
 
 export function StartGameButton({text, enabled}: StartGameButtonProps) {
     return (
-        <div className={"start-button game-button" + (enabled ? "" : " disabled")} onClick={()=> {API.startGame()}}>
+        <div className={"start-button game-button" + (enabled ? "" : " disabled")} onClick={()=> {enabled && API.startGame()}}>
             {text}
         </div>
     );
