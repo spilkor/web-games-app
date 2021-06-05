@@ -278,7 +278,7 @@ export function Chess () {
         const isSelected = fromPosition && fromPosition.x === position.x && fromPosition.y === position.y;
 
         return(
-            <div className={"square" + (isSelected ? " selected" : "") + (clickable ? " clickable" : "") + (piece === null ? "" : piece.color === Color.WHITE ? " white" : " black")} onClick={()=> clickable && selectSquare(position)}>
+            <div className={"square" + (isSelected ? " selected" : "") + (clickable ? " clickable" : "") + (piece === null ? "" : piece.color === Color.WHITE ? " white" : " black") + ((position.x + position.y) % 2 === 0 ? " even" : " odd")} onClick={()=> clickable && selectSquare(position)}>
                 {piece && <ChessPiece/>}
             </div>
         );
