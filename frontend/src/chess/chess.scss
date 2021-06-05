@@ -85,19 +85,19 @@
 
   .promotion-type-selector.white{
     .promotion-piece-type:hover{
-      box-shadow: 0 0 10px 1px deepskyblue;
+      box-shadow: 0 0 10px 1px white;
     }
     .promotion-piece-type svg{
-      fill: deepskyblue;
+      fill: white;
     }
   }
 
   .promotion-type-selector.black{
     .promotion-piece-type:hover{
-      box-shadow: 0 0 10px 1px coral;
+      box-shadow: 0 0 10px 1px black;
     }
     .promotion-piece-type svg{
-      fill: coral;
+      fill: black;
     }
   }
 
