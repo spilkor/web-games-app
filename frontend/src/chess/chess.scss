@@ -4,42 +4,10 @@
     border-collapse: collapse;
     border: 3px solid black;
 
-
-
     .square{
-      width: 50px;
-      height: 50px;
+      width: 100px;
+      height: 100px;
       border: 1px solid black;
-
-      svg{
-        height: 50px;
-        width: 50px;
-      }
-
-    }
-
-    .square.white{
-      path{
-        fill: white;
-      }
-      polygon{
-        fill: white;
-      }
-      circle{
-        fill: white;
-      }
-    }
-
-    .square.black{
-      path{
-        fill: black;
-      }
-      polygon{
-        fill: black;
-      }
-      circle{
-        fill: black;
-      }
     }
 
     .square.selected{
@@ -78,17 +46,14 @@
     }
 
     .promotion-piece-type svg{
-      height: 50px;
-      width: 50px;
+      height: 100px;
+      width: 100px;
     }
   }
 
   .promotion-type-selector.white{
     .promotion-piece-type:hover{
       box-shadow: 0 0 10px 1px white;
-    }
-    .promotion-piece-type svg{
-      fill: white;
     }
   }
 
@@ -101,8 +66,15 @@
     }
   }
 
-
-
+  .chess-piece path{
+    fill: white;
+    stroke: black;
+    stroke-width: .5px;
+  }
+  .black .chess-piece path{
+    stroke: white;
+    fill: black;
+  }
 
   .draw{
     position: absolute;
@@ -121,7 +93,6 @@
   .draw:hover{
     transform: scale(1.2);
   }
-
 
   .surrender-flag{
     position: absolute;
