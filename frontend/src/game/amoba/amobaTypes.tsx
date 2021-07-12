@@ -1,6 +1,4 @@
-
-import {Coordinate, User} from "../util/types";
-
+import {Coordinate, User} from "../../util/types";
 
 export type SquireProps = {
     position: Coordinate,

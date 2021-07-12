@@ -1,8 +1,8 @@
 import React, {ChangeEvent, useContext, useState} from 'react';
-import {AppContext} from "../App";
-import {QuitButton, StartGameButton, SystemMessage} from "../Main Components/Game";
-import API from "../util/API";
-import {Coordinate, GameState} from "../util/types";
+import {AppContext} from "../../App";
+import {QuitButton, StartGameButton, SystemMessage} from "../Game";
+import API from "../../util/API";
+import {Coordinate, GameState} from "../../util/types";
 
 import {ReactComponent as KingSVG} from './king.svg';
 import {ReactComponent as QueenSVG} from './queen.svg';
@@ -24,8 +24,8 @@ import {
     Player,
     SquireProps
 } from "./chessTypes";
-import {ReactComponent as SurrenderFlag} from "../svg/surrender-flag.svg";
-import {Modal} from "../Main Components/Modal";
+import {ReactComponent as SurrenderFlag} from "../../svg/surrender-flag.svg";
+import {Modal} from "../../modal/Modal";
 
 
 export function Chess () {

@@ -1,14 +1,14 @@
 import React, {useContext} from 'react';
-import '../css/friends.css';
-import {Modal} from "./Modal";
-import {ReactComponent as Logo} from '../svg/questionmark.svg';
-import {ReactComponent as AcceptInviteLogo} from '../svg/acceptinvite.svg';
+import './controls.css';
+import {ReactComponent as Logo} from '../../svg/questionmark.svg';
+import {ReactComponent as AcceptInviteLogo} from '../../svg/acceptinvite.svg';
 
-import {ReactComponent as DeclineInviteLogo} from '../svg/declineinvite.svg';
+import {ReactComponent as DeclineInviteLogo} from '../../svg/declineinvite.svg';
 
-import {GameState, User} from "../util/types";
-import {AppContext, ContentMode} from "../App";
-import API from "../util/API";
+import {GameState, User} from "../../util/types";
+import {AppContext, ContentMode} from "../../App";
+import API from "../../util/API";
+import {Modal} from "../../modal/Modal";
 
 export type Invite = {
     owner: User,

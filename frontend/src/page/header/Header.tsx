@@ -1,9 +1,9 @@
 import React, {useContext, useEffect} from 'react';
-import API from "../util/API";
-import {AppContext, ContentMode} from "../App";
-import '../css/header.css';
-import {ReactComponent as LogoutLogo} from '../svg/logout.svg';
-import {ReactComponent as ReconnectLogo} from '../svg/reconnect.svg';
+import API from "../../util/API";
+import {AppContext, ContentMode} from "../../App";
+import './header.css';
+import {ReactComponent as LogoutLogo} from '../../svg/logout.svg';
+import {ReactComponent as ReconnectLogo} from '../../svg/reconnect.svg';
 import {Key} from "ts-keycode-enum";
 
 

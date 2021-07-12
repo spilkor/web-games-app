@@ -1,6 +1,6 @@
 import React, {ReactNode, useEffect} from 'react';
 
-import '../css/header.css';
+import '../page/header/header.css';
 
 type ModalProps = {
     children: ReactNode,

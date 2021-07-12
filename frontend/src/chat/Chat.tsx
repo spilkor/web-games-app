@@ -7,7 +7,7 @@ import API from "../util/API";
 export function Chat () {
 
     const [text, _setText] = useState("");
-    const { chatMessages, user, } = useContext(AppContext);
+    const {chatMessages, user} = useContext(AppContext);
 
     const textRef = React.useRef(text);
     const setText = (text: string) => {
@@ -16,7 +16,6 @@ export function Chat () {
     };
 
     const listener = (event: KeyboardEvent) => {
-        console.log("text:", textRef.current);
         if (event.keyCode === Key.Enter && textRef.current != "") {
             API.sendChatMessage(textRef.current);
             setText("");
@@ -31,15 +30,13 @@ export function Chat () {
     }, []);
 
 
-    const messagesEndRef = useRef(null)
+    const messagesEndRef = useRef<HTMLDivElement>(null)
 
     const scrollToBottom = () => {
-        // @ts-ignore
-        messagesEndRef.current.scrollIntoView()
+        messagesEndRef && messagesEndRef.current && messagesEndRef.current.scrollIntoView!()
     };
 
     useEffect(scrollToBottom, [chatMessages]);
-
 
     return (
         <div className={"chat"}>
@@ -57,7 +54,7 @@ export function Chat () {
                 <div ref={messagesEndRef} />
             </div>
             <div className={"user-input"}>
-                <input value={text} onChange={(event) => setText(event.target.value)}/>
+                <input value={text} onChange={(event) => setText(event.target.value)} autoFocus={true}/>
             </div>
         </div>
     );

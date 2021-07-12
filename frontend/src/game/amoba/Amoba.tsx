@@ -1,18 +1,15 @@
 import React, {ChangeEvent, useContext} from 'react';
-import {AppContext} from "../App";
-import {QuitButton, StartGameButton, SystemMessage} from "../Main Components/Game";
-import API from "../util/API";
-import {GameState, Coordinate} from "../util/types";
-
-import {ReactComponent as ZoomInSVG} from '../svg/zoom-in.svg';
-import {ReactComponent as ZoomOutSVG} from '../svg/zoom-out.svg';
-
-import {ReactComponent as LeftSVG} from '../svg/left.svg';
-import {ReactComponent as RightSVG} from '../svg/right.svg';
-import {ReactComponent as UpSVG} from '../svg/up.svg';
-import {ReactComponent as DownSVG} from '../svg/down.svg';
-
-import {ReactComponent as ResetSVG} from '../svg/reset.svg';
+import {AppContext} from "../../App";
+import {QuitButton, StartGameButton, SystemMessage} from "../Game";
+import API from "../../util/API";
+import {GameState, Coordinate} from "../../util/types";
+import {ReactComponent as ZoomInSVG} from '../../svg/zoom-in.svg';
+import {ReactComponent as ZoomOutSVG} from '../../svg/zoom-out.svg';
+import {ReactComponent as LeftSVG} from '../../svg/left.svg';
+import {ReactComponent as RightSVG} from '../../svg/right.svg';
+import {ReactComponent as UpSVG} from '../../svg/up.svg';
+import {ReactComponent as DownSVG} from '../../svg/down.svg';
+import {ReactComponent as ResetSVG} from '../../svg/reset.svg';
 
 import './amoba.scss';
 import {

@@ -1,12 +1,12 @@
 import React, {useContext, useState} from 'react';
-import {Amoba} from "../amoba/Amoba";
+import {Amoba} from "./amoba/Amoba";
 import {GameButtonProps, StartGameButtonProps} from "../util/types";
 import {AppContext } from "../App";
 import API from "../util/API";
 
 import {ReactComponent as QuitLogo} from '../svg/quit.svg';
-import {Chess} from "../chess/Chess";
-import {Carcassonne} from "../carcassonne/Carcassonne";
+import {Chess} from "./chess/Chess";
+import {Carcassonne} from "./carcassonne/Carcassonne";
 
 export enum GameType  {
     AMOBA = "AMOBA",
@@ -41,10 +41,9 @@ export function Game () {
             return(
                 <Carcassonne/>
             );
+
+        default: return null;
     }
-
-
-    return null;
 
     function LocalLobby() {
 
@@ -61,7 +60,7 @@ export function Game () {
                 return (
                     <div>
                         <GameButton enabled={true} text={"NEW LOBBY"} onClick={()=> {setState(State.CHOSE_GAME_TYPE)}}/>
-                        <GameButton enabled={true} text={"JOIN LOBBY"} onClick={()=> {setState(State.CHOOSE_LOBBY_TO_JOIN)}}/>
+                        {/*<GameButton enabled={true} text={"JOIN LOBBY"} onClick={()=> {setState(State.CHOOSE_LOBBY_TO_JOIN)}}/>*/}
                     </div>
                 );
             case State.CHOSE_GAME_TYPE:
@@ -98,8 +97,6 @@ export function Game () {
         }
     }
 
-
-
 }
 
 export function GameButton({text, onClick, enabled}: GameButtonProps) {
@@ -128,7 +125,6 @@ export function SystemMessage({text}:SystemMessageProps) {
     return(
         <div className={"system-message"}>
             {text}
-            {/*{amobaGameData.nextPlayer === null ? (amobaEndData.winner.id === user!.id ? "You won" : "You lost") : (myMove ? "Your move" : "Waiting for the opponent")}*/}
         </div>
     );
 

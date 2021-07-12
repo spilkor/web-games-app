@@ -11,17 +11,17 @@ import {
     Player,
     TileDTO
 } from "./carcassonneTypes";
-import {Coordinate, GameState, PointOfCompass} from "../util/types";
+import {Coordinate, GameState, PointOfCompass} from "../../util/types";
 import Tile from "./Tile";
 import './carcassonne.scss';
-import {AppContext} from "../App";
-import {QuitButton, StartGameButton, SystemMessage} from "../Main Components/Game";
-import {ReactComponent as RotateSVG} from '../svg/rotate-left.svg';
-import {ReactComponent as SurrenderFlag} from '../svg/surrender-flag.svg';
+import {QuitButton, StartGameButton, SystemMessage} from "../Game";
+import {ReactComponent as RotateSVG} from '../../svg/rotate-left.svg';
+import {ReactComponent as SurrenderFlag} from '../../svg/surrender-flag.svg';
 import logo from "./card-back-400X400.png";
 
-import API from "../util/API";
-import {Modal} from "../Main Components/Modal";
+import API from "../../util/API";
+import {AppContext} from "../../App";
+import {Modal} from "../../modal/Modal";
 
 export function Carcassonne () {
 

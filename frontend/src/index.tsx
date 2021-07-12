@@ -26,7 +26,6 @@ export function log(message?: any, ...optionalParams: any[]) {
 ReactDOM.render(
     <BrowserRouter>
         <Route component={App}/>
-        {/*<Route component={Dev}/>*/}
     </BrowserRouter>
     , document.getElementById('root')
 );

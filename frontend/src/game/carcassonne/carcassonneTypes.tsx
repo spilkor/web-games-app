@@ -1,4 +1,4 @@
-import {PointOfCompass, Coordinate, User} from "../util/types";
+import {PointOfCompass, Coordinate, User} from "../../util/types";
 import React from "react";
 
 export enum Color {

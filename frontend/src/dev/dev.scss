@@ -1,0 +1,13 @@
+.draggable-container-svg{
+  height: 300px;
+  width: 300px;
+  background: white;
+}
+
+.draggable-rect:hover{
+  cursor: grab;
+}
+
+.draggable-rect:active{
+  cursor: grabbing;
+}

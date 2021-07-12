@@ -1,20 +1,20 @@
 import React, {useContext, useEffect, useState} from 'react';
-import '../css/friends.css';
-import {Modal} from "./Modal";
-import {ReactComponent as FriendsLogo} from '../svg/friends.svg';
-import {ReactComponent as PlusLogo} from '../svg/plus2.svg';
+import './controls.css';
+import {ReactComponent as FriendsLogo} from '../../svg/friends.svg';
+import {ReactComponent as PlusLogo} from '../../svg/plus2.svg';
 
-import {ReactComponent as InviteLogo} from '../svg/invite.svg';
+import {ReactComponent as InviteLogo} from '../../svg/invite.svg';
 
-import {ReactComponent as KickLogo} from '../svg/kick.svg';
+import {ReactComponent as KickLogo} from '../../svg/kick.svg';
 
-import {ReactComponent as MinusLogo40} from '../svg/minus40.svg';
-import {ReactComponent as PlusLogo70} from '../svg/plus70.svg';
-import {ReactComponent as CrownLogo} from '../svg/crown.svg';
+import {ReactComponent as MinusLogo40} from '../../svg/minus40.svg';
+import {ReactComponent as PlusLogo70} from '../../svg/plus70.svg';
+import {ReactComponent as CrownLogo} from '../../svg/crown.svg';
 
-import {GameState, User, UserState} from "../util/types";
-import {AppContext} from "../App";
-import API from "../util/API";
+import {GameState, User, UserState} from "../../util/types";
+import {AppContext} from "../../App";
+import API from "../../util/API";
+import {Modal} from "../../modal/Modal";
 
 
 export function UsersLogo(){

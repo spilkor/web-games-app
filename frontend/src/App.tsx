@@ -1,28 +1,29 @@
 import React, {useEffect, useState} from 'react';
 import {Redirect, Route, Switch} from "react-router-dom";
-import './css/app.css';
+import './app.css';
 
 import {ChatMessage, GameState, User, WSMessage} from "./util/types";
-import {Login} from "./components/Login";
+import {Login} from "./login/Login";
 import {MessageType} from "./util/enums";
 import API from "./util/API";
-import {Game, GameType} from "./Main Components/Game";
+import {Game, GameType} from "./game/Game";
 import {log, WEBSOCKET_URL} from "./index";
-import {Header} from "./Main Components/Header";
-import {Users, UsersLogo} from "./Main Components/Users";
-import {Invites, InvitesLogo} from "./Main Components/Invites";
-import {Home} from "./Main Components/Home";
-import {Chat} from "./Main Components/Chat";
-import {FriendRequests, FriendRequestsLogo} from "./Main Components/FriendRequests";
-import {CarcassonneGameSettingsDTO} from "./carcassonne/carcassonneTypes";
+import {Header} from "./page/header/Header";
+import {Users, UsersLogo} from "./page/controls/Users";
+import {Invites, InvitesLogo} from "./page/controls/Invites";
+import {Home} from "./home/Home";
+import {Chat} from "./chat/Chat";
+import {FriendRequests, FriendRequestsLogo} from "./page/controls/FriendRequests";
+import {CarcassonneGameSettingsDTO} from "./game/carcassonne/carcassonneTypes";
+import {Dev} from "./dev/Dev";
 
 export const AppContext = React.createContext<Partial<ContextProps>>({});
-
 
 export enum ContentMode  {
     HOME = "HOME",
     CHAT = "CHAT",
-    GAME = "GAME"
+    GAME = "GAME",
+    DEV = "DEV"
 }
 
 export type GameData = {
@@ -68,13 +69,16 @@ export type ContextProps = {
     setGameSettings: (gameSettings: any) => void
 };
 
+
+export const defaultContentMode = ContentMode.GAME;
+
 export function App () {
 
     const [user, setUser] = useState<User | null | undefined>(undefined);
     const [webSocket, setWebsocket] = useState<WebSocket | null>(null);
     const [gameData, setGameData] = useState<GameData | null | undefined>(undefined);
     const [friends, setFriends] = useState<User[]>([]);
-    const [contentMode, setContentMode] = useState<ContentMode>(ContentMode.GAME);
+    const [contentMode, setContentMode] = useState<ContentMode>(defaultContentMode);
     const [chatMessages, _setChatMessages] = useState<ChatMessage[]>([]);
     const chatMessagesRef = React.useRef(chatMessages);
     const setChatMessages = (chatMessages: ChatMessage[]) => {
@@ -214,6 +218,8 @@ export function App () {
                 return(<Chat/>);
             case ContentMode.GAME:
                 return(<Game/>);
+            case ContentMode.DEV:
+                return(<Dev/>);
             default:
                 return null;
         }
@@ -272,7 +278,7 @@ export function App () {
         setFriends([]);
         setUsersOpen(false);
 
-        setContentMode(ContentMode.GAME);
+        setContentMode(defaultContentMode);
 
         setGameData(undefined);
         setInvites([]);

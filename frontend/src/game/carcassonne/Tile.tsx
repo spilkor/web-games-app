@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Coordinate, PointOfCompass} from "../util/types";
+import {Coordinate, PointOfCompass} from "../../util/types";
 import {
     MeepleProps,
     MonasteryProps,
@@ -10,7 +10,7 @@ import {
     TileDTO,
     MeepleType, Color, CarcassonneMoveDTO
 } from "./carcassonneTypes";
-import API from "../util/API";
+import API from "../../util/API";
 
 export default function Tile (tileProps: TileDTO) {
 
