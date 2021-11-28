@@ -5,6 +5,7 @@ import com.spilkor.webgamesapp.game.Game;
 import com.spilkor.webgamesapp.game.amoba.Amoba;
 import com.spilkor.webgamesapp.game.carcassonne.Carcassonne;
 import com.spilkor.webgamesapp.game.chess.Chess;
+import com.spilkor.webgamesapp.game.snapszer.Snapszer;
 import com.spilkor.webgamesapp.model.dto.GameDTO;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.model.dto.WebSocketMessage;
@@ -30,6 +31,9 @@ public class GameHandler {
                 break;
             case CARCASSONNE:
                 game = new Carcassonne(owner, gameType);
+                break;
+            case SNAPSZER:
+                game = new Snapszer(owner, gameType);
                 break;
         }
 

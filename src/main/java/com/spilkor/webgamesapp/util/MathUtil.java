@@ -25,4 +25,5 @@ public class MathUtil {
     public static <E> E selectRandom(Collection<E> elements) {
         return (E) elements.toArray()[randomNumberLowerThan(elements.size())];
     }
+
 }

@@ -19,7 +19,8 @@ public abstract class Game {
     public enum GameType {
         AMOBA,
         CHESS,
-        CARCASSONNE
+        CARCASSONNE,
+        SNAPSZER
     }
 
     private boolean locked = true;

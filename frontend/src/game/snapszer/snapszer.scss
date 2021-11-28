@@ -1,0 +1,332 @@
+
+.snapszer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  .my-hand{
+    display: flex;
+    position: fixed;
+    bottom: -50px;
+    transform: translateX(-50%);
+
+    .card:hover{
+      translate: 0 -20px;
+      cursor: pointer;
+    }
+
+    .card{
+      transition: all .1s ease-out;
+      transform: rotate(0);
+    }
+
+    .card-6-1{
+      margin-right: -40px;
+      transform: rotate(-25deg);
+    }
+    .card-6-2{
+      margin-right: -30px;
+      transform: rotate(-15deg);
+    }
+    .card-6-3{
+      margin-right: -30px;
+      transform: rotate(-5deg);
+    }
+    .card-6-4{
+      margin-left: -30px;
+      transform: rotate(5deg);
+    }
+    .card-6-5{
+      margin-left: -40px;
+      transform: rotate(15deg);
+    }
+    .card-6-6{
+      margin-left: -40px;
+      transform: rotate(25deg);
+    }
+
+    .card-5-1{
+      margin-right: -40px;
+      transform: rotate(-20deg);
+    }
+    .card-5-2{
+      margin-right: -30px;
+      transform: rotate(-10deg);
+    }
+    .card-5-4{
+      margin-left: -30px;
+      transform: rotate(10deg);
+    }
+    .card-5-5{
+      margin-left: -40px;
+      transform: rotate(20deg);
+    }
+
+    .card-4-1{
+      margin-right: -40px;
+      transform: rotate(-15deg);
+    }
+    .card-4-2{
+      margin-right: -20px;
+      transform: rotate(-5deg);
+    }
+    .card-4-3{
+      margin-left: -20px;
+      transform: rotate(5deg);
+    }
+    .card-4-4{
+      margin-left: -40px;
+      transform: rotate(15deg);
+    }
+
+    .card-3-1{
+      margin-right: -30px;
+      transform: rotate(-10deg);
+    }
+    .card-3-3{
+      margin-left: -30px;
+      transform: rotate(10deg);
+    }
+
+    .card-2-1{
+      margin-right: -20px;
+      transform: rotate(-5deg);
+    }
+    .card-2-2{
+      margin-left: -20px;
+      transform: rotate(5deg);
+    }
+  }
+
+  .joker{
+    position: absolute;
+    right: -20px;
+    top: -40px;
+    transition: all .1s ease-out;
+    cursor: pointer;
+    transform: scale(.6);
+  }
+  .joker:hover{
+    transform: scale(.65);
+  }
+
+  .won-rounds{
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%) scale(.8);
+    top: 50%;
+    position: fixed;
+    max-width: 1400px;
+    max-height: 70vh;
+    overflow-y: auto;
+    scrollbar-width: none
+  }
+
+  .won-rounds img{
+    margin: 5px 20px;
+  }
+
+  .csap{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%) scale(.8);
+    top: 50%;
+    display: flex;
+  }
+
+  .csap img{
+    margin: 10px;
+    transition: all .1s ease-out;
+  }
+
+  .csap.my-turn img:hover{
+    cursor: pointer;
+    transform: scale(1.1);
+  }
+
+  .left-hand{
+    position: absolute;
+    left: 50px;
+    bottom: 50%;
+    transform: translateY(50%) scale(.7);
+  }
+
+  .right-hand{
+    position: absolute;
+    right: 50px;
+    bottom: 50%;
+    transform: translateY(50%) scale(.7);
+  }
+
+  .opposite-hand{
+    position: absolute;
+    top: -100px;
+    transform: translateX(-50%) scale(.5);
+  }
+
+  .player-name-hand{
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: -70px;
+  }
+
+  .player-board{
+    background: #86c3e9;
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    outline: 2px solid;
+    padding: 10px;
+    font-weight: bold;
+
+    table{
+      border-collapse: collapse;
+
+      td{
+        border: 1px solid black;
+        padding: 4px 10px;
+      }
+
+      td.border-none{
+        border:none;
+      }
+    }
+
+    .player-row.next{
+      border-left: 5px solid;
+    }
+
+    .player-row{
+
+      .player-name{
+        text-shadow: 0 0 10px white;
+      }
+
+      .player-points{
+        color: black;
+      }
+
+    }
+
+  }
+
+  .act{
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%) scale(.8);
+    top: 50%;
+    position: fixed;
+    background: #86c3e9;
+    border: 2px solid black;
+    width: 300px;
+  }
+
+  .act-option{
+    margin:  5px;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: 2px solid black;
+  }
+
+  .act-option:hover{
+    cursor: pointer;
+    background: rgba(255,255,255, .5);
+  }
+
+  .call-card{
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%) scale(.8);
+    top: 50%;
+    position: fixed;
+    width: 1400px;
+    max-height: 70vh;
+    overflow-y: auto;
+    scrollbar-width: none
+  }
+
+  .call-card img{
+    margin: 5px 20px;
+    transition: all .1s ease-out;
+    transform-origin: center;
+  }
+
+  .call-card img:hover{
+    cursor: pointer;
+    transform: scale(1.05);
+  }
+
+  .round{
+    position: absolute;
+    right: 50%;
+    bottom: 50%;
+    transform: translateY(50%) translateX(50%);
+  }
+
+  .round img{
+    position: absolute;
+    bottom: -150px;
+    left: -90px;
+  }
+
+  .round :nth-child(1){
+    transform: scale(.8) rotate(10deg);
+  }
+
+  .round :nth-child(2){
+    transform: scale(.8) rotate(-60deg) translate(-100px, -100px);
+  }
+
+  .round :nth-child(3){
+    transform: scale(.8) rotate(70deg) translate(80px, -80px);
+  }
+
+  .round :nth-child(4){
+    transform: scale(.8) rotate(50deg)translate(80px, 50px);
+  }
+
+
+  .last-round{
+    position: absolute;
+    left: 280px;
+    bottom: 120px;
+    transform: translateY(50%) translateX(50%) scale(.5);
+  }
+
+  .last-round img{
+    position: absolute;
+    bottom: -150px;
+    left: -90px;
+  }
+
+  .last-round :nth-child(1){
+    transform: scale(.8) rotate(10deg);
+  }
+
+  .last-round :nth-child(2){
+    transform: scale(.8) rotate(-60deg) translate(-100px, -100px);
+  }
+
+  .last-round :nth-child(3){
+    transform: scale(.8) rotate(70deg) translate(80px, -80px);
+  }
+
+  .last-round :nth-child(4){
+    transform: scale(.8) rotate(50deg)translate(80px, 50px);
+  }
+
+
+  .called-card{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #fff;
+    font-weight: bold;
+  }
+
+  .pointer{
+    cursor: pointer;
+  }
+}
+

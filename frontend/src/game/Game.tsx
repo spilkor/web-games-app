@@ -7,11 +7,13 @@ import API from "../util/API";
 import {ReactComponent as QuitLogo} from '../svg/quit.svg';
 import {Chess} from "./chess/Chess";
 import {Carcassonne} from "./carcassonne/Carcassonne";
+import {Snapszer} from "./snapszer/Snapszer";
 
 export enum GameType  {
     AMOBA = "AMOBA",
     CHESS = "CHESS",
-    CARCASSONNE = "CARCASSONNE"
+    CARCASSONNE = "CARCASSONNE",
+    SNAPSZER = "SNAPSZER"
 }
 
 export function Game () {
@@ -40,6 +42,10 @@ export function Game () {
         case GameType.CARCASSONNE:
             return(
                 <Carcassonne/>
+            );
+        case GameType.SNAPSZER:
+            return(
+                <Snapszer/>
             );
 
         default: return null;

@@ -11,7 +11,7 @@ enum Profile  {
     developer
 }
 
-const profile = Profile.container as Profile;
+const profile = Profile.developer as Profile;
 
 const IP = profile === Profile.container ? 'spilkor.com' : 'localhost';
 const PORT = profile === Profile.container ? '' : ':8080';

@@ -85,7 +85,7 @@ export function App () {
         chatMessagesRef.current = chatMessages;
         _setChatMessages(chatMessages);
     };
-    const [gameTypes, setGameTypes] = useState<GameType[]>([GameType.AMOBA, GameType.CHESS, GameType.CARCASSONNE]); // TODO fetch + cache
+    const [gameTypes, setGameTypes] = useState<GameType[]>([GameType.AMOBA, GameType.CHESS, GameType.CARCASSONNE, GameType.SNAPSZER]); // TODO fetch + cache
     const [usersOpen, setUsersOpen2] = useState<boolean>(false);
     function setUsersOpen(usersOpen: boolean){
         setUsersOpen2(usersOpen);

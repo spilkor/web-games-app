@@ -22,7 +22,7 @@ export function InvitesLogo(){
     const { user, invitesOpen, setInvitesOpen, invites, gameData} = useContext(AppContext);
 
     const hasInvite = invites && invites.length != 0;
-    // const gameInProgress = gameData && gameData.gameState === GameState.IN_GAME;
+    // const gameInProgress = gameData && gameData.gameState === GameStatus.IN_GAME;
 
     if (hasInvite || invitesOpen && !gameData){
         return(
