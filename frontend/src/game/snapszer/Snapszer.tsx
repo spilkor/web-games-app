@@ -13,6 +13,7 @@ import {
     GameStatus,
     Player,
     SnapszerGameDTO,
+    SnapszerGameSettingsDTO,
     SnapszerMoveDTO,
     TurnValue
 } from "./snapszerTypes";
@@ -61,13 +62,15 @@ import joker from "./png/joker.png";
 import {Modal} from "../../modal/Modal";
 import API from "../../util/API";
 
+import {ReactComponent as HandSVG} from './svg/hand.svg';
+
 export function Snapszer () {
 
     const { gameData, user, gameSettings, setGameSettings  } = useContext(AppContext);
 
     const snapszerGameDTO = JSON.parse(gameData!.gameJSON) as SnapszerGameDTO;
 
-    const {players, caller, nextPlayer, gameStatus, csapCards, csapIndex, snapszer, turnValue, round, calledCard, lastRound} = snapszerGameDTO;
+    const {players, caller, nextPlayer, gameStatus, csapCards, csapIndex, snapszer, turnValue, round, calledCard} = snapszerGameDTO;
 
     const myTurn = nextPlayer && nextPlayer.user.id == user!.id;
 
@@ -76,11 +79,24 @@ export function Snapszer () {
 
     const leftPlayer = players[getIndex(myIndex+1)];
     const oppositePlayer = players[getIndex(myIndex+2)];
-    const rightPlayer = players[getIndex(myIndex-1)];
+    const rightPlayer = players[getIndex(myIndex+3)];
 
     const [jokerOpen, setJokerOpen] = useState<boolean>(false);
 
     const [showPlayerWonCards, setShowPlayerWonCards] = useState<Player>();
+
+
+    const tempSetting = gameSettings as SnapszerGameSettingsDTO;
+    const snapszerGameSettingsDTO = {
+        lastRound: tempSetting && tempSetting.lastRound ? tempSetting.lastRound : null,
+    } as SnapszerGameSettingsDTO;
+    const {
+        lastRound
+    } = snapszerGameSettingsDTO;
+
+    const lastRoundChanged = snapszerGameDTO.lastRound && snapszerGameDTO.lastRound.find((c: Card) => {return lastRound != null && !lastRound.find((c2: Card)=>{return c.figure === c2.figure && c.color === c2.color})});
+
+    lastRoundChanged && setGameSettings!(snapszerGameSettingsDTO);
 
     function getIndex(index: number) {
         if (index < 0){
@@ -161,6 +177,7 @@ export function Snapszer () {
                 <MyHand/>
                 <WoundRounds/>
                 <CalledCard/>
+                {myTurn && gameStatus === GameStatus.PLAY_CARD && myPlayer.wonRounds && myPlayer.wonRounds.length !== 0 && <Count/>}
             </div>
         );
     }
@@ -572,17 +589,6 @@ export function Snapszer () {
 
     }
 
-    // function CalledCard () {
-    //     if (!calledCard){
-    //         return null;
-    //     }
-    //     return(
-    //         <div className={"called-card"}>
-    //             <Card card={calledCard}/>
-    //         </div>
-    //     );
-    // }
-
     function WoundRounds () {
         return(
             <>
@@ -601,6 +607,21 @@ export function Snapszer () {
                 }
             </>
         );
+    }
+
+    function Count () {
+        return(
+            <div className={"count"} onClick={()=>count()}>
+                <HandSVG/>
+            </div>
+        );
+    }
+
+    async function count() {
+        let snapszerMoveDTO = {
+            count: true
+        } as SnapszerMoveDTO;
+        API.move(JSON.stringify(snapszerMoveDTO));
     }
 
     function MyHand () {

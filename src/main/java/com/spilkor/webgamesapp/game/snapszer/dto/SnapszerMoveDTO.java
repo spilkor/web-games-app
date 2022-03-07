@@ -13,6 +13,7 @@ public class SnapszerMoveDTO implements Serializable {
     private Card calledCard;
     private Act act;
     private Card card;
+    private Boolean count;
 
     public Integer getCsapIndex() {
         return csapIndex;
@@ -52,6 +53,14 @@ public class SnapszerMoveDTO implements Serializable {
 
     public void setCard(Card card) {
         this.card = card;
+    }
+
+    public Boolean getCount() {
+        return count;
+    }
+
+    public void setCount(Boolean count) {
+        this.count = count;
     }
 }
 

@@ -14,6 +14,7 @@ public class Player {
     private Integer points = null;
     private Boolean withCaller;
     private List<List<Card>> wonRounds = new ArrayList<>();
+    private Integer announce;
 
     public Player(UserDTO user) {
         this.user = user;
@@ -59,4 +60,11 @@ public class Player {
         this.wonRounds = wonRounds;
     }
 
+    public Integer getAnnounce() {
+        return announce;
+    }
+
+    public void setAnnounce(Integer announce) {
+        this.announce = announce;
+    }
 }

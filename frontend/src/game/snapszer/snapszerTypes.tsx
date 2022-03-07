@@ -25,12 +25,18 @@ export type SnapszerGameDTO = {
     lastRound: Card[] | null
 }
 
+export type SnapszerGameSettingsDTO = {
+    lastRound: Card[] | null
+}
+
+
 export type SnapszerMoveDTO = {
     csapIndex: number | null
     csapFigure: Figure | null
     calledCard: Card | null
     act: Act | null
     card: Card | null
+    count: boolean | null
 }
 
 export enum GameStatus {
