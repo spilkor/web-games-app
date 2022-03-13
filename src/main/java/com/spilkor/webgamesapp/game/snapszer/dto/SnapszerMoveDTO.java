@@ -2,7 +2,9 @@ package com.spilkor.webgamesapp.game.snapszer.dto;
 
 import com.spilkor.webgamesapp.game.snapszer.Card;
 import com.spilkor.webgamesapp.game.snapszer.enums.Act;
+import com.spilkor.webgamesapp.game.snapszer.enums.ActionType;
 import com.spilkor.webgamesapp.game.snapszer.enums.Figure;
+import com.spilkor.webgamesapp.game.snapszer.enums.Licit;
 
 import java.io.Serializable;
 
@@ -10,10 +12,18 @@ public class SnapszerMoveDTO implements Serializable {
 
     private Integer csapIndex;
     private Figure csapFigure;
-    private Card calledCard;
-    private Act act;
+    private Licit licit;
     private Card card;
     private Boolean count;
+    private ActionType actionType;
+
+    public ActionType getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(ActionType actionType) {
+        this.actionType = actionType;
+    }
 
     public Integer getCsapIndex() {
         return csapIndex;
@@ -31,20 +41,12 @@ public class SnapszerMoveDTO implements Serializable {
         this.csapFigure = csapFigure;
     }
 
-    public Card getCalledCard() {
-        return calledCard;
+    public Licit getLicit() {
+        return licit;
     }
 
-    public void setCalledCard(Card calledCard) {
-        this.calledCard = calledCard;
-    }
-
-    public Act getAct() {
-        return act;
-    }
-
-    public void setAct(Act act) {
-        this.act = act;
+    public void setLicit(Licit licit) {
+        this.licit = licit;
     }
 
     public Card getCard() {

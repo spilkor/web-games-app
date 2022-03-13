@@ -2,41 +2,44 @@ package com.spilkor.webgamesapp.game.snapszer.enums;
 
 public enum TurnValue {
 
-    BASIC,
-    KONTRA,
-    RE_KONTRA,
-    SZUB_KONTRA,
-    MORD_KONTRA,
-    HIRSCH_KONTRA,
-    FEDAK_SARI,
-    KEREKES_BICIKLI
+    BASIC("BASIC", 1),
+    KONTRA("KONTRA",2),
+    RE_KONTRA("RE_KONTRA",4),
+    SZUB_KONTRA("SZUB_KONTRA",8),
+    MORD_KONTRA("MORD_KONTRA",16),
+    HIRSCH_KONTRA("HIRSCH_KONTRA",32),
+    FEDAK_SARI("FEDAK_SARI",64),
+    KEREKES_BICIKLI("KEREKES_BICIKLI",128);
 
-//    BASIC("BASIC", 1, TurnValue.KONTRA, true),
-//    KONTRA("KONTRA",2, TurnValue.RE_KONTRA, false),
-//    RE_KONTRA("RE_KONTRA",4, TurnValue.RE_KONTRA, true),
-//    SZUB_KONTRA("SZUB_KONTRA",8, TurnValue.RE_KONTRA, false),
-//    MORD_KONTRA("MORD_KONTRA",16, TurnValue.RE_KONTRA, true),
-//    HIRSCH_KONTRA("HIRSCH_KONTRA",32, TurnValue.RE_KONTRA, false),
-//    FEDAK_SARI("FEDAK_SARI",64, TurnValue.RE_KONTRA, true),
-//    KEREKES_BICIKLI("KEREKES_BICIKLI",128, null, false);
-//
-//    public final String stringValue;
-//    public final int value;
-//    public final TurnValue next;
-//    public final boolean callerTeam;
-//
-//    TurnValue(String stringValue, int value, TurnValue next, boolean callerTeam) {
-//        this.stringValue = stringValue;
-//        this.value = value;
-//        this.next = next;
-//        this.callerTeam = callerTeam;
-//    }
-//
-//    public int getValue() {
-//        return value;
-//    }
-//
-//    public TurnValue getNext() {
-//        return next;
-//    }
+    public final int value;
+    public final String stringValue;
+
+    TurnValue(String stringValue, int value) {
+        this.stringValue = stringValue;
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public TurnValue getNextTurnValue() {
+        switch (this){
+            case BASIC:
+                return TurnValue.KONTRA;
+            case KONTRA:
+                return TurnValue.RE_KONTRA;
+            case RE_KONTRA:
+                return TurnValue.SZUB_KONTRA;
+            case SZUB_KONTRA:
+                return TurnValue.MORD_KONTRA;
+            case MORD_KONTRA:
+                return TurnValue.HIRSCH_KONTRA;
+            case HIRSCH_KONTRA:
+                return TurnValue.FEDAK_SARI;
+            case FEDAK_SARI:
+                return TurnValue.KEREKES_BICIKLI;
+        }
+        return null;
+    }
 }

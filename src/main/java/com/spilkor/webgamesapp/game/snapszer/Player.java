@@ -1,7 +1,5 @@
 package com.spilkor.webgamesapp.game.snapszer;
 
-import com.spilkor.webgamesapp.game.snapszer.enums.Color;
-import com.spilkor.webgamesapp.game.snapszer.enums.Figure;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 
 import java.util.ArrayList;
@@ -11,10 +9,6 @@ public class Player {
 
     private UserDTO user;
     private List<Card> cards = new ArrayList<>();
-    private Integer points = null;
-    private Boolean withCaller;
-    private List<List<Card>> wonRounds = new ArrayList<>();
-    private Integer announce;
 
     public Player(UserDTO user) {
         this.user = user;
@@ -36,35 +30,17 @@ public class Player {
         this.cards = cards;
     }
 
-    public Integer getPoints() {
-        return points;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return user.equals(player.getUser());
     }
 
-    public void setPoints(Integer points) {
-        this.points = points;
+    @Override
+    public int hashCode() {
+        return user.hashCode();
     }
 
-    public Boolean getWithCaller() {
-        return withCaller;
-    }
-
-    public void setWithCaller(Boolean withCaller) {
-        this.withCaller = withCaller;
-    }
-
-    public List<List<Card>> getWonRounds() {
-        return wonRounds;
-    }
-
-    public void setWonRounds(List<List<Card>> wonRounds) {
-        this.wonRounds = wonRounds;
-    }
-
-    public Integer getAnnounce() {
-        return announce;
-    }
-
-    public void setAnnounce(Integer announce) {
-        this.announce = announce;
-    }
 }

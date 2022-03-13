@@ -8,7 +8,9 @@ public enum Figure {
     FELSO,
     ALSO,
     KILENC,
-    UNKNOWN;
+    UNKNOWN,
+    TWENTY,
+    FORTY;
 
     public boolean strongerThan(Figure figure) {
         return getValue() > figure.getValue();

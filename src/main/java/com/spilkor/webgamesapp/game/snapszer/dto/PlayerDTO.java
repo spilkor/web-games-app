@@ -12,9 +12,7 @@ public class PlayerDTO {
 
     private UserDTO user;
     private List<Card> cards = new ArrayList<>();
-    private Integer points = null;
     private Boolean withCaller;
-    private List<List<Card>> wonRounds = new ArrayList<>();
 
     public UserDTO getUser() {
         return user;
@@ -32,14 +30,6 @@ public class PlayerDTO {
         this.cards = cards;
     }
 
-    public Integer getPoints() {
-        return points;
-    }
-
-    public void setPoints(Integer points) {
-        this.points = points;
-    }
-
     public Boolean getWithCaller() {
         return withCaller;
     }
@@ -47,13 +37,4 @@ public class PlayerDTO {
     public void setWithCaller(Boolean withCaller) {
         this.withCaller = withCaller;
     }
-
-    public List<List<Card>> getWonRounds() {
-        return wonRounds;
-    }
-
-    public void setWonRounds(List<List<Card>> wonRounds) {
-        this.wonRounds = wonRounds;
-    }
-
 }

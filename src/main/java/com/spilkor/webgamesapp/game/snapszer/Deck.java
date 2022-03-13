@@ -42,7 +42,7 @@ public class Deck {
     }
 
     public Card draw(){
-        if (isEmpty()){
+        if (cards.isEmpty()){
             return null;
         }
         Card card = MathUtil.selectRandom(cards);
@@ -50,16 +50,4 @@ public class Deck {
         return card;
     }
 
-
-    public boolean isEmpty(){
-        return cards.isEmpty();
-    }
-
-    public boolean isNotEmpty(){
-        return !isEmpty();
-    }
-
-    public int getSize() {
-        return cards.size();
-    }
 }

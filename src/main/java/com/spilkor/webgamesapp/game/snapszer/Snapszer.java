@@ -2,11 +2,10 @@ package com.spilkor.webgamesapp.game.snapszer;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.spilkor.webgamesapp.game.Game;
-import com.spilkor.webgamesapp.game.snapszer.dto.PlayerDTO;
-import com.spilkor.webgamesapp.game.snapszer.dto.SnapszerGameDTO;
-import com.spilkor.webgamesapp.game.snapszer.dto.SnapszerMoveDTO;
+import com.spilkor.webgamesapp.game.snapszer.dto.*;
 import com.spilkor.webgamesapp.game.snapszer.enums.*;
 import com.spilkor.webgamesapp.model.dto.UserDTO;
 import com.spilkor.webgamesapp.util.Mapper;
@@ -19,44 +18,34 @@ import java.util.stream.Collectors;
 public class Snapszer extends Game {
 
     private List<Player> players = new ArrayList<>();
-    private Player caller = null;
     private Player nextPlayer = null;
-    private GameStatus gameStatus = null;
-    private List<Card> csapCards = null;
-    private Integer csapIndex;
-    private Color adu;
-    private Card calledCard;
-    private Boolean snapszer;
-    private TurnValue turnValue;
-    private Player lastTurnValueModifier;
-    private Card firstRoundCard;
-    private LinkedHashMap<Card, Player> round;
-    private Card strongestRoundCard;
-    private Boolean secret;
-    private List<Card> lastRound = null;
+    private Round round = null;
+    private ScoreBoard scoreBoard;
+    private List<Round> rounds = new ArrayList<>();
+    private final Card twenty = new Card(Color.UNKNOWN, Figure.TWENTY);
+    private final Card forty = new Card(Color.UNKNOWN, Figure.FORTY);
+    private final Card unknownCard = new Card(Color.UNKNOWN, Figure.UNKNOWN);
+    private final Set<Figure> unPlayableFigures = Sets.newHashSet(Figure.UNKNOWN, Figure.TWENTY, Figure.FORTY);
 
     public Snapszer(UserDTO owner, GameType gameType){
         super(owner, gameType);
-        players.add(new Player(owner));
+        Player player = new Player(owner);
+        players.add(player);
+        scoreBoard = new ScoreBoard(player);
     }
 
     @Override
     public void playerJoined(UserDTO user) {
-        players.add(new Player(user));
+        Player player = new Player(user);
+        players.add(player);
+        scoreBoard.addPlayer(player);
     }
 
     @Override
     public void playerLeft(UserDTO user) {
-        players = players.stream().filter(player -> !player.getUser().equals(user)).collect(Collectors.toList());
-    }
-
-    private Player getPlayer(UserDTO user){
-        return players.stream().filter(player -> player.getUser().equals(user)).findFirst().orElse(null);
-    }
-
-    @Override
-    public void surrender(UserDTO userDTO) {
-//        TODO
+        Player player = getPlayer(user);
+        players.remove(player);
+        scoreBoard.removePlayer(player);
     }
 
     @Override
@@ -71,129 +60,112 @@ public class Snapszer extends Game {
 
     @Override
     public void start() {
-        gameStatus = GameStatus.CALL_CARD;
-
         Collections.shuffle(players);
-        players.forEach(player -> player.setPoints(0));
-
-        caller = players.get(0);
-        nextPlayer = caller;
-
-        dealCards();
-
-        round = new LinkedHashMap<>();
-        snapszer = false;
-        secret = true;
-    }
-
-    private void dealCards(){
-        Player player_1 = getNextPlayer(caller);
-        Player player_2 = getNextPlayer(player_1);
-        Player player_3 = getNextPlayer(player_2);
-
-        csapCards = new ArrayList<>();
-
-        Deck deck = new Deck();
-
-        caller.getCards().add(deck.draw());
-        player_1.getCards().add(deck.draw());
-        player_2.getCards().add(deck.draw());
-        player_3.getCards().add(deck.draw());
-
-        caller.getCards().add(deck.draw());
-        player_1.getCards().add(deck.draw());
-        player_2.getCards().add(deck.draw());
-        player_3.getCards().add(deck.draw());
-
-        caller.getCards().add(deck.draw());
-        player_1.getCards().add(deck.draw());
-        player_2.getCards().add(deck.draw());
-        player_3.getCards().add(deck.draw());
-
-        csapCards.add(deck.draw());
-        player_1.getCards().add(deck.draw());
-        player_2.getCards().add(deck.draw());
-        player_3.getCards().add(deck.draw());
-
-        csapCards.add(deck.draw());
-        player_1.getCards().add(deck.draw());
-        player_2.getCards().add(deck.draw());
-        player_3.getCards().add(deck.draw());
-
-        csapCards.add(deck.draw());
-        player_1.getCards().add(deck.draw());
-        player_2.getCards().add(deck.draw());
-        player_3.getCards().add(deck.draw());
-    }
-
-    @Override
-    public void restart() {
-        gameStatus = null;
-        caller = null;
-        nextPlayer = null;
-        players.forEach(player -> player.setCards(new ArrayList<>()));
-        players.forEach(player -> player.setPoints(null));
-        players.forEach(player -> player.setWithCaller(null));
-        csapCards = null;
-        csapIndex = null;
-        adu = null;
-        calledCard = null;
-        snapszer = null;
-        turnValue = null;
-        lastTurnValueModifier = null;
-        firstRoundCard = null;
-        round = null;
-        strongestRoundCard = null;
-        secret = null;
-        lastRound = null;
+        nextPlayer = players.get(0);
+        round = new Round(nextPlayer);
+        rounds.add(round);
     }
 
     @Override
     public String getGameJSON(UserDTO user) {
         SnapszerGameDTO snapszerGameDTO = new SnapszerGameDTO();
-        List<PlayerDTO> playersDTOs = new ArrayList<>();
 
-        PlayerDTO callerDTO = null;
-        PlayerDTO nextPlayerDTO = null;
-        for (Player player: players){
+        List<PlayerDTO> playerDTOs = new ArrayList<>();
+        for(Player player: players){
             PlayerDTO playerDTO = new PlayerDTO();
+
             playerDTO.setUser(player.getUser());
-            playerDTO.setCards(player.getUser().equals(user) ? player.getCards() : player.getCards().stream().map(c-> new Card(Color.UNKNOWN, Figure.UNKNOWN)).collect(Collectors.toList()));
-            playerDTO.setPoints(player.getPoints());
-            playerDTO.setWithCaller(player.getUser().equals(user) ? player.getWithCaller() : null);
-
-            if (player.getUser().equals(user) || (!Boolean.TRUE.equals(secret) && Boolean.TRUE.equals(getPlayer(user).getWithCaller()) == Boolean.TRUE.equals(player.getWithCaller()))){
-                playerDTO.setWonRounds(player.getWonRounds());
+            if (player.getUser().equals(user)){
+                if (nextPlayer == getPlayer(user)
+                        && round != null
+                        && RoundState.TURNS.equals(round.roundState)
+                        && nextPlayer == getPlayer(user)
+                        && round.turn.cards.isEmpty()
+                        && !round.turn.twenty
+                        && !round.turn.forty){
+                    if (nextPlayer.getCards().stream()
+                            .filter(card -> !card.getColor().equals(round.adu))
+                            .filter(card -> Figure.KIRALY.equals(card.getFigure()))
+                            .anyMatch(card -> nextPlayer.getCards().stream()
+                                    .anyMatch(c -> c.getColor().equals(card.getColor()) && Figure.FELSO.equals(c.getFigure())))){
+                        playerDTO.getCards().add(twenty);
+                    }
+                    if (nextPlayer.getCards().stream()
+                            .filter(card -> card.getColor().equals(round.adu))
+                            .filter(card -> Figure.KIRALY.equals(card.getFigure()))
+                            .anyMatch(card -> nextPlayer.getCards().stream()
+                                    .anyMatch(c -> c.getColor().equals(card.getColor()) && Figure.FELSO.equals(c.getFigure())))){
+                        playerDTO.getCards().add(forty);
+                    }
+                }
+                playerDTO.getCards().addAll(player.getCards());
             } else {
-                player.getWonRounds().forEach(wr -> playerDTO.getWonRounds().add(wr.stream().map(c-> wr == lastRound ? c : new Card(Color.UNKNOWN, Figure.UNKNOWN)).collect(Collectors.toList())));
+                playerDTO.setCards(player.getCards().stream().map(c-> unknownCard).collect(Collectors.toList()));
+            }
+            playerDTO.setWithCaller(!player.getUser().equals(user) || round == null ? null : round.playersWithCaller.contains(getPlayer(user)));
+
+            playerDTOs.add(playerDTO);
+
+            if (player.equals(nextPlayer)){
+                snapszerGameDTO.setNextPlayer(playerDTO);
+            }
+        }
+        snapszerGameDTO.setPlayers(playerDTOs);
+
+        List<RoundDTO> roundDTOs = new ArrayList<>();
+        for(Round r: rounds){
+            RoundDTO roundDTO = new RoundDTO();
+
+            roundDTO.setCaller(playerDTOs.stream().filter(playerDTO -> playerDTO.getUser().equals(r.caller.getUser())).findFirst().orElse(null));
+            roundDTO.setRoundState(r.roundState);
+            roundDTO.setCsapCards(r.csapCards.stream().map(csapCard -> r.csapCard == csapCard ? csapCard : unknownCard).collect(Collectors.toList()));
+            roundDTO.setCsapCard(r.csapCard);
+            roundDTO.setCalledCard(r.calledCard);
+            roundDTO.setAdu(r.adu);
+            roundDTO.setSnapszer(r.snapszer);
+            roundDTO.setTurnValue(r.turnValue);
+            roundDTO.setFirstLicitTurn(r.firstLicitTurn);
+
+            if (r.finalScoreBoard != null){
+                roundDTO.setScoreBoard(r.finalScoreBoard.toIntegerList(players));
             }
 
-            if (caller != null && player.getUser().equals(caller.getUser())){
-                callerDTO = playerDTO;
-            }
-            if (nextPlayer != null && player.getUser().equals(nextPlayer.getUser())){
-                nextPlayerDTO = playerDTO;
-            }
+            List<TurnDTO> turnDTOs = new ArrayList<>();
+            for(Turn t: r.turns){
+                TurnDTO turnDTO = new TurnDTO();
 
-            playersDTOs.add(playerDTO);
-        }
-        snapszerGameDTO.setLastRound(lastRound);
-        snapszerGameDTO.setPlayers(playersDTOs);
-        snapszerGameDTO.setCaller(callerDTO);
-        snapszerGameDTO.setGameStatus(gameStatus);
-        snapszerGameDTO.setNextPlayer(nextPlayerDTO);
+                turnDTO.setCaller(playerDTOs.stream().filter(playerDTO -> playerDTO.getUser().equals(t.caller.getUser())).findFirst().orElse(null));
 
-        if (csapCards != null){
-            snapszerGameDTO.setCsapCards(csapCards.stream().map(csapCard -> csapIndex != null && csapIndex == csapCards.indexOf(csapCard) ? csapCard : new Card(Color.UNKNOWN, Figure.UNKNOWN)).collect(Collectors.toList()));
+                if (!t.ended){
+                    turnDTO.setCards(t.cards);
+                } else if(t.strongestPlayer != null && (user.equals(t.strongestPlayer.getUser()) || (!r.secret && r.playersWithCaller.contains(getPlayer(user)) == r.playersWithCaller.contains(t.strongestPlayer)))){
+                    turnDTO.setCards(t.cards);
+                } else if (t == r.getLastEndedTurn()){
+                    turnDTO.setCards(t.cards);
+                } else {
+                    turnDTO.setCards(t.cards.stream().map(card -> unknownCard).collect(Collectors.toList()));
+                }
+
+                turnDTO.setTwenty(t.twenty);
+                turnDTO.setForty(t.forty);
+                turnDTO.setEnded(t.ended);
+                turnDTO.setStrongestPlayer(t.strongestPlayer);
+
+                turnDTOs.add(turnDTO);
+                if (t == r.turn){
+                    roundDTO.setTurn(turnDTO);
+                }
+            }
+            roundDTO.setTurns(turnDTOs);
+
+            roundDTOs.add(roundDTO);
+            if (r == round){
+                snapszerGameDTO.setRound(roundDTO);
+            }
         }
-        snapszerGameDTO.setCsapIndex(csapIndex);
-        snapszerGameDTO.setAdu(adu);
-        snapszerGameDTO.setSnapszer(snapszer);
-        snapszerGameDTO.setTurnValue(turnValue);
-        snapszerGameDTO.setCalledCard(calledCard);
-        if (round != null){
-            snapszerGameDTO.setRound(round.keySet());
-        }
+        snapszerGameDTO.setRounds(roundDTOs);
+
+        snapszerGameDTO.setScoreBoard(scoreBoard.toIntegerList(players));
 
         try {
             return Mapper.writeValueAsString(snapszerGameDTO);
@@ -211,108 +183,156 @@ public class Snapszer extends Game {
         try {
             SnapszerMoveDTO snapszerMoveDTO = Mapper.readValue(moveJSON, SnapszerMoveDTO.class);
 
-            if(GameStatus.CALL_CARD.equals(gameStatus)){
+            if(RoundState.CALL_CARD.equals(round.roundState)){
                 Integer csapIndex = snapszerMoveDTO.getCsapIndex();
                 if (csapIndex != null){
                     return MathUtil.inRange(0, csapIndex, 3);
                 } else {
-                    Card calledCard = snapszerMoveDTO.getCalledCard();
-                    return calledCard != null
-                            && calledCard.getColor() != null && !Color.UNKNOWN.equals(calledCard.getColor())
-                            && calledCard.getFigure() != null && !Figure.UNKNOWN.equals(calledCard.getFigure());
+                    Card card = snapszerMoveDTO.getCard();
+                    return card != null
+                            && card.getColor() != null && !Color.UNKNOWN.equals(card.getColor())
+                            && card.getFigure() != null && !unPlayableFigures.contains(card.getFigure());
                 }
-            } else if (GameStatus.CALL_FIGURE.equals(gameStatus)){
+
+            } else if (RoundState.CALL_FIGURE.equals(round.roundState)){
                 Figure csapFigure = snapszerMoveDTO.getCsapFigure();
-                return csapFigure != null && !Figure.UNKNOWN.equals(csapFigure);
-            } else if (GameStatus.FIRST_ACT.equals(gameStatus)){
-                return Sets.newHashSet(Act.CHECK, Act.SNAPSZER, Act.THROW_IN).contains(snapszerMoveDTO.getAct());
-            } else if (GameStatus.ACT.equals(gameStatus)){
-                Act act = snapszerMoveDTO.getAct();
-                if (act == null){
+                return csapFigure != null && !unPlayableFigures.contains(csapFigure);
+
+            } else if (RoundState.LICIT.equals(round.roundState)){
+                Licit licit = snapszerMoveDTO.getLicit();
+                if (licit == null){
                     return false;
                 }
-                switch (act){
+                switch (licit){
                     case CHECK:
                         return true;
+
                     case SNAPSZER:
-                        return !snapszer && nextPlayer.getWithCaller();
+                        return round.playersWithCaller.contains(nextPlayer)
+                                && !round.snapszer
+                                && round.firstLicitTurn;
+
                     case CONTRA:
-                        if (nextPlayer.getWithCaller()){
-                            return Sets.newHashSet(TurnValue.KONTRA, TurnValue.SZUB_KONTRA, TurnValue.HIRSCH_KONTRA).contains(turnValue);
+                        if (round.playersWithCaller.contains(nextPlayer)){
+                            return Sets.newHashSet(TurnValue.KONTRA, TurnValue.SZUB_KONTRA, TurnValue.HIRSCH_KONTRA)
+                                    .contains(round.turnValue);
                         } else {
-                            return Sets.newHashSet(TurnValue.BASIC, TurnValue.RE_KONTRA, TurnValue.MORD_KONTRA, TurnValue.FEDAK_SARI).contains(turnValue);
+                            return Sets.newHashSet(TurnValue.BASIC, TurnValue.RE_KONTRA, TurnValue.MORD_KONTRA, TurnValue.FEDAK_SARI)
+                                    .contains(round.turnValue);
                         }
-                        default: return false;
+
+                    case CONTRA_SNAPSZER:
+                        return round.playersWithCaller.contains(nextPlayer)
+                                && !round.snapszer
+                                && round.firstLicitTurn
+                                && Sets.newHashSet(TurnValue.KONTRA, TurnValue.SZUB_KONTRA, TurnValue.HIRSCH_KONTRA)
+                                .contains(round.turnValue);
+
+                    case THROW_IN:
+                        return round.caller.equals(nextPlayer) && round.firstLicitTurn;
+
+                    case THREE_NINE:
+                        return round.caller.equals(nextPlayer)
+                                && round.firstLicitTurn
+                                && 3 <= nextPlayer.getCards().stream().filter(c-> Figure.KILENC.equals(c.getFigure())).count();
+                    default: return false;
                 }
-            } else if(GameStatus.PLAY_CARD.equals(gameStatus)){
-                if (Boolean.TRUE.equals(snapszerMoveDTO.getCount())){
-
-                    Set<Player> countForPlayers = Sets.newHashSet();
-                    if (secret){
-                        countForPlayers.add(nextPlayer);
-                    } else {
-                        countForPlayers.addAll(players.stream().filter(p-> p.getWithCaller() == nextPlayer.getWithCaller()).collect(Collectors.toList()));
-                    }
-
-                    int sum = 0;
-                    for(Player player: countForPlayers){
-                        for(List<Card> wr: player.getWonRounds()){
-                            for(Card card: wr){
-                                sum += getValue(card);
-                            }
+            } else if (RoundState.TURNS.equals(round.roundState)){
+                ActionType actionType = snapszerMoveDTO.getActionType();
+                if (actionType == null){
+                    return false;
+                }
+                switch (actionType){
+                    case TWENTY:
+                        return round.turn.cards.isEmpty() && !round.turn.twenty && !round.turn.forty
+                                && nextPlayer.getCards().stream()
+                                .filter(card -> !card.getColor().equals(round.adu))
+                                .filter(card -> Figure.KIRALY.equals(card.getFigure()))
+                                .anyMatch(card -> nextPlayer.getCards().stream()
+                                        .anyMatch(c -> c.getColor().equals(card.getColor()) && Figure.FELSO.equals(c.getFigure())));
+                    case FORTY:
+                        return round.turn.cards.isEmpty() && !round.turn.twenty && !round.turn.forty
+                                && nextPlayer.getCards().stream()
+                                .filter(card -> card.getColor().equals(round.adu))
+                                .filter(card -> Figure.KIRALY.equals(card.getFigure()))
+                                .anyMatch(card -> nextPlayer.getCards().stream()
+                                        .anyMatch(c -> c.getColor().equals(card.getColor()) && Figure.FELSO.equals(c.getFigure())));
+                    case PLAY_CARD:
+                        if (round.turn.ended){
+                            return false;
                         }
-                        sum += player.getAnnounce();
-                    }
-
-                    if (sum < 66){
-                        return false;
-                    } else {
-                        if (secret){
-                            return userDTO.equals(caller.getUser());
-                        } else {
-                            return true;
+                        Card card = snapszerMoveDTO.getCard();
+                        if (card == null ||
+                                card.getColor() == null || Color.UNKNOWN.equals(card.getColor()) ||
+                                card.getFigure() == null || unPlayableFigures.contains(card.getFigure())){
+                            return false;
                         }
-                    }
-                } else {
-                    Card card = snapszerMoveDTO.getCard();
 
-                    if (card == null ||
-                            card.getColor() == null || Color.UNKNOWN.equals(card.getColor()) ||
-                            card.getFigure() == null || Figure.UNKNOWN.equals(card.getFigure())){
-                        return false;
-                    }
+                        if (!nextPlayer.getCards().contains(card)){
+                            return false;
+                        }
 
-                    if (!nextPlayer.getCards().contains(card)){
-                        return false;
-                    }
-
-                    if (firstRoundCard == null){
-                        return true;
-                    } else {
-                        if (nextPlayer.getCards().stream().map(Card::getColor).anyMatch(c -> c.equals(firstRoundCard.getColor()))){
-                            if (!firstRoundCard.getColor().equals(adu) && strongestRoundCard.getColor().equals(adu)){
-                                return card.getColor().equals(firstRoundCard.getColor());
+                        if (round.turn.cards.isEmpty()){
+                            if (round.turn.twenty){
+                                return !card.getColor().equals(round.adu) &&
+                                        nextPlayer.getCards().stream()
+                                                .anyMatch(c -> c.getColor().equals(card.getColor())
+                                                        && (Figure.KIRALY.equals(card.getFigure()) && Figure.FELSO.equals(c.getFigure())
+                                                        || Figure.KIRALY.equals(c.getFigure()) && Figure.FELSO.equals(card.getFigure())));
+                            } else if (round.turn.forty){
+                                return card.getColor().equals(round.adu) &&
+                                        nextPlayer.getCards().stream()
+                                                .anyMatch(c -> c.getColor().equals(card.getColor())
+                                                        && (Figure.KIRALY.equals(card.getFigure()) && Figure.FELSO.equals(c.getFigure())
+                                                        || Figure.KIRALY.equals(c.getFigure()) && Figure.FELSO.equals(card.getFigure())));
                             } else {
-                                if (nextPlayer.getCards().stream().filter(c-> c.getColor().equals(firstRoundCard.getColor())).anyMatch(c-> c.getFigure().strongerThan(strongestRoundCard.getFigure()))){
-                                    return card.getColor().equals(firstRoundCard.getColor()) && card.getFigure().strongerThan(strongestRoundCard.getFigure());
-                                } else {
-                                    return card.getColor().equals(firstRoundCard.getColor());
-                                }
-                            }
-                        } else if (nextPlayer.getCards().stream().map(Card::getColor).anyMatch(c -> c.equals(adu))){
-                            if (strongestRoundCard.getColor().equals(adu)){
-                                if (nextPlayer.getCards().stream().filter(c-> c.getColor().equals(adu)).anyMatch(c-> c.getFigure().strongerThan(strongestRoundCard.getFigure()))){
-                                    return card.getColor().equals(adu) && card.getFigure().strongerThan(strongestRoundCard.getFigure());
-                                } else {
-                                    return card.getColor().equals(adu);
-                                }
-                            } else {
-                                return card.getColor().equals(adu);
+                                return true;
                             }
                         } else {
-                            return true;
+                            if (nextPlayer.getCards().stream().anyMatch(c -> c.getColor().equals(round.turn.firstCard.getColor()))){
+                                if (!round.turn.firstCard.getColor().equals(round.adu) && round.turn.strongestCard.getColor().equals(round.adu)){
+                                    return card.getColor().equals(round.turn.firstCard.getColor());
+                                } else {
+                                    if (nextPlayer.getCards().stream().filter(c-> c.getColor().equals(round.turn.firstCard.getColor())).anyMatch(c-> c.getFigure().strongerThan(round.turn.strongestCard.getFigure()))){
+                                        return card.getColor().equals(round.turn.firstCard.getColor()) && card.getFigure().strongerThan(round.turn.strongestCard.getFigure());
+                                    } else {
+                                        return card.getColor().equals(round.turn.firstCard.getColor());
+                                    }
+                                }
+                            } else if (nextPlayer.getCards().stream().anyMatch(c -> c.getColor().equals(round.adu))){
+                                if (round.turn.strongestCard.getColor().equals(round.adu)){
+                                    if (nextPlayer.getCards().stream().filter(c-> c.getColor().equals(round.adu)).anyMatch(c-> c.getFigure().strongerThan(round.turn.strongestCard.getFigure()))){
+                                        return card.getColor().equals(round.adu) && card.getFigure().strongerThan(round.turn.strongestCard.getFigure());
+                                    } else {
+                                        return card.getColor().equals(round.adu);
+                                    }
+                                } else {
+                                    return card.getColor().equals(round.adu);
+                                }
+                            } else {
+                                return true;
+                            }
                         }
-                    }
+                    case STOP:
+                        if (round.turn.cards.isEmpty() && (round.caller.equals(nextPlayer) || !round.secret)){
+                            Set<Player> countForPlayers = Sets.newHashSet();
+                            if (round.secret){
+                                countForPlayers.add(nextPlayer);
+                            } else {
+                                countForPlayers.addAll(players.stream().filter(player -> round.playersWithCaller.contains(player) == round.playersWithCaller.contains(nextPlayer)).collect(Collectors.toSet()));
+                            }
+
+                            int sum = 0;
+                            for(Player player: countForPlayers){
+                                sum += round.scoreBoard.get(player);
+                            }
+
+                            return sum >= 66;
+                        } else {
+                            return false;
+                        }
+                    case KOPP:
+                        return round.turn.ended;
                 }
             }
             return false;
@@ -321,211 +341,112 @@ public class Snapszer extends Game {
         }
     }
 
-    private int getValue(Card card) {
-        switch (card.getFigure()){
-            case ASZ:
-                return 11;
-            case TIZ:
-                return 10;
-            case KIRALY:
-                return 4;
-            case FELSO:
-                return 3;
-            case ALSO:
-                return 2;
-        }
-        return 0;
-    }
-
     @Override
     public void move(UserDTO userDTO, String moveJSON) {
         try {
             SnapszerMoveDTO snapszerMoveDTO = Mapper.readValue(moveJSON, SnapszerMoveDTO.class);
-
-            if(GameStatus.CALL_CARD.equals(gameStatus)){
+            if(RoundState.CALL_CARD.equals(round.roundState)){
                 Integer csapIndex = snapszerMoveDTO.getCsapIndex();
                 if (csapIndex != null){
-                    gameStatus = GameStatus.CALL_FIGURE;
-                    this.csapIndex = csapIndex;
+                    round.csapCard = round.csapCards.get(csapIndex);
+                    round.roundState = RoundState.CALL_FIGURE;
                 } else {
-                    calledCard = snapszerMoveDTO.getCalledCard();
-                    adu = calledCard.getColor();
-                    gameStatus = GameStatus.FIRST_ACT;
-                    caller.getCards().addAll(csapCards);
-                    csapCards = null;
-                    for(Player player: players){
-                        player.setWithCaller(caller.getUser().equals(player.getUser()) || player.getCards().contains(calledCard));
-                    }
-                    turnValue = TurnValue.BASIC;
+                    round.callCard(snapszerMoveDTO.getCard());
                 }
-            } else if(GameStatus.CALL_FIGURE.equals(gameStatus)){
-                Card csap = csapCards.get(csapIndex);
-                Figure csapFigure = snapszerMoveDTO.getCsapFigure();
-                adu = csap.getColor();
-                calledCard = new Card(adu, csapFigure);
-                gameStatus = GameStatus.FIRST_ACT;
-                caller.getCards().addAll(csapCards);
-                csapCards = null;
-                csapIndex = null;
-                for(Player player: players){
-                    player.setWithCaller(caller == player || player.getCards().contains(calledCard));
+
+            } else if(RoundState.CALL_FIGURE.equals(round.roundState)){
+                round.callFigure(snapszerMoveDTO.getCsapFigure());
+
+            } else if (RoundState.LICIT.equals(round.roundState)){
+                Licit licit = snapszerMoveDTO.getLicit();
+                if (Licit.CHECK.equals(licit)){
+                    round.checkLength ++;
+                } else {
+                    round.checkLength = 0;
                 }
-                turnValue = TurnValue.BASIC;
-            } else if (GameStatus.FIRST_ACT.equals(gameStatus)){
-                Act act = snapszerMoveDTO.getAct();
-                if (Act.CHECK.equals(act)){
-                    nextPlayer = getNextPlayer();
-                    gameStatus = GameStatus.ACT;
-                    lastTurnValueModifier = caller;
-                } else if(Act.SNAPSZER.equals(act)){
-                    snapszer = true;
-                    nextPlayer = getNextPlayer();
-                    gameStatus = GameStatus.ACT;
-                    lastTurnValueModifier = caller;
-                } else if(Act.THROW_IN.equals(act)){
-                    endRound();
-                }
-            } else if (GameStatus.ACT.equals(gameStatus)){
-                Act act = snapszerMoveDTO.getAct();
-                switch (act){
+                switch (licit){
                     case CHECK:
-                        Player nextP = getNextPlayer();
-                        if (nextP == lastTurnValueModifier){
-                            nextPlayer = caller;
-                            gameStatus = GameStatus.PLAY_CARD;
-                            lastTurnValueModifier = null;
+                        if (round.checkLength == 4 || (round.checkLength == 3 && !round.firstLicitTurn)){ //FIXME snapszer check check check / max limit / passz snapszer passz passz / ?
+                            round.roundState = RoundState.TURNS;
+                            nextPlayer = round.caller;
+                            round.turn = new Turn(nextPlayer);
+                            round.turns.add(round.turn);
                         } else {
-                            nextPlayer = nextP;
+                            nextPlayer = getNextPlayer();
+                            if (round.caller.equals(nextPlayer)){
+                                round.firstLicitTurn = false;
+                            }
                         }
                         return;
+
                     case SNAPSZER:
-                        snapszer = true;
-                        lastTurnValueModifier = this.nextPlayer;
+                        round.snapszer = true;
                         nextPlayer = getNextPlayer();
+                        if (round.caller.equals(nextPlayer)){
+                            round.firstLicitTurn = false;
+                        }
                         return;
+
                     case CONTRA:
-                        lastTurnValueModifier = nextPlayer;
+                        round.turnValue = round.turnValue.getNextTurnValue();
                         nextPlayer = getNextPlayer();
-                        switch (turnValue){
-                            case BASIC:
-                                turnValue = TurnValue.KONTRA;
-                                return;
-                            case KONTRA:
-                                turnValue = TurnValue.RE_KONTRA;
-                                return;
-                            case RE_KONTRA:
-                                turnValue = TurnValue.SZUB_KONTRA;
-                                return;
-                            case SZUB_KONTRA:
-                                turnValue = TurnValue.MORD_KONTRA;
-                                return;
-                            case MORD_KONTRA:
-                                turnValue = TurnValue.HIRSCH_KONTRA;
-                                return;
-                            case HIRSCH_KONTRA:
-                                turnValue = TurnValue.FEDAK_SARI;
-                                return;
-                            case FEDAK_SARI:
-                                turnValue = TurnValue.KEREKES_BICIKLI;
+                        if (round.caller.equals(nextPlayer)){
+                            round.firstLicitTurn = false;
                         }
+                        return;
+
+                    case CONTRA_SNAPSZER:
+                        round.turnValue = round.turnValue.getNextTurnValue();
+                        round.snapszer = true;
+                        nextPlayer = getNextPlayer();
+                        if (round.caller.equals(nextPlayer)){
+                            round.firstLicitTurn = false;
+                        }
+                        return;
+
+                    case THROW_IN:
+                        endRound(EndRound.THROW_IN);
+                        return;
+
+                    case THREE_NINE:
+                        rounds.remove(round);
+                        round = new Round(round.caller);
+                        rounds.add(round);
+                        return;
                 }
-            } else if (GameStatus.PLAY_CARD.equals(gameStatus)){
-                if (Boolean.TRUE.equals(snapszerMoveDTO.getCount())){
+            } else if (RoundState.TURNS.equals(round.roundState)){
+                ActionType actionType = snapszerMoveDTO.getActionType();
+                switch (actionType){
+                    case TWENTY:
+                        round.turn.twenty = true;
+                        round.scoreBoard.score(nextPlayer, 20);
+                        return;
 
-                    Set<Player> winners = Sets.newHashSet();
-                    if (secret && userDTO.equals(nextPlayer.getUser())){
-                        winners.add(nextPlayer);
-                    } else {
-                        winners.addAll(players.stream().filter(p-> p.getWithCaller() == nextPlayer.getWithCaller()).collect(Collectors.toList()));
-                    }
+                    case FORTY:
+                        round.turn.forty = true;
+                        round.scoreBoard.score(nextPlayer, 40);
+                        return;
 
-                    winners.forEach(w-> w.setPoints(w.getPoints() + 1)); //FIXME +1
-
-                    gameStatus = GameStatus.CALL_CARD;
-                    nextPlayer = getNextPlayer(caller);
-                    strongestRoundCard = null;
-                    firstRoundCard = null;
-                    round.clear();
-                    adu = null;
-                    snapszer = false;
-                    calledCard = null;
-                    turnValue = TurnValue.BASIC;
-                    caller = nextPlayer;
-                    secret = true;
-                    lastRound = null;
-                    players.forEach(p-> p.getWonRounds().clear());
-                    players.forEach(p-> p.setWithCaller(null));
-                    players.forEach(p-> p.getCards().clear());
-
-                    dealCards();
-                } else {
-                    Card card = snapszerMoveDTO.getCard();
-                    nextPlayer.getCards().remove(card);
-                    round.put(card, nextPlayer);
-                    if (card.equals(calledCard)){
-                        secret = false;
-                    }
-
-                    if (round.size() == 1){
-                        nextPlayer = getNextPlayer();
-                        firstRoundCard = card;
-                        strongestRoundCard = card;
-                    } else if (round.size() == 4){
-
-                        if (strongestRoundCard.getColor().equals(adu)){
-                            if (card.getColor().equals(adu) && card.getFigure().strongerThan(strongestRoundCard.getFigure())){
-                                strongestRoundCard = card;
-                            }
-                        } else if (card.getColor().equals(adu)){
-                            strongestRoundCard = card;
-                        } else if (strongestRoundCard.getColor().equals(card.getColor()) && card.getFigure().strongerThan(strongestRoundCard.getFigure())){
-                            strongestRoundCard = card;
+                    case PLAY_CARD:
+                        Card card = snapszerMoveDTO.getCard();
+                        nextPlayer.getCards().remove(card);
+                        if (card.equals(round.calledCard)){
+                            round.secret = false;
                         }
-
-                        Player roundWinner = round.get(strongestRoundCard);
-
-                        lastRound = new ArrayList<>(round.keySet());
-                        roundWinner.getWonRounds().add(lastRound);
-
-                        if (roundWinner.getCards().isEmpty()){
-                            Player winner = round.get(strongestRoundCard);
-                            boolean callerWon = winner.getWithCaller();
-
-
-                            //...ha nincs vége
-                            gameStatus = GameStatus.CALL_CARD;
-                            nextPlayer = getNextPlayer(caller);
-                            strongestRoundCard = null;
-                            firstRoundCard = null;
-                            round.clear();
-                            adu = null;
-                            snapszer = false;
-                            calledCard = null;
-                            turnValue = TurnValue.BASIC;
-                            caller = nextPlayer;
-                            secret = true;
-                            lastRound = null;
-                            players.forEach(p-> p.getWonRounds().clear());
-                            players.forEach(p-> p.setWithCaller(null));
-                            dealCards();
+                        round.turn.playCard(nextPlayer, card);
+                        if (round.turn.cards.size() != players.size()){
+                            nextPlayer = getNextPlayer();
                         } else {
-                            nextPlayer = roundWinner;
-                            strongestRoundCard = null;
-                            firstRoundCard = null;
-                            round.clear();
+                            endTurn();
                         }
-                    } else {
-                        nextPlayer = getNextPlayer();
-                        if (strongestRoundCard.getColor().equals(adu)){
-                            if (card.getColor().equals(adu) && card.getFigure().strongerThan(strongestRoundCard.getFigure())){
-                                strongestRoundCard = card;
-                            }
-                        } else if (card.getColor().equals(adu)){
-                            strongestRoundCard = card;
-                        } else if (strongestRoundCard.getColor().equals(card.getColor()) && card.getFigure().strongerThan(strongestRoundCard.getFigure())){
-                            strongestRoundCard = card;
-                        }
-                    }
+                        return;
+
+                    case STOP:
+                        endRound(EndRound.STOP);
+                        return;
+
+                    case KOPP:
+                        kopp();
                 }
             }
         } catch (JsonProcessingException e) {
@@ -533,8 +454,127 @@ public class Snapszer extends Game {
         }
     }
 
-    private void endRound() {
-        //TODO
+    enum EndRound {
+        NO_CARDS,
+        SNAPSZER_FAIL,
+        STOP,
+        THROW_IN
+    }
+
+    private void endRound(EndRound endRound) {
+        final Set<Player> countForPlayers = Sets.newHashSet();
+        int point = 1;
+
+        switch (endRound){
+            case SNAPSZER_FAIL:{
+                countForPlayers.addAll(players.stream().filter(p-> !round.playersWithCaller.contains(p)).collect(Collectors.toSet()));
+                point = 6 * round.turnValue.getValue();
+                break;
+            }
+            case NO_CARDS: {
+                countForPlayers.addAll(players.stream().filter(p-> round.playersWithCaller.contains(p) == round.playersWithCaller.contains(nextPlayer)).collect(Collectors.toSet()));
+                int snapszer = round.snapszer ? 6 : 1;
+                int modifier = 1;
+                if (!round.snapszer){
+                    int pointsForOtherTeam = 0;
+                    Set<Player> otherTeam = players.stream().filter(player -> !countForPlayers.contains(player)).collect(Collectors.toSet());
+                    for (Player player: otherTeam){
+                        pointsForOtherTeam += round.scoreBoard.get(player);
+                    }
+                    if (otherTeam.stream().allMatch(player -> round.turns.stream().noneMatch(turn -> player.equals(turn.strongestPlayer)))){
+                        modifier = 3;
+                    } else if(pointsForOtherTeam < 33){
+                        modifier = 2;
+                    }
+                }
+                point = snapszer * round.turnValue.getValue() * modifier;
+                break;
+            }
+            case STOP: {
+                if (round.secret){
+                    countForPlayers.add(nextPlayer);
+                } else {
+                    countForPlayers.addAll(players.stream().filter(p-> round.playersWithCaller.contains(p) == round.playersWithCaller.contains(nextPlayer)).collect(Collectors.toList()));
+                }
+                int snapszer = round.snapszer ? 6 : 1;
+                int modifier = 1;
+                if (!round.snapszer){
+                    int pointsForOtherTeam = 0;
+                    Set<Player> otherTeam = players.stream().filter(player -> !countForPlayers.contains(player)).collect(Collectors.toSet());
+                    for (Player player: otherTeam){
+                        pointsForOtherTeam += round.scoreBoard.get(player);
+                    }
+                    if (otherTeam.stream().allMatch(player -> round.turns.stream().noneMatch(turn -> player.equals(turn.strongestPlayer)))){
+                        modifier = 3;
+                    } else if(pointsForOtherTeam < 33){
+                        modifier = 2;
+                    }
+                }
+                point = snapszer * round.turnValue.getValue() * modifier;
+                break;
+            }
+            case THROW_IN: {
+                countForPlayers.addAll(players.stream().filter(player -> !round.playersWithCaller.contains(player)).collect(Collectors.toSet()));
+                point = 2;
+                break;
+            }
+        }
+
+        round.finalScoreBoard = new ScoreBoard(players);
+        for(Player player: countForPlayers){
+            round.finalScoreBoard.score(player, point);
+            scoreBoard.score(player, point);
+        }
+
+        if (scoreBoard.max() > 32){
+            gameState = GameState.ENDED;
+        } else {
+            nextPlayer = getNextPlayer(round.caller);
+            round = new Round(nextPlayer);
+            rounds.add(round);
+        }
+    }
+
+    private void endTurn() {
+        int sum = 0;
+        for(Card card: round.turn.cards){
+            sum += card.getFigure().getValue();
+        }
+        round.scoreBoard.score(round.turn.strongestPlayer, sum);
+
+        round.turn.ended = true;
+
+        nextPlayer = round.turn.strongestPlayer;
+    }
+
+    private void kopp() {
+        if(round.snapszer && !round.playersWithCaller.contains(nextPlayer)){
+            endRound(EndRound.SNAPSZER_FAIL);
+        } else {
+            if (nextPlayer.getCards().isEmpty()){
+                endRound(EndRound.NO_CARDS);
+            } else {
+                round.turn = new Turn(nextPlayer);
+                round.turns.add(round.turn);
+            }
+        }
+    }
+
+    @Override
+    public void surrender(UserDTO userDTO) {
+
+    }
+
+    @Override
+    public void restart() {
+        nextPlayer = null;
+        round = null;
+        scoreBoard.clear();
+        rounds = new ArrayList<>();
+    }
+
+    private Player getPlayer(UserDTO user){
+        return players.stream().filter(player -> player.getUser().equals(user)).findFirst().orElse(null);
     }
 
     private Player getNextPlayer(Player player) {
@@ -543,6 +583,133 @@ public class Snapszer extends Game {
 
     private Player getNextPlayer() {
         return players.get((players.indexOf(nextPlayer) + 1) % players.size());
+    }
+
+
+    public class Round {
+        RoundState roundState = RoundState.CALL_CARD;
+        Player caller;
+        Set<Player> playersWithCaller = new HashSet<>();
+        List<Card> csapCards = new ArrayList<>();
+        Card calledCard = null;
+        Color adu = null;
+        TurnValue turnValue = TurnValue.BASIC;
+        Card csapCard = null;
+        boolean snapszer = false;
+        boolean firstLicitTurn = true;
+        int checkLength = 0;
+        boolean secret = true;
+        ScoreBoard scoreBoard;
+        ScoreBoard finalScoreBoard = null;
+        Turn turn = null;
+        List<Turn> turns = new ArrayList<>();
+
+        public Round(Player player){
+            caller = player;
+            playersWithCaller.add(caller);
+            players.forEach(p -> p.getCards().clear());
+            dealCards();
+            scoreBoard = new ScoreBoard(players);
+        }
+
+        private void callCard(Card card) {
+            calledCard = card;
+            adu = card.getColor();
+            caller.getCards().addAll(round.csapCards);
+            csapCards.clear();
+            playersWithCaller.addAll(players.stream().filter(player -> player.getCards().contains(card)).collect(Collectors.toSet()));
+            roundState = RoundState.LICIT;
+        }
+
+        private void callFigure(Figure figure) {
+            callCard(new Card(round.csapCard.getColor(), figure));
+        }
+
+        private void dealCards(){
+            Player player_1 = getNextPlayer(caller);
+            Player player_2 = getNextPlayer(player_1);
+            Player player_3 = getNextPlayer(player_2);
+
+            Deck deck = new Deck();
+
+            caller.getCards().add(deck.draw());
+            player_1.getCards().add(deck.draw());
+            player_2.getCards().add(deck.draw());
+            player_3.getCards().add(deck.draw());
+
+            caller.getCards().add(deck.draw());
+            player_1.getCards().add(deck.draw());
+            player_2.getCards().add(deck.draw());
+            player_3.getCards().add(deck.draw());
+
+            caller.getCards().add(deck.draw());
+            player_1.getCards().add(deck.draw());
+            player_2.getCards().add(deck.draw());
+            player_3.getCards().add(deck.draw());
+
+            csapCards.add(deck.draw());
+            player_1.getCards().add(deck.draw());
+            player_2.getCards().add(deck.draw());
+            player_3.getCards().add(deck.draw());
+
+            csapCards.add(deck.draw());
+            player_1.getCards().add(deck.draw());
+            player_2.getCards().add(deck.draw());
+            player_3.getCards().add(deck.draw());
+
+            csapCards.add(deck.draw());
+            player_1.getCards().add(deck.draw());
+            player_2.getCards().add(deck.draw());
+            player_3.getCards().add(deck.draw());
+        }
+
+        Turn getLastEndedTurn() {
+            Turn result = null;
+            for(Turn turn: turns){
+                if (turn.ended){
+                    result = turn;
+                }
+            }
+            return result;
+        }
+    }
+
+
+    public class Turn {
+        public boolean ended = false;
+        List<Card> cards = Lists.newArrayList();
+        Card strongestCard = null;
+        Card firstCard = null;
+        Player caller;
+        Player strongestPlayer;
+        boolean twenty = false;
+        boolean forty = false;
+
+        Turn(Player player){
+            caller = player;
+        }
+
+        void playCard(Player player, Card card){
+            if (cards.isEmpty()){
+                firstCard = card;
+                strongestCard = card;
+                strongestPlayer = player;
+            } else {
+                if (strongestCard.getColor().equals(round.adu)){
+                    if (card.getColor().equals(round.adu) && card.getFigure().strongerThan(strongestCard.getFigure())){
+                        strongestCard = card;
+                        strongestPlayer = player;
+                    }
+                } else if (card.getColor().equals(round.adu)){
+                    strongestCard = card;
+                    strongestPlayer = player;
+                } else if (strongestCard.getColor().equals(card.getColor()) && card.getFigure().strongerThan(strongestCard.getFigure())){
+                    strongestCard = card;
+                    strongestPlayer = player;
+                }
+            }
+            cards.add(card);
+        }
     }
 
 }

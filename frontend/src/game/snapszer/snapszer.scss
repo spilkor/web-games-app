@@ -8,6 +8,10 @@
   width: 100%;
   height: 100%;
 
+  .lobby{
+    min-width: 250px;
+  }
+
   .my-hand{
     display: flex;
     position: fixed;
@@ -22,6 +26,64 @@
     .card{
       transition: all .1s ease-out;
       transform: rotate(0);
+    }
+
+    .card-8-1{
+      margin-right: -40px;
+      transform: rotate(-35deg);
+    }
+    .card-8-2{
+      margin-right: -35px;
+      transform: rotate(-25deg);
+    }
+    .card-8-3{
+      margin-right: -30px;
+      transform: rotate(-15deg);
+    }
+    .card-8-4{
+      margin-right: -25px;
+      transform: rotate(-5deg);
+    }
+    .card-8-5{
+      margin-left: -25px;
+      transform: rotate(5deg);
+    }
+    .card-8-6{
+      margin-left: -30px;
+      transform: rotate(15deg);
+    }
+    .card-8-7{
+      margin-left: -35px;
+      transform: rotate(25deg);
+    }
+    .card-8-8{
+      margin-left: -40px;
+      transform: rotate(35deg);
+    }
+
+    .card-7-1{
+      margin-right: -50px;
+      transform: rotate(-25deg);
+    }
+    .card-7-2{
+      margin-right: -40px;
+      transform: rotate(-15deg);
+    }
+    .card-7-3{
+      margin-right: -30px;
+      transform: rotate(-5deg);
+    }
+    .card-7-5{
+      margin-left: -30px;
+      transform: rotate(5deg);
+    }
+    .card-7-6{
+      margin-left: -40px;
+      transform: rotate(15deg);
+    }
+    .card-7-7{
+      margin-left: -50px;
+      transform: rotate(25deg);
     }
 
     .card-6-1{
@@ -283,9 +345,17 @@
   }
 
   .round :nth-child(4){
-    transform: scale(.8) rotate(50deg)translate(80px, 50px);
+    transform: scale(.8) rotate(50deg) translate(80px, 50px);
   }
 
+  .round .twenty-or-forty{
+    transform: scale(.6) rotate(0deg) translate(-600px, -100px) !important;
+  }
+
+
+  .round.kopp img:hover{
+    cursor: pointer;
+  }
 
   .last-round{
     position: absolute;
@@ -329,18 +399,103 @@
     cursor: pointer;
   }
 
-  .count:hover{
+  .stop:hover{
     cursor: pointer;
     transform: scale(1.1);
   }
 
-  .count{
+  .stop{
     position: absolute;
     top: 30px;
     right: 30px;
     transition: all .1s;
     height: 100px;
     width: 100px;
+  }
+
+
+  .score-board-logo{
+    position: absolute;
+    bottom: 0;
+    right: -50px;
+    background: #86c3e9;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .3s;
+    width: 40px;
+    height: 40px;
+    z-index: 105;
+    outline: 1px solid;
+  }
+
+  .score-board-logo.open{
+    z-index: 100;
+  }
+
+  .score-board-logo svg{
+    margin: 5px;
+  }
+
+  .score-board-logo:hover{
+    transform: scale(1.1);
+  }
+
+  .score-board{
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    top: 50%;
+    position: fixed;
+    background: #86c3e9;
+    outline: 2px solid;
+    padding: 10px;
+
+    .score-board-row{
+      display: flex;
+    }
+
+    .score-board-cell{
+      width: 150px;
+      height: 30px;
+      border: 1px solid;
+      line-height: 30px;
+      margin:-1px 0 0 -1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .score-board-cell.winner{
+      background-color: rgba(yellow, .4);
+    }
+
+    .score-board-cell.is-wide{
+      width: 240px;
+      padding-left: 6px;
+    }
+    .score-board-cell.c-first-letter:first-letter{
+      text-transform: capitalize;
+    }
+
+
+    .score-board-cell.caller{
+      background-color: rgba(white, .3);
+    }
+
+    .score-board-cell.is-bold{
+      font-weight: bold;
+    }
+
+    .score-board-cell.border-none{
+      border: none;
+      padding-right: 2px;
+    }
+
+    .score-board-wrapper{
+      max-height: 350px;
+      overflow-y: scroll;
+      scrollbar-color: black transparent;
+    }
+
   }
 
 }

@@ -5,46 +5,62 @@ import React from "react";
 export type Player = {
     user: User
     cards: Card[]
-    points: number | null
     withCaller: boolean | null
-    wonRounds: Card[][] | null
 }
 
 export type SnapszerGameDTO = {
     players: Player[]
-    caller: Player | null
     nextPlayer: Player | null
-    gameStatus: GameStatus
+    round: Round | null
+    rounds: Round[] | null
+    scoreBoard: (number | null)[]
+}
+
+export type Round = {
+    caller: Player
+    roundState: RoundState
     csapCards: Card[] | null
-    csapIndex: number | null
+    csapCard: Card | null
     calledCard: Card | null
     adu: Color | null
-    snapszer: boolean | null
-    turnValue: TurnValue | null
-    round: Card[] | null
-    lastRound: Card[] | null
+    snapszer: boolean
+    turnValue: TurnValue
+    turn: Turn | null
+    turns: Turn[] | null
+    scoreBoard: (number | null)[] | null
+    firstLicitTurn: boolean
 }
 
-export type SnapszerGameSettingsDTO = {
-    lastRound: Card[] | null
+export type Turn = {
+    cards: Card[] | null
+    caller: Player | null
+    twenty: boolean | null
+    forty: boolean | null
+    ended: boolean
+    strongestPlayer: Player | null
 }
-
 
 export type SnapszerMoveDTO = {
     csapIndex: number | null
     csapFigure: Figure | null
-    calledCard: Card | null
-    act: Act | null
+    licit: Licit | null
     card: Card | null
-    count: boolean | null
+    actionType: ActionType | null
 }
 
-export enum GameStatus {
+export enum ActionType {
+    TWENTY = "TWENTY",
+    FORTY = "FORTY",
+    PLAY_CARD = "PLAY_CARD",
+    STOP = "STOP",
+    KOPP = "KOPP"
+}
+
+export enum RoundState {
     CALL_CARD = "CALL_CARD",
     CALL_FIGURE = "CALL_FIGURE",
-    FIRST_ACT = "FIRST_ACT",
-    ACT = "ACT",
-    PLAY_CARD = "PLAY_CARD"
+    LICIT = "LICIT",
+    TURNS = "TURNS"
 }
 
 export type Card = {
@@ -52,11 +68,13 @@ export type Card = {
     figure: Figure;
 }
 
-export enum Act {
+export enum Licit {
     CHECK = "CHECK",
     SNAPSZER = "SNAPSZER",
     THROW_IN = "THROW_IN",
-    CONTRA = "CONTRA"
+    CONTRA = "CONTRA",
+    CONTRA_SNAPSZER = "CONTRA_SNAPSZER",
+    THREE_NINE = "THREE_NINE"
 }
 
 export enum Color {
@@ -74,7 +92,9 @@ export enum Figure {
     FELSO = "FELSO",
     ALSO = "ALSO",
     KILENC = "KILENC",
-    UNKNOWN = "UNKNOWN"
+    UNKNOWN = "UNKNOWN",
+    TWENTY = "TWENTY",
+    FORTY = "FORTY"
 }
 
 export enum TurnValue {

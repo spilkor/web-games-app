@@ -3,17 +3,18 @@ import React, {useContext, useState} from 'react';
 
 import {GameState} from "../../util/types";
 import './snapszer.scss';
-import {StartGameButton} from "../Game";
+import {QuitButton, StartGameButton} from "../Game";
 import {AppContext} from "../../App";
 import {
-    Act,
+    ActionType,
     Card,
     Color,
     Figure,
-    GameStatus,
+    Licit,
     Player,
+    Round,
+    RoundState,
     SnapszerGameDTO,
-    SnapszerGameSettingsDTO,
     SnapszerMoveDTO,
     TurnValue
 } from "./snapszerTypes";
@@ -46,6 +47,9 @@ import zoldfelso from "./png/zoldfelso.png";
 import zoldalso from "./png/zoldalso.png";
 import zoldkilenc from "./png/zoldkilenc.png";
 
+import twenty from "./png/twenty.png";
+import forty from "./png/forty.png";
+
 import cardback from "./png/cardback.png";
 
 import hand_0 from "./png/hand_0.png";
@@ -63,6 +67,7 @@ import {Modal} from "../../modal/Modal";
 import API from "../../util/API";
 
 import {ReactComponent as HandSVG} from './svg/hand.svg';
+import {ReactComponent as ScoreBoardSVG} from './svg/scoreboardlogo.svg';
 
 export function Snapszer () {
 
@@ -70,7 +75,14 @@ export function Snapszer () {
 
     const snapszerGameDTO = JSON.parse(gameData!.gameJSON) as SnapszerGameDTO;
 
-    const {players, caller, nextPlayer, gameStatus, csapCards, csapIndex, snapszer, turnValue, round, calledCard} = snapszerGameDTO;
+    const {
+        players,
+        nextPlayer,
+        round,
+        rounds,
+        scoreBoard
+    } = snapszerGameDTO;
+
 
     const myTurn = nextPlayer && nextPlayer.user.id == user!.id;
 
@@ -83,20 +95,9 @@ export function Snapszer () {
 
     const [jokerOpen, setJokerOpen] = useState<boolean>(false);
 
+    const [scoreBoardOpen, setScoreBoardOpen] = useState<boolean>(false);
+
     const [showPlayerWonCards, setShowPlayerWonCards] = useState<Player>();
-
-
-    const tempSetting = gameSettings as SnapszerGameSettingsDTO;
-    const snapszerGameSettingsDTO = {
-        lastRound: tempSetting && tempSetting.lastRound ? tempSetting.lastRound : null,
-    } as SnapszerGameSettingsDTO;
-    const {
-        lastRound
-    } = snapszerGameSettingsDTO;
-
-    const lastRoundChanged = snapszerGameDTO.lastRound && snapszerGameDTO.lastRound.find((c: Card) => {return lastRound != null && !lastRound.find((c2: Card)=>{return c.figure === c2.figure && c.color === c2.color})});
-
-    lastRoundChanged && setGameSettings!(snapszerGameSettingsDTO);
 
     function getIndex(index: number) {
         if (index < 0){
@@ -163,21 +164,23 @@ export function Snapszer () {
                 <LeftHand/>
                 <OppositeHand/>
                 <RightHand/>
-                {round && <Round/>}
-                {lastRound && <LastRound/>}
-                {(gameStatus === GameStatus.CALL_CARD || gameStatus === GameStatus.CALL_FIGURE) &&
+                {round && round.turn && <Round/>}
+                {/*{lastRound && <LastRound/>}*/}
+                {(round && round.roundState === RoundState.CALL_CARD || round && round.roundState === RoundState.CALL_FIGURE) &&
                     <Csap/>
                 }
-                {myTurn && (gameStatus === GameStatus.CALL_CARD || gameStatus === GameStatus.CALL_FIGURE) &&
+                {myTurn && (round && round.roundState === RoundState.CALL_CARD || round && round.roundState === RoundState.CALL_FIGURE) &&
                     <Joker/>
                 }
-                {myTurn && (gameStatus === GameStatus.FIRST_ACT || gameStatus === GameStatus.ACT) &&
+                {myTurn && (round && round.roundState === RoundState.LICIT) &&
                 <ActComp/>
                 }
                 <MyHand/>
                 <WoundRounds/>
                 <CalledCard/>
-                {myTurn && gameStatus === GameStatus.PLAY_CARD && myPlayer.wonRounds && myPlayer.wonRounds.length !== 0 && <Count/>}
+                {myTurn && round?.roundState === RoundState.TURNS && round.turns?.length !== 1 && round.turn?.cards?.length === 0 &&
+                <Stop/>}
+
             </div>
         );
     }
@@ -245,6 +248,14 @@ export function Snapszer () {
         }
     }
 
+    function ScoreBoardLogo(){
+        return(
+            <div className={"score-board-logo" + (scoreBoardOpen ? " open" : "")} onClick={()=> setScoreBoardOpen(true)}>
+                <ScoreBoardSVG/>
+            </div>
+        );
+    }
+
     function Joker () {
         return(
             <>
@@ -255,7 +266,7 @@ export function Snapszer () {
                 }
                 {jokerOpen &&
                 <Modal isOpen={jokerOpen} closeOnBackGroundClick={true} close={()=> {setJokerOpen(false)}}>
-                    {gameStatus === GameStatus.CALL_CARD ? <CallCard/> : <CallFigure/>}
+                    {round && round.roundState === RoundState.CALL_CARD ? <CallCard/> : <CallFigure/>}
                 </Modal>
                 }
             </>
@@ -301,7 +312,7 @@ export function Snapszer () {
         }
 
         function CallFigure () {
-            const csapColor = csapCards![csapIndex!].color;
+            const csapColor = round && round.csapCard && round.csapCard.color;
             return(
                 <div className={"call-card"} >
                     {csapColor == Color.MAKK &&
@@ -355,35 +366,65 @@ export function Snapszer () {
     function ActComp () {
         return(
             <div className={"act"} >
-                <div className={"act-option"} onClick={()=> act(Act.CHECK)}>
+                <div className={"act-option"} onClick={()=> act(Licit.CHECK)}>
                     Check
                 </div>
-                {(myPlayer.withCaller === true && !snapszer) &&
-                <div className={"act-option"} onClick={()=> act(Act.SNAPSZER)}>
+                {(myPlayer.withCaller === true && round && !round.snapszer && round.firstLicitTurn) &&
+                <div className={"act-option"} onClick={()=> act(Licit.SNAPSZER)}>
                     Snapszer
                 </div>
                 }
                 <Contra/>
-                {gameStatus === GameStatus.FIRST_ACT &&
-                <div className={"act-option"} onClick={()=> act(Act.THROW_IN)}>
+                <ContraSnapszer/>
+                {round && round.firstLicitTurn && round.caller.user.id === myPlayer.user.id &&
+                <div className={"act-option"} onClick={()=> act(Licit.THROW_IN)}>
                     Throw in
+                </div>
+                }
+                {round && round.firstLicitTurn && round.caller.user.id === myPlayer.user.id && myPlayer.cards.filter(c => c.figure === Figure.KILENC).length >= 3 &&
+                <div className={"act-option"} onClick={()=> act(Licit.THREE_NINE)}>
+                    Three nine
                 </div>
                 }
             </div>
         );
     }
 
-    function Contra () {
-        if (gameStatus == GameStatus.FIRST_ACT){
+    function ContraSnapszer () {
+        if (!(myPlayer.withCaller === true && round && !round.snapszer && round.firstLicitTurn)){
             return null;
         }
-        switch (turnValue + "") {
+        switch (round && round.turnValue + "") {
+            case TurnValue.KONTRA:
+                return (
+                    <div className={"act-option"} onClick={()=> act(Licit.CONTRA_SNAPSZER)}>
+                        {getContraString(TurnValue.RE_KONTRA) + " snapszer"}
+                    </div>
+                );
+            case TurnValue.SZUB_KONTRA:
+                return (
+                    <div className={"act-option"} onClick={()=> act(Licit.CONTRA_SNAPSZER)}>
+                        {getContraString(TurnValue.MORD_KONTRA) + " snapszer"}
+                    </div>
+                );
+            case TurnValue.HIRSCH_KONTRA:
+                return (
+                    <div className={"act-option"} onClick={()=> act(Licit.CONTRA_SNAPSZER)}>
+                        {getContraString(TurnValue.FEDAK_SARI) + " snapszer"}
+                    </div>
+                );
+            default: return null;
+        }
+    }
+
+    function Contra () {
+        switch (round && round.turnValue + "") {
             case TurnValue.BASIC:
                 if (myPlayer.withCaller){
                     return null;
                 } else {
                     return (
-                        <div className={"act-option"} onClick={()=> act(Act.CONTRA)}>
+                        <div className={"act-option"} onClick={()=> act(Licit.CONTRA)}>
                             {getContraString(TurnValue.KONTRA)}
                         </div>
                     );
@@ -391,7 +432,7 @@ export function Snapszer () {
             case TurnValue.KONTRA:
                 if (myPlayer.withCaller){
                     return (
-                        <div className={"act-option"} onClick={()=> act(Act.CONTRA)}>
+                        <div className={"act-option"} onClick={()=> act(Licit.CONTRA)}>
                             {getContraString(TurnValue.RE_KONTRA)}
                         </div>
                     );
@@ -403,7 +444,7 @@ export function Snapszer () {
                     return null;
                 } else {
                     return (
-                        <div className={"act-option"} onClick={()=> act(Act.CONTRA)}>
+                        <div className={"act-option"} onClick={()=> act(Licit.CONTRA)}>
                             {getContraString(TurnValue.SZUB_KONTRA)}
                         </div>
                     );
@@ -411,7 +452,7 @@ export function Snapszer () {
             case TurnValue.SZUB_KONTRA:
                 if (myPlayer.withCaller){
                     return (
-                        <div className={"act-option"} onClick={()=> act(Act.CONTRA)}>
+                        <div className={"act-option"} onClick={()=> act(Licit.CONTRA)}>
                             {getContraString(TurnValue.MORD_KONTRA)}
                         </div>
                     );
@@ -423,7 +464,7 @@ export function Snapszer () {
                     return null;
                 } else {
                     return (
-                        <div className={"act-option"} onClick={()=> act(Act.CONTRA)}>
+                        <div className={"act-option"} onClick={()=> act(Licit.CONTRA)}>
                             {getContraString(TurnValue.HIRSCH_KONTRA)}
                         </div>
                     );
@@ -431,7 +472,7 @@ export function Snapszer () {
             case TurnValue.HIRSCH_KONTRA:
                 if (myPlayer.withCaller){
                     return (
-                        <div className={"act-option"} onClick={()=> act(Act.CONTRA)}>
+                        <div className={"act-option"} onClick={()=> act(Licit.CONTRA)}>
                             {getContraString(TurnValue.FEDAK_SARI)}
                         </div>
                     );
@@ -443,77 +484,104 @@ export function Snapszer () {
                     return null;
                 } else {
                     return (
-                        <div className={"act-option"} onClick={()=> act(Act.CONTRA)}>
+                        <div className={"act-option"} onClick={()=> act(Licit.CONTRA)}>
                             {getContraString(TurnValue.KEREKES_BICIKLI)}
                         </div>
                     );
                 }
             default: return null;
         }
-
-        function getContraString(turnValue: TurnValue) : string {
-            switch (turnValue + "") {
-                case TurnValue.KONTRA: return "Kontra";
-                case TurnValue.RE_KONTRA: return "Rekontra";
-                case TurnValue.SZUB_KONTRA: return "Szubkontra";
-                case TurnValue.MORD_KONTRA: return "Mordkontra";
-                case TurnValue.HIRSCH_KONTRA: return "Hirschkontra";
-                case TurnValue.FEDAK_SARI: return "Fedák Sári";
-                case TurnValue.KEREKES_BICIKLI: return "Kerekes bicikli";
-                default: return "";
-            }
+    }
+    function getContraString(turnValue: TurnValue) : string {
+        switch (turnValue + "") {
+            case TurnValue.KONTRA: return "Kontra";
+            case TurnValue.RE_KONTRA: return "Rekontra";
+            case TurnValue.SZUB_KONTRA: return "Szubkontra";
+            case TurnValue.MORD_KONTRA: return "Mordkontra";
+            case TurnValue.HIRSCH_KONTRA: return "Hirschkontra";
+            case TurnValue.FEDAK_SARI: return "Fedák Sári";
+            case TurnValue.KEREKES_BICIKLI: return "Kerekes bicikli";
+            default: return "";
         }
     }
 
-    function LastRound () {
+    function Round () {
+        const myKopp = myTurn && round!.turn!.ended;
         return(
-            <div className={"last-round"}>
-                {lastRound!.length > 0 && <Card card={lastRound![0]}/>}
-                {lastRound!.length > 1 && <Card card={lastRound![1]}/>}
-                {lastRound!.length > 2 && <Card card={lastRound![2]}/>}
-                {lastRound!.length > 3 && <Card card={lastRound![3]}/>}
+            <div className={"round" + (myKopp ? " kopp" : "")}>
+                {round!.turn!.cards!.length > 0 && <Card card={round!.turn!.cards![0]} onClick={()=> myTurn && kopp()}/>}
+                {round!.turn!.cards!.length > 1 && <Card card={round!.turn!.cards![1]} onClick={()=> myTurn && kopp()}/>}
+                {round!.turn!.cards!.length > 2 && <Card card={round!.turn!.cards![2]} onClick={()=> myTurn && kopp()}/>}
+                {round!.turn!.cards!.length > 3 && <Card card={round!.turn!.cards![3]} onClick={()=> myTurn && kopp()}/>}
+                {round!.turn!.twenty && <Card className={"twenty-or-forty"} card={{color: Color.UNKNOWN, figure: Figure.TWENTY} as Card} onClick={()=> myTurn && kopp()}/>}
+                {round!.turn!.forty && <Card className={"twenty-or-forty"} card={{color: Color.UNKNOWN, figure: Figure.FORTY} as Card} onClick={()=> myTurn && kopp()}/>}
             </div>
         );
     }
 
-    function Round () {
-        return(
-            <div className={"round"}>
-                {round!.length > 0 && <Card card={round![0]}/>}
-                {round!.length > 1 && <Card card={round![1]}/>}
-                {round!.length > 2 && <Card card={round![2]}/>}
-                {round!.length > 3 && <Card card={round![3]}/>}
-            </div>
-        );
+    async function kopp() {
+        let snapszerMoveDTO = {
+            actionType: ActionType.KOPP
+        } as SnapszerMoveDTO;
+        API.move(JSON.stringify(snapszerMoveDTO));
     }
 
     function Csap () {
         return(
-            <div className={"csap" + ((myTurn && gameStatus === GameStatus.CALL_CARD) ? " my-turn" : "")} >
-                <Card card={csapCards![0]} onClick={gameStatus === GameStatus.CALL_CARD ? ()=> csapCard(0) : undefined}/>
-                <Card card={csapCards![1]} onClick={gameStatus === GameStatus.CALL_CARD ? ()=> csapCard(1) : undefined}/>
-                <Card card={csapCards![2]} onClick={gameStatus === GameStatus.CALL_CARD ? ()=> csapCard(2) : undefined}/>
+            <div className={"csap" + ((myTurn && round && round.roundState == RoundState.CALL_CARD) ? " my-turn" : "")} >
+                <Card card={round!.csapCards![0]} onClick={round && round.roundState == RoundState.CALL_CARD ? ()=> csapCard(0) : undefined}/>
+                <Card card={round!.csapCards![1]} onClick={round && round.roundState == RoundState.CALL_CARD ? ()=> csapCard(1) : undefined}/>
+                <Card card={round!.csapCards![2]} onClick={round && round.roundState == RoundState.CALL_CARD ? ()=> csapCard(2) : undefined}/>
             </div>
         );
     }
 
-    async function act(act: Act) {
+    async function act(licit: Licit) {
         let snapszerMoveDTO = {
-            act: act
+            licit
         } as SnapszerMoveDTO;
         API.move(JSON.stringify(snapszerMoveDTO));
     }
 
     async function playCard(card: Card) {
+        let snapszerMoveDTO;
+        if (card.figure === Figure.TWENTY){
+            snapszerMoveDTO = {
+                actionType: ActionType.TWENTY,
+            } as SnapszerMoveDTO;
+            API.move(JSON.stringify(snapszerMoveDTO));
+        } else if (card.figure === Figure.FORTY){
+            snapszerMoveDTO = {
+                actionType: ActionType.FORTY,
+            } as SnapszerMoveDTO;
+            API.move(JSON.stringify(snapszerMoveDTO));
+        } else {
+            snapszerMoveDTO = {
+                actionType: ActionType.PLAY_CARD,
+                card: card
+            } as SnapszerMoveDTO;
+        }
+        API.move(JSON.stringify(snapszerMoveDTO));
+    }
+
+
+    async function callTwenty() {
         let snapszerMoveDTO = {
-            card: card
+            actionType: ActionType.TWENTY
+        } as SnapszerMoveDTO;
+        API.move(JSON.stringify(snapszerMoveDTO));
+    }
+
+    async function callForty() {
+        let snapszerMoveDTO = {
+            actionType: ActionType.FORTY
         } as SnapszerMoveDTO;
         API.move(JSON.stringify(snapszerMoveDTO));
     }
 
     async function callCard(card: Card) {
         let snapszerMoveDTO = {
-            calledCard: card
+            card
         } as SnapszerMoveDTO;
         API.move(JSON.stringify(snapszerMoveDTO));
     }
@@ -533,10 +601,20 @@ export function Snapszer () {
     }
 
     function CalledCard () {
-        if (!calledCard){
+        if (!round || !round.calledCard){
             return null;
         }
+        return(
+            <div className={"called-card"}>
+                {round.caller.user.name + ": " + getRoundString(round)}
+            </div>
+        );
+    }
 
+    function getRoundString(round: Round) {
+        if (!round || !round.calledCard){
+            return "?";
+        }
         function getCardName(card: Card) {
             function getColorName(color: Color) {
                 switch (color) {
@@ -554,6 +632,7 @@ export function Snapszer () {
                     case Figure.TIZ: return "tíz";
                     case Figure.KIRALY: return "király";
                     case Figure.FELSO: return "felső";
+                    case Figure.ALSO: return "alsó";
                     case Figure.KILENC: return "kilenc";
                     default: return "";
                 }
@@ -580,46 +659,40 @@ export function Snapszer () {
             return snapszer ? " snapszer" : "";
         }
 
-        return(
-            <div className={"called-card"}>
-                {caller!.user.name + ": " + getCardName(calledCard) + getTurnValueString(turnValue!) + getSnapszerString(snapszer!)}
-            </div>
-        );
-
-
+        return getCardName(round.calledCard) + getTurnValueString(round.turnValue!) + getSnapszerString(round.snapszer!);
     }
 
     function WoundRounds () {
-        return(
-            <>
-                {showPlayerWonCards &&
+        if (showPlayerWonCards){
+            return (
                 <Modal isOpen={!!showPlayerWonCards} closeOnBackGroundClick={true} close={()=> {setShowPlayerWonCards(undefined)}}>
-                    <div className={"won-rounds"} >
-                    {showPlayerWonCards.wonRounds && showPlayerWonCards.wonRounds.map((woundRound, key) =>
-                        <div key={key} className={"row"}>
-                            {woundRound.map((card, key)=>
-                                <Card key={key} card={card}/>
-                            )}
-                        </div>
-                    )}
+                    <div className={"won-rounds"}>
+                        {round && round.turns && round.turns.filter(turn => turn.ended === true && turn.strongestPlayer && turn.strongestPlayer.user.id === showPlayerWonCards.user.id).map((turn, key) =>
+                            <div key={key} className={"row"}>
+                                {turn.cards && turn.cards.map((card, key)=>
+                                    <Card key={key} card={card}/>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </Modal>
-                }
-            </>
-        );
+            );
+        } else {
+            return null;
+        }
     }
 
-    function Count () {
+    function Stop () {
         return(
-            <div className={"count"} onClick={()=>count()}>
+            <div className={"stop"} onClick={()=>stop()}>
                 <HandSVG/>
             </div>
         );
     }
 
-    async function count() {
+    async function stop() {
         let snapszerMoveDTO = {
-            count: true
+            actionType: ActionType.STOP
         } as SnapszerMoveDTO;
         API.move(JSON.stringify(snapszerMoveDTO));
     }
@@ -628,7 +701,9 @@ export function Snapszer () {
         return(
             <div className={"my-hand"} >
                 {myPlayer.cards.map((card, key)=>
-                    <div key={key} className={"card card-" + myPlayer.cards.length + "-" + (key+1)} onClick={()=> myTurn && gameStatus === GameStatus.PLAY_CARD && playCard(card)}>
+                    <div key={key}
+                         className={"card card-" + myPlayer.cards.length + "-" + (key+1)}
+                         onClick={()=> myTurn && round && round.roundState === RoundState.TURNS && playCard(card)}>
                         <Card key={key} card={card}/>
                     </div>
                 )}
@@ -639,71 +714,79 @@ export function Snapszer () {
     type CardProps = {
         card: Card
         onClick?: ()=> any
+        className?: string
     }
 
-    function Card({card, onClick}: CardProps) {
+    function Card({card, onClick, className}: CardProps) {
         switch (card.color) {
             case Color.MAKK:
                 switch (card.figure) {
                     case Figure.ASZ:
-                        return <img alt = "makkasz" src={makkasz} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "makkasz" src={makkasz} onClick={()=> onClick && onClick()}/>;
                     case Figure.TIZ:
-                        return <img alt = "makktiz" src={makktiz} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "makktiz" src={makktiz} onClick={()=> onClick && onClick()}/>;
                     case Figure.KIRALY:
-                        return <img alt = "makkkiraly" src={makkkiraly} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "makkkiraly" src={makkkiraly} onClick={()=> onClick && onClick()}/>;
                     case Figure.FELSO:
-                        return <img alt = "makkfelso" src={makkfelso} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "makkfelso" src={makkfelso} onClick={()=> onClick && onClick()}/>;
                     case Figure.ALSO:
-                        return <img alt = "makkalso" src={makkalso} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "makkalso" src={makkalso} onClick={()=> onClick && onClick()}/>;
                     case Figure.KILENC:
-                        return <img alt = "makkkilenc" src={makkkilenc} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "makkkilenc" src={makkkilenc} onClick={()=> onClick && onClick()}/>;
                 }
             case Color.TOK:
                 switch (card.figure) {
                     case Figure.ASZ:
-                        return <img alt = "tokasz" src={tokasz} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "tokasz" src={tokasz} onClick={()=> onClick && onClick()}/>;
                     case Figure.TIZ:
-                        return <img alt = "toktiz" src={toktiz} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "toktiz" src={toktiz} onClick={()=> onClick && onClick()}/>;
                     case Figure.KIRALY:
-                        return <img alt = "tokkiraly" src={tokkiraly} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "tokkiraly" src={tokkiraly} onClick={()=> onClick && onClick()}/>;
                     case Figure.FELSO:
-                        return <img alt = "tokfelso" src={tokfelso} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "tokfelso" src={tokfelso} onClick={()=> onClick && onClick()}/>;
                     case Figure.ALSO:
-                        return <img alt = "tokalso" src={tokalso} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "tokalso" src={tokalso} onClick={()=> onClick && onClick()}/>;
                     case Figure.KILENC:
-                        return <img alt = "tokkilenc" src={tokkilenc} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "tokkilenc" src={tokkilenc} onClick={()=> onClick && onClick()}/>;
                 }
             case Color.KOR:
                 switch (card.figure) {
                     case Figure.ASZ:
-                        return <img alt = "korasz" src={korasz} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "korasz" src={korasz} onClick={()=> onClick && onClick()}/>;
                     case Figure.TIZ:
-                        return <img alt = "kortiz" src={kortiz} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "kortiz" src={kortiz} onClick={()=> onClick && onClick()}/>;
                     case Figure.KIRALY:
-                        return <img alt = "korkiraly" src={korkiraly} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "korkiraly" src={korkiraly} onClick={()=> onClick && onClick()}/>;
                     case Figure.FELSO:
-                        return <img alt = "korfelso" src={korfelso} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "korfelso" src={korfelso} onClick={()=> onClick && onClick()}/>;
                     case Figure.ALSO:
-                        return <img alt = "koralso" src={koralso} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "koralso" src={koralso} onClick={()=> onClick && onClick()}/>;
                     case Figure.KILENC:
-                        return <img alt = "korkilenc" src={korkilenc} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "korkilenc" src={korkilenc} onClick={()=> onClick && onClick()}/>;
                 }
             case Color.ZOLD:
                 switch (card.figure) {
                     case Figure.ASZ:
-                        return <img alt = "zoldasz" src={zoldasz} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "zoldasz" src={zoldasz} onClick={()=> onClick && onClick()}/>;
                     case Figure.TIZ:
-                        return <img alt = "zoldtiz" src={zoldtiz} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "zoldtiz" src={zoldtiz} onClick={()=> onClick && onClick()}/>;
                     case Figure.KIRALY:
-                        return <img alt = "zoldkiraly" src={zoldkiraly} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "zoldkiraly" src={zoldkiraly} onClick={()=> onClick && onClick()}/>;
                     case Figure.FELSO:
-                        return <img alt = "zoldfelso" src={zoldfelso} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "zoldfelso" src={zoldfelso} onClick={()=> onClick && onClick()}/>;
                     case Figure.ALSO:
-                        return <img alt = "zoldalso" src={zoldalso} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "zoldalso" src={zoldalso} onClick={()=> onClick && onClick()}/>;
                     case Figure.KILENC:
-                        return <img alt = "zoldkilenc" src={zoldkilenc} onClick={()=> onClick && onClick()}/>;
+                        return <img className={className} alt = "zoldkilenc" src={zoldkilenc} onClick={()=> onClick && onClick()}/>;
                 }
-            default: return <img alt = "cardback" src={cardback} onClick={()=> onClick && onClick()}/>;
+            case Color.UNKNOWN:
+                switch (card.figure) {
+                    case Figure.TWENTY:
+                        return <img className={className} alt = "twenty" src={twenty} onClick={()=> onClick && onClick()}/>;
+                    case Figure.FORTY:
+                        return <img className={className} alt = "forty" src={forty} onClick={()=> onClick && onClick()}/>;
+                }
+            default: return <img className={className} alt = "cardback" src={cardback} onClick={()=> onClick && onClick()}/>;
         }
     }
 
@@ -713,22 +796,17 @@ export function Snapszer () {
             <div className={"game"}>
                 <Board/>
                 <PlayerBoard/>
+                {scoreBoardOpen && <ScoreBoardModal/>}
             </div>
         );
     }
 
-
-    function PlayerBoard () {
+    function End () {
         return (
-            <div className={"player-board"}>
-                <table>
-                    <tbody>
-                    {players.map((player, key)=>
-                        <PlayerRow key = {key} player={player}/>
-                    )}
-                    </tbody>
-                </table>
-            </div>
+            <>
+                <ScoreBoard/>
+                {gameData?.owner.id === user!.id && <QuitButton/>}
+            </>
         );
     }
 
@@ -740,26 +818,81 @@ export function Snapszer () {
         const isNextPlayer = snapszerGameDTO.nextPlayer && snapszerGameDTO.nextPlayer.user.id === player.user.id === true;
         return(
             <tr className={"player-row" + (isNextPlayer ? " next" : "")}>
-                <td onClick={()=> gameStatus === GameStatus.PLAY_CARD && setShowPlayerWonCards(player)} className={gameStatus === GameStatus.PLAY_CARD ? "pointer" : ""}>
+                <td onClick={()=> round && round.roundState == RoundState.TURNS && setShowPlayerWonCards(player)} className={round && round.roundState == RoundState.TURNS ? "pointer" : ""}>
                     <div className={"player-name"}>
                         {player.user.name}
                     </div>
                 </td>
                 <td>
                     <div className={"player-points"}>
-                        {player.points}
+                        {scoreBoard[players.indexOf(player)]}
                     </div>
                 </td>
             </tr>
         );
     }
 
-    function End () {
+    function PlayerBoard () {
+        if (scoreBoardOpen){
+            return null;
+        }
         return (
-                <>
-                    <Game/>
-                </>
-            );
+            <div className={"player-board"}>
+                <table>
+                    <tbody>
+                    {players.map((player, key)=>
+                        <PlayerRow key = {key} player={player}/>
+                    )}
+                    </tbody>
+                </table>
+
+                <ScoreBoardLogo/>
+            </div>
+        );
+    }
+
+    function ScoreBoardModal () {
+        return(
+            <Modal isOpen={scoreBoardOpen} closeOnBackGroundClick={true} close={()=> {setScoreBoardOpen(false)}}>
+                <ScoreBoard/>
+            </Modal>
+        );
+    }
+
+    function ScoreBoard () {
+        return(
+            <div className={"score-board"}>
+                <div className={"score-board-row players"}>
+                    <div className={"score-board-cell border-none is-wide"}>
+                    </div>
+                    {players.map((player, key)=>
+                        <div key = {key} className={"score-board-cell is-bold"}>{player.user.name}</div>
+                    )}
+                </div>
+
+                <div className={"score-board-wrapper"}>
+                    {rounds && rounds.map((round, key)=>
+                        <div key={key} className={"score-board-row"}>
+                            <div className={"score-board-cell border-none is-wide c-first-letter"}>
+                                {getRoundString(round)}
+                            </div>
+                            {players.map((player, key2)=>
+                                <div className={"score-board-cell" + (round.caller.user.id === player.user.id ? " caller" : "")} key = {key2}>{round.scoreBoard === null ? "?" : round.scoreBoard[players.indexOf(player)]}</div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                <div className={"score-board-row"}>
+                    <div className={"score-board-cell is-bold is-wide"}>
+                        VICTORY POINTS
+                    </div>
+                    {players.map((player, key)=>
+                        <div key = {key} className={"score-board-cell is-bold"}>{scoreBoard[players.indexOf(player)]}</div>
+                    )}
+                </div>
+            </div>
+        );
     }
 
     return(
